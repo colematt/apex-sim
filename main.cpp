@@ -4,17 +4,26 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
           Brian Gracin <bgracin1@binghamton.edu>
 Description: Driver for apex-sim. Contains functions controlling simulator high-level behavior.
 */
-include <iostream>
+#include <iostream>
+#include <boost/program_options.hpp>
+
+namespace po = boost::program_options;
+using namespace std;
 
 // Initialize the simulator to a known state. Optionally zero the memory text file, representing a format of the memory)
 void initialize(bool zero=false)
 {
-
+  cout << "initialize()" << endl;
 }
 
 // Display the simulator internal state.
 void display()
 {
+  cout << "display()" << endl;
+
+  //Call to cpu::display()
+  //Call to register::display()
+  //Call to memory::display()
 
 }
 

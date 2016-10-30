@@ -1,6 +1,4 @@
-BOOST_ROOT=/usr/local/boost_1_62_0
 CC=g++
-CFLAGS=-I $(BOOST_ROOT)
 CLASS_FILES = 	cpu.cpp \
 								mmu.cpp \
 								register.cpp
@@ -8,7 +6,7 @@ CLASS_FILES = 	cpu.cpp \
 all: apex-sim
 
 apex-sim:
-	$(CC) $(CFLAGS) main.cpp $(CLASS_FILES) -o apex-sim
+	$(CC) main.cpp $(CLASS_FILES) -o apex-sim
 
 .PHONY: clean
 clean:
