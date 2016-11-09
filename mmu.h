@@ -9,3 +9,6 @@ struct instruction_t {
     std::string opcode;
     std::vector<std::string> operands;
 }
+
+//TODO Make vector to hold instruction_t
+//TODO Make vector of 32-bit integers to hold memory

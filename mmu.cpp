@@ -11,11 +11,20 @@ class MMU
 private:
 
 public:
-  MMU(const char* codeFile, const char* memFile);
+  MMU(const char* codeFile);
   ~MMU();
 
-  //Read one instruction from code at <addr>
-  instruction_t readCode(int addr);
+  //Read in all instructions from file
+  void readCode(){
+    //Read file line by line
+    //Parse line into instruction_t
+    //Put instruction_t generated into holder vector
+  }
+
+  //Get instruction given index of instruction pointer
+  instruction_t getInstr(int addr){
+
+  }
 
   //Read one byte-address from memory at <addr>
   int readMem(int addr);
