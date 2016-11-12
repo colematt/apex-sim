@@ -17,8 +17,8 @@ Description: Driver for apex-sim. Contains functions controlling simulator high-
 using namespace std;
 
 //Simulator variables with external linkage
-extern int cycle = 0; //simulator's current cycle
-extern const char* instFile; //instruction input file
+static int cycle; //simulator's current cycle
+static const char* instFile; //instruction input file
 
 //Display an interface help message
 void help()
@@ -90,7 +90,8 @@ int main(int argc, char** argv)
     instFile = (const char*) argv[1];
   }
 
-  //TODO Perform entry actions?
+  //Perform entry actions
+  cycle = 0;
 
   //TODO Instantiate Simulator classes
 
