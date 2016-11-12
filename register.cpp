@@ -43,7 +43,7 @@ void Registers::display(){
 
 //Set reg_file[register] = (value,valid)
 //Throws std::invalid_argument exception if register doesn't exist
-void write(std::string register, int value, bool valid){
+void Registers::write(std::string register, int value, bool valid){
   auto it = this.reg_file.find(register);
   if (it != this.reg_file.end()){
     this.reg_file[register] = std::make_tuple(value, valid);
@@ -55,7 +55,7 @@ void write(std::string register, int value, bool valid){
 
 //Get reg_file[register] value
 //Throws std::invalid_argument exception if register doesn't exist
-int read(std::string register){
+int Registers::read(std::string register){
   int myvalue;
 
   auto it = this.reg_file.find(register);
@@ -70,7 +70,7 @@ int read(std::string register){
 
 //Check reg_file[register] validity
 //Throws std::invalid_argument exception if register doesn't exist
-bool isValid(std::string register){
+bool Registers::isValid(std::string register){
   bool myvalid;
   auto it = this.reg_file.find(register);
   if (it != this.reg_file.end()) {
