@@ -6,6 +6,15 @@ Description: Contains the DATA class, which simulates reading and writing main m
 */
 
 #include "data.h"
+#include <iostream>
+
+  Data(){ //initialize the memory with all positions set to zero
+    this->initialize;
+  }
+
+  void initialize(){
+    
+  }
 
   //Read one byte-address from memory at <addr>
   int Data::readMem(int addr){
@@ -13,7 +22,7 @@ Description: Contains the DATA class, which simulates reading and writing main m
   }
 
   //Write one byte to memory at <addr>
-  void Data::writeMem(int addr, short value){
+  void Data::writeMem(int addr, int value){
     memory.at(addr) = value;
   }
 

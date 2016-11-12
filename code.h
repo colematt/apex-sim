@@ -7,8 +7,22 @@ Description: Header for code.cpp
 #ifndef CODE_H
 #define CODE_H
 
+#include <vector>
+#include "instruction.h"
+
 class Code{
-	void readCode();
+private:
+	std::vector<Instruction::instruction_t>  instructions;
+
+public:
+	//Instantiates a Code object given a file to read from
+	Code(const char* codeFile);
+	
+	//Reads contents of file into a vector
+	void readCode(const char* codeFile);
+
+	//Returns instruction given instruction point value.
+	Instruction::instruction_t getInstr(int addr);
 
 };
 #endif

@@ -8,14 +8,18 @@ Description: Header for data.cpp
 #ifndef DATA_H
 #define DATA_H
 
+#include <vector>
+
 class Data
 {
 private:
-	std::vector<int>  memory (4000);
+	std::vector<int>  memory;
 
 public:
 	Data(); //initialize the memory with all positions set to zero
 
+	void initialize();
+	
   	//Read one byte-address from memory at <addr>
   	int readMem(int addr);
 
@@ -26,3 +30,5 @@ public:
   	void display();
 
 };
+
+#endif

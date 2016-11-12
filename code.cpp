@@ -5,18 +5,22 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Contains the CODE class, which simulates reading instructions from the program
 */
 
+#include <fstream>
 #include "code.h"
 
-  void Code::readCode(){
+  Code::Code(const char* codeFile){
+    this->readCode(codeFile);
+  }
 
-/*
-    instruction_t instr;
+  void Code::readCode(const char* codeFile){
+
+    Instruction::instruction_t instr;
     
     std::string inputString;
     std::string holderString;
     size_t pos = 0;
 
-    ifstream file(codeFile, ios::in);
+    std::ifstream file(codeFile);
     if (file.is_open()){
       while (getline(file,inputString)){
         pos = inputString.find(" ");
@@ -30,15 +34,16 @@ Description: Contains the CODE class, which simulates reading instructions from 
           instr.operands.push_back(holderString);
         }
 
-        instructions.push_back (instr);
+        Code::instructions.push_back (instr);
 
         instr.opcode = "";
         instr.operands.clear();
       }
-    }
+    }   
+  }
 
-*/
-    //Read file line by line
-    //Parse line into instruction_t
-    //Put instruction_t generated into holder vector    
+    //Get instruction given index of instruction pointer
+  Instruction::instruction_t Code::getInstr(int addr){
+    addr = addr + 4000;
+    return instructions.at (addr);
   }

@@ -8,12 +8,20 @@ Description: Header for instruction.cpp
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 
-struct instruction_t {
-  int pc; // the Program Counter value of this instruction
-  std::string opcode; //the string (e.g. ADD) representing this instruction
-  std::vector<std::string> operands; //a vector of strings representing operands
-}
+#include <string>
 
-int littos(string literal); //Convert a literal string to a 4-byte integral
+class Instruction
+{
+private:
 
+public:
+	struct instruction_t {
+  		int pc; // the Program Counter value of this instruction
+  		std::string opcode; //the string (e.g. ADD) representing this instruction
+  		std::vector<std::string> operands; //a vector of strings representing operands
+	};
+
+	int littos(std::string literal); //Convert a literal string to a 4-byte integral
+
+};
 #endif
