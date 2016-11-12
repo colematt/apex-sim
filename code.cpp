@@ -23,11 +23,14 @@ Description: Contains the CODE class, which simulates reading instructions from 
     std::ifstream file(codeFile);
     if (file.is_open()){
       while (getline(file,inputString)){
+
+        //Get opcode
         pos = inputString.find(" ");
         holderString = inputString.substr(0, pos);
         inputString.erase(0, pos + 1);
         instr.opcode = holderString;
 
+        //Get operands
         while ((pos = inputString.find(",")) != std::string::npos){
           holderString = inputString.substr(0, pos);
           inputString.erase(0, pos + 1);
@@ -42,8 +45,8 @@ Description: Contains the CODE class, which simulates reading instructions from 
     }   
   }
 
-    //Get instruction given index of instruction pointer
+  //Get instruction given index of instruction pointer
   Instruction::instruction_t Code::getInstr(int addr){
-    addr = addr + 4000;
+    addr = addr - 4000;
     return instructions.at (addr);
   }

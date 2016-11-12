@@ -9,6 +9,7 @@ Description: Header for instruction.cpp
 #define INSTRUCTION_H
 
 #include <string>
+#include <vector>
 
 class Instruction
 {
@@ -21,7 +22,7 @@ public:
   		std::vector<std::string> operands; //a vector of strings representing operands
 	};
 
-	int littos(std::string literal); //Convert a literal string to a 4-byte integral
+	int littoi(std::string literal); //Convert a literal string to a 4-byte integral
 
 };
 #endif

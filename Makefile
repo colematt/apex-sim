@@ -1,8 +1,10 @@
-CC=g++
+CC=g++ -std=c++11
 CLASS_FILES = 	cpu.cpp \
-								mmu.cpp \
-								register.cpp
-
+	code.cpp \
+	register.cpp \
+	data.cpp \
+	instruction.cpp
+	
 all: apex-sim
 
 apex-sim:

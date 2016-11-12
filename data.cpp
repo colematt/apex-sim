@@ -8,20 +8,25 @@ Description: Contains the DATA class, which simulates reading and writing main m
 #include "data.h"
 #include <iostream>
 
-  Data(){ //initialize the memory with all positions set to zero
-    this->initialize;
+  Data::Data(){ //initialize the memory with all positions set to zero
+    this->initialize();
   }
 
-  void initialize(){
-    
+  //Initialize vector size and vector positions
+  void Data::initialize(){
+    memory.resize(4000);
+
+    for (int i = 0; i < memory.size(); i++){
+      memory.at(i) = 0;
+    }
   }
 
-  //Read one byte-address from memory at <addr>
+  //Read four bytes from memory starting at address <addr>
   int Data::readMem(int addr){
     return memory.at(addr);
   }
 
-  //Write one byte to memory at <addr>
+  //Write four bytes to memory starting at <addr>
   void Data::writeMem(int addr, int value){
     memory.at(addr) = value;
   }

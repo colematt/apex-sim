@@ -19,7 +19,7 @@ public:
 	Data(); //initialize the memory with all positions set to zero
 
 	void initialize();
-	
+
   	//Read one byte-address from memory at <addr>
   	int readMem(int addr);
 
