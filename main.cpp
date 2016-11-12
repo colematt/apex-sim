@@ -109,23 +109,25 @@ int main(int argc, char** argv)
     if (command == "s")
       cin >> n;
 
+    char selectCom = command[0];
     //Perform appropriate action based on the command / parameter
-    switch (command) {
-      case "i":
+    switch (command[0]) {
+      case 'i':
         initialize();
         break;
-      case "s":
+      case 's':
         simulate(n);
         break;
-      case "d":
+      case 'd':
         display();
         break;
-      case "q": //quitting causes no action except to conclude this function
+      case 'q': //quitting causes no action except to conclude this function
         break;
-      case "h": //Falls through to default (which prints the help message)
+      case 'h': //Falls through to default (which prints the help message)
       default: //Input wasn't recognized
         help();
         break;
+    }
   } // End User Interface
 
   //TODO Perform any exiting actions?
