@@ -14,6 +14,6 @@ struct instruction_t {
   std::vector<std::string> operands; //a vector of strings representing operands
 }
 
-short littos(string literal); //Convert a literal string to a 4-byte integral
+int littos(string literal); //Convert a literal string to a 4-byte integral
 
 #endif

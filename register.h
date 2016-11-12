@@ -15,7 +15,7 @@ Description: header file for register.cpp
 class Registers
 {
 private:
-  std::map<std::string,short> reg_file;
+  std::map<std::string,int> reg_file;
 
 public:
   Registers(); //initialize the RF with all registers/flags set to zero

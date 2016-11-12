@@ -11,7 +11,7 @@ Description: Header for data.cpp
 class Data
 {
 private:
-	std::vector<short>  memory (4000);
+	std::vector<int>  memory (4000);
 
 public:
 	Data(); //initialize the memory with all positions set to zero
