@@ -1,8 +1,8 @@
 /* FILE INFORMATION
-File:     mmu.h
+File:     instruction.h
 Authors:  Matthew Cole <mcole8@binghamton.edu>
           Brian Gracin <bgracin1@binghamton.edu>
-Description: Header for mmu.cpp
+Description: Header for instruction.cpp
 */
 
 
@@ -12,4 +12,4 @@ struct instruction_t {
   std::vector<std::string> operands; //a vector of strings representing operands
 }
 
-int littoi(string literal); //Convert a literal string to an integer value 
+short littos(string literal); //Convert a literal string to a 4-byte integral 
