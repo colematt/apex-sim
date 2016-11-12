@@ -5,23 +5,29 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Contains the Registers class, which simulates operation of a register file.
 */
 
-class Registers
-{
-private:
-  std::map<std::string,short> values;
-  std::map<std::string,bool> valids;
-public:
-  RegisterFile(); //initialize the RF with all registers/flags set to zero
+Registers::Registers(){
+  this->initialize();
+}
 
-  void initialize(); //reset the RF with all registers/flags set to zero
-  void display(); //display the contents of the registers/flags
+//initialize the RF with all registers/flags set to zero
+void Registers::initialize(){
+  int r;
+  std::string reg_name;
 
-  //methods for interacting with values map
-  void write(string register, int value); //sets values[register] = value
-  int read(string register); //return values[register]
+  //Set register values and valids
+  for (r=0; r<=15; r++){
+    reg_name = "R" + std::to_string(r);
+    this.values[reg_name] = 0;
+  }
 
-  //methods for interacting with valid map
-  void setValid(string register, bool valid); //set valids[register] = valid
-  void flipValid(string register); //set valids[register] = !valids[register]
-  bool getValid(string register); //return valids[register]
+  //Set flag values and valids
+  this.values["Z"] = 0;
+  this.valids["Z"] = true;
+}
+
+//display the contents of the registers/flags
+void Registers::display(){
+  for (auto it = reg_file.begin(); it != reg_file.end(); ++it) {
+    std::cout << it->first << ": " << it->second << '\n';
+  }
 }
