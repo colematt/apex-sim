@@ -5,6 +5,8 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Header for instruction.cpp
 */
 
+#ifndef INSTRUCTION_H
+#define INSTRUCTION_H
 
 struct instruction_t {
   int pc; // the Program Counter value of this instruction
@@ -12,4 +14,6 @@ struct instruction_t {
   std::vector<std::string> operands; //a vector of strings representing operands
 }
 
-short littos(string literal); //Convert a literal string to a 4-byte integral 
+short littos(string literal); //Convert a literal string to a 4-byte integral
+
+#endif

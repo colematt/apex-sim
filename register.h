@@ -26,6 +26,6 @@ public:
   //methods for interacting with values map
   void write(string register, int value, bool valid); //sets values[register] = (value,valid)
   int read(string register); //return values[register]
-}
+};
 
 #endif
