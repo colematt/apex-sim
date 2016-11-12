@@ -10,6 +10,7 @@ Description: header file for register.cpp
 #include <map>
 #include <tuple>
 #include <exception>
+#include <stdexcept>
 
 #ifndef REGISTER_H
 #define REGISTER_H
