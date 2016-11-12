@@ -22,9 +22,7 @@ public:
   	//Write one byte to memory at <addr>
   	void writeMem(int addr, int value);
 
-  	//Display contents of memory beginning at <startAddr>
-  	//and ending at <endAddr>, inclusive
-  	//If <endAddr> < <startAddr>, return silently.
-  	void display(int startAddr, int endAddr);
+  	//Display first 100 non-zero contents of memory
+  	void display();
 
 };

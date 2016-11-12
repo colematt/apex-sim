@@ -39,13 +39,13 @@ void initialize()
 }
 
 // Display the simulator internal state.
-void display(int start=0, int stop=0)
+void display()
 {
   if (VERBOSE)
     cout << "Displaying simulator state ... " << endl;
   //TODO Call to cpu::display()
   //TODO Call to registers::display()
-  //TODO Call to data::display(start,stop)
+  //TODO Call to data::display()
   //TODO Call to code::display()
 }
 
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 
     //Get the next command. If command takes the n parameter, ingest it also
     cin >> command;
-    if (command == "s" || command == "d")
+    if (command == "s")
       cin >> n;
 
     //Perform appropriate action based on the command / parameter
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
         simulate(n);
         break;
       case "d":
-        display(n);
+        display();
         break;
       case "q": //quitting causes no action except to conclude this function
         break;
