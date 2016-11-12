@@ -8,6 +8,8 @@ Description: header file for register.cpp
 #include <string>
 #include <iomanip>
 #include <map>
+#include <tuple>
+#include <exception>
 
 #ifndef REGISTER_H
 #define REGISTER_H

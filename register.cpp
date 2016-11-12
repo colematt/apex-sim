@@ -4,7 +4,7 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
           Brian Gracin <bgracin1@binghamton.edu>
 Description: Contains the Registers class, which simulates operation of a register file.
 */
-#include <exception>
+
 #include "register.h"
 
 Registers::Registers(){
