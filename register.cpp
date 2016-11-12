@@ -4,7 +4,7 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
           Brian Gracin <bgracin1@binghamton.edu>
 Description: Contains the Registers class, which simulates operation of a register file.
 */
-
+#include <exception>
 #include "register.h"
 
 Registers::Registers(){
@@ -42,18 +42,43 @@ void Registers::display(){
 }
 
 //Set reg_file[register] = (value,valid)
+//Throws std::invalid_argument exception if register doesn't exist
 void write(std::string register, int value, bool valid){
-
+  auto it = this.reg_file.find(register);
+  if (it != this.reg_file.end()){
+    this.reg_file[register] = std::make_tuple(value, valid);
+  } else {
+    std::string what_arg = register + " is not a valid register";
+    throw std::invalid_argument(what_arg);
+  }
 }
 
 //Get reg_file[register] value
-//WARNING: Does NOT perform any membership test
+//Throws std::invalid_argument exception if register doesn't exist
 int read(std::string register){
+  int myvalue;
 
+  auto it = this.reg_file.find(register);
+  if (it != this.reg_file.end()) {
+    myvalue = std::get<0>(it->second);
+  } else {
+    std::string what_arg = register + " is not a valid register";
+    throw std::invalid_argument(what_arg);
+  }
+  return myvalue;
 }
 
 //Check reg_file[register] validity
-//WARNING: Does not perform any membership test
+//Throws std::invalid_argument exception if register doesn't exist
 bool isValid(std::string register){
+  bool myvalid;
+  auto it = this.reg_file.find(register);
+  if (it != this.reg_file.end()) {
+    myvalid = std::get<1>(it->second);
+  } else {
+    std::string what_arg = register + " is not a valid register";
+    throw std::invalid_argument(what_arg);
+  }
 
+  return myvalid;
 }
