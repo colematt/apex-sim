@@ -23,18 +23,16 @@ Description: Contains the DATA class, which simulates reading and writing main m
     int col = 0 ;
     int nz = 0;
 
-    while (nz < 100){
+    while (nz < 100 && i <= 3996){
       //Print one row of four memory-addressable locations
       std::cout << i << ": ";
       for (col = 0; col < 4; col++){
         //print out Memory[i+col] followed by a tab
-        std::cout << this->readMem(i) << "\t";
-        //if Memory[i+col] != 0, increment nz
-        if (this->readMem(i) != 0)
-          nz++;
+        std::cout << this->readMem(i+col) << "\t";
 
-        //Move to next column  
-        col++;
+        //if Memory[i+col] != 0, increment nz
+        if (this->readMem(i+col) != 0)
+          nz++;
       } //end for (print one row)
 
       //Print out line break

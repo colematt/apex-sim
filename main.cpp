@@ -5,7 +5,12 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Driver for apex-sim. Contains functions controlling simulator high-level behavior.
 */
 #include <iostream>
-#include <string.h>
+#include <string>
+#include "code.h"
+#include "cpu.h"
+#include "data.h"
+#include "instruction.h"
+#include "register.h"
 
 #define VERBOSE 1
 
@@ -123,6 +128,7 @@ int main(int argc, char** argv)
         break;
   } // End User Interface
 
-  //TODO Perform exiting actions?
+  //TODO Perform any exiting actions?
+
   return 0;
 }
