@@ -22,13 +22,13 @@ Sample instruction input files are located in `$(APEX_HOME)/inputs`.
 
 Once execution begins, the following commands can be used:
 
-| Command | Action                         |
-|---------|--------------------------------|
-| `i`     | Initialize the simulator state |
-| `s n`   | Simulate `n` number of cycles  |
+| Command | Action                           |
+|---------|----------------------------------|
+| `i`     | Initialize the simulator state   |
+| `s n`   | Simulate `n` number of cycles    |
 | `d`     | Display simulator internal state |
-| `q`     | Quit the simulator             |
-| `h`     | Display a help message         |
+| `q`     | Quit the simulator               |
+| `h`     | Display a help message           |
 
 ## Instruction Semantics
 See `$(APEX_HOME)\docs\semantics.md`
