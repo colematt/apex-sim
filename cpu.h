@@ -13,7 +13,7 @@ Description: Header file for cpu.cpp
 #define CPU_H
 
 //Represents the instruction occupying an APEX pipeline stage, its operands, any values accumulated by the register file/forwarding/computation and any validity bools accumulated.
-Class Stage {
+class Stage {
 private:
 
 public:
