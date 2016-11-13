@@ -24,13 +24,10 @@ static const char* instFile; //instruction input file
 void help()
 {
   cout << "[i]   Initialize the simulator state" << endl;
-  cout << "[s n] Simulate the number of cycles specified by <n>," << endl;
-  cout << "      displaying contents every <disp_cycles> cycles" << endl;
-  cout << "[d n] Display the contents of each stage in the pipeline," << endl;
-  cout << "      registers/flags, and the first <num_addr> memory " <<endl;
-  cout << "      locations containing data" << endl;
+  cout << "[s n] Simulate <n> number of cycles" << endl;
+  cout << "[d n] Display the simulator internal state" << endl;
   cout << "[q]   Quit the simulator" << endl;
-  cout << "[h]   Help message (repeat this information)" << endl;
+  cout << "[h]   Display a help message" << endl;
 }
 
 // Initialize the simulator to a known state.
