@@ -10,7 +10,7 @@
 | OR     | `dest` `src1` `src2`  | `dest` := `src1` &#124; `src2` |
 | EX-OR  | `dest` `src1` `src2`  | `dest` := `src1` ^ `src2` |
 | LOAD   | `dest` `src1` `#lit`  | `dest` := M[`src1` + `#lit`]|
-| STORE  | `src1` `dest` `#lit`  | M[`dest` + #lit] := `src1`|
+| STORE  | `src1` `dest` `#lit`  | M[`dest` + `#lit`] := `src1`|
 | BZ     | `#lit`| if(`Z`): `PC` := `PC` + `#lit`/4, else: `PC` := `PC` + 1 |
 | BNZ    | `#lit`| if(`Z`): `PC` := `PC` + 1, else: `PC` := `PC` + `#lit`/4 |
 | BAL    | `src` `#lit`| `X` := `PC` + 1; `PC` := `src` + `#lit`/4 |
