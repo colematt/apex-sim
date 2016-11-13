@@ -12,7 +12,7 @@ Description: Header for code.cpp
 
 class Code{
 private:
-	std::vector<Instruction::instruction_t>  instructions;
+	std::vector<Instruction>  instructions;
 
 public:
 	//Instantiates a Code object given a file to read from
@@ -22,7 +22,7 @@ public:
 	void readCode(const char* codeFile);
 
 	//Returns instruction given instruction point value.
-	Instruction::instruction_t getInstr(int addr);
+	Instruction getInstr(int addr);
 
 };
 #endif
