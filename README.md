@@ -1,7 +1,6 @@
 # apex-sim
 A simulator for the Architecture Pipeline EXample (APEX) ISA
 
----
 ## Prerequisites
 | Required | Version |
 |----------|---------|
@@ -12,7 +11,7 @@ Note for Binghamton University users: this software is compatible with the `remo
 
 ## Installation
 
-1. In the makefile, set the value of the `CC` (C++ compiler path).
+1. In the makefile, set the value of the `CC` variable to your C++ compiler path.
 2. Build the software using the `apex-sim` or `all` make target.
 3. To remove build files, use the `clean` target.
 
