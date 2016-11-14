@@ -12,16 +12,17 @@ Description: Header for code.cpp
 
 class Code{
 private:
-	std::vector<Instruction>  instructions;
+	std::vector<std::string> instructions;
 
 public:
 	//Instantiates a Code object given a file to read from
 	Code(const char* codeFile);
 	
-	//Reads contents of file into a vector
+	//Reads contents of file into a vector os strings
 	void readCode(const char* codeFile);
 
-	//Returns instruction given instruction point value.
+	//Returns instruction object given instruction pointer value.
+	//Object returns in 4 bytes starting at value given.
 	Instruction getInstr(int addr);
 
 };

@@ -16,12 +16,11 @@ Description: Contains the CODE class, which simulates reading instructions from 
 
   //Read contents of file into a vector of instruction_t
   void Code::readCode(const char* codeFile){
-
-    Instruction instr;
     
     std::string inputString;
     std::string holderString;
     size_t pos = 0;
+    int i = 0;
 
     std::ifstream file(codeFile);
     if (file.is_open()){
@@ -34,30 +33,59 @@ Description: Contains the CODE class, which simulates reading instructions from 
         pos = inputString.find(" ");
         holderString = inputString.substr(0, pos);
         inputString.erase(0, pos + 1);
-        instr.opcode = holderString;
+
+        //On HALT, opcode was leaking into operands. If inputString and holderString equal
+        //there are no opcode. Set inputString to " " to skip operand parsing.
+        if(inputString == holderString) inputString = " ";
+
+        Code::instructions.push_back(holderString);
+        i++;
 
         //Get operands
         while ((pos = inputString.find(",")) != std::string::npos){
           holderString = inputString.substr(0, pos);
           inputString.erase(0, pos + 2);
-          instr.operands.push_back(holderString);
+
+          Code::instructions.push_back(holderString);
+          i++;
         }
 
-        //Get land operand after comma or if no commas.
+        //Get last operand after comma or if no commas.
         if (inputString != " "){
-          instr.operands.push_back(inputString);
+          Code::instructions.push_back(inputString);
+          i++;
         }
 
-        Code::instructions.push_back (instr);
+        //Populate any open byte addressable positions for instruction
+        while (i < 4){
+          Code::instructions.push_back(" ");
+          i++;
+        }
 
-        instr.opcode = "";
-        instr.operands.clear();
+        i = 0;
       }
     }   
   }
 
   //Get instruction given index of instruction pointer
   Instruction Code::getInstr(int addr){
+    Instruction instr;
+
+    //Modify incoming address to work with random access indexing of vector
     addr = addr - 4000;
-    return Code::instructions.at (addr);
+
+    //Set opcode field for Instruction object
+    instr.opcode = Code::instructions.at (addr);
+    addr++;
+
+    //Set operand fields for Instruction object if any
+    for (int i = 0; i < 3; i++){
+      if (Code::instructions.at (addr) != " "){
+        instr.operands.push_back(Code::instructions.at (addr));
+      }
+      addr++;
+    }
+
+    //Return Instruction object for use by cpu
+    return instr;
   }
