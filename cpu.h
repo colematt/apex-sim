@@ -15,6 +15,7 @@ Description: Header file for cpu.cpp
 //Represents the instruction occupying an APEX pipeline stage, its operands, any values accumulated by the register file/forwarding/computation and any validity bools accumulated.
 class Stage {
 private:
+    std::string name;
 
 public:
   //the stage is occupied by an inflight instruction
@@ -34,33 +35,33 @@ public:
   std::vector<bool> valids;
 
   //Constructors/Destructors
-  Stage();
+  Stage(std::string n);
 
   //Interface functions
   void initialize(); //Initialize the contents of this stage to empty with NOP
-  void display(); //Display the contents of this stage
-  int simulate(); //Perform this stage's actions
+  void display(); //Display the contents of this stage: name, opcode, operands
 
   //Utility functions
   int littoi(std::string literal);
+  bool isAllValid(); //For this instr are all sources valid or no sources
 
 }; //class Stage
 
 class CPU {
 private:
-  Stage F;      //Fetch stage
-  Stage DRF;    //Decode/Reg File stage
-  Stage ALU1;   //ALU 1st stage
-  Stage ALU2;   //ALU 2nd stage
-  Stage B;      //Branch stage
-  Stage D;      //(Branch) Delay stage
-  Stage M;      //Memory stage
-  Stage WB;     //Write Back stage
+  Stage F("Fetch");      //Fetch stage
+  Stage DRF("Decode/RF");    //Decode/Reg File stage
+  Stage ALU1("ALU First");   //ALU 1st stage
+  Stage ALU2("ALU Second");   //ALU 2nd stage
+  Stage B("Branch");      //Branch stage
+  Stage D("Branch Delay");      //(Branch) Delay stage
+  Stage M("Memory");      //Memory stage
+  Stage WB("Write Back");     //Write Back stage
 public:
   CPU(Code &mycode, Registers &myregisters, Data &mydata);
   void initialize();
   void display();
   int simulate();
-}
+};
 
 #endif
