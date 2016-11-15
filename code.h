@@ -8,7 +8,7 @@ Description: Header for code.cpp
 #define CODE_H
 
 #include <vector>
-#include "instruction.h"
+#include <string>
 
 class Code{
 private:
@@ -23,7 +23,7 @@ public:
 
 	//Returns instruction object given instruction pointer value.
 	//Object returns in 4 bytes starting at value given.
-	Instruction getInstr(int addr);
+	std::vector<std::string> getInstr(int addr);
 
 };
 #endif

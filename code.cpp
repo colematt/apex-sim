@@ -68,8 +68,8 @@ Description: Contains the CODE class, which simulates reading instructions from 
   }
 
   //Get instruction given index of instruction pointer
-  std::vector<string> Code::getInstr(int addr){
-    std::vector<string> instr;
+  std::vector<std::string> Code::getInstr(int addr){
+    std::vector<std::string> instr;
 
     //Modify incoming address to work with random access indexing of vector
     addr = addr - 4000;

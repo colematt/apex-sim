@@ -9,7 +9,6 @@ Description: Driver for apex-sim. Contains functions controlling simulator high-
 #include "code.h"
 #include "cpu.h"
 #include "data.h"
-#include "instruction.h"
 #include "register.h"
 
 #define VERBOSE 1
@@ -42,9 +41,9 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
   pc = 4000;
 
   //Initialize each of the instances by delegating to member functions
-  mycpu->initialize();
-  myregisters->initialize();
-  mydata->initialize();
+  mycpu.initialize();
+  myregisters.initialize();
+  mydata.initialize();
 }
 
 // Display the simulator internal state.
@@ -64,7 +63,7 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
 // Simulate the operation of the system for <num_cycles>, or until a HALT
 //instruction is encountered, or until an error occurs in simulation.
 //Return the current cycle number after simulation pauses or halts.
-int simulate(int num_cycles)
+int simulate(int num_cycles, CPU &apexCPU)
 {
   for (int c = cycle; c < cycle + num_cycles; c++)
   {
@@ -74,7 +73,7 @@ int simulate(int num_cycles)
 
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)
-    if(!(apexCPU->simulate()))
+    if(!(apexCPU.simulate()))
       break;
 
     //Cycle complete, increment the global cycle counter
@@ -101,10 +100,10 @@ int main(int argc, char** argv)
   Code *apexCode = new Code(instFile);
   Registers *apexRF = new Registers();
   Data *apexData = new Data();
-  CPU *apexCPU = new CPU();
+  CPU *apexCPU = new CPU(*apexCode, *apexRF, *apexData);
 
   //Perform first initialization
-  initialize(apexCPU, apexRF, apexData);
+  initialize(*apexCPU, *apexRF, *apexData);
 
   //Set up simulator command interface
   string command = "h"; //interface switch statement selector
@@ -121,17 +120,16 @@ int main(int argc, char** argv)
     if (command == "s")
       cin >> n;
 
-    char selectCom = command[0];
     //Perform appropriate action based on the command / parameter
     switch (command[0]) {
       case 'i':
-        initialize(apexCPU, apexRF, apexData);
+        initialize(*apexCPU, *apexRF, *apexData);
         break;
       case 's':
-        simulate(n);
+        simulate(n, *apexCPU);
         break;
       case 'd':
-        display(apexCPU, apexRF, apexData);
+        display(*apexCPU, *apexRF, *apexData);
         break;
       case 'q': //quitting causes no action except to conclude this function
         break;

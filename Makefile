@@ -1,10 +1,10 @@
 CC=clang++
-CCFLAGS = -std=c++11
+CCFLAGS = -std=c++11 -g -Wall
 CLASS_FILES = 	cpu.cpp \
 	code.cpp \
 	register.cpp \
 	data.cpp \
-	instruction.cpp
+	stage.cpp
 
 all: apex-sim
 

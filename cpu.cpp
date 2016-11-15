@@ -8,40 +8,18 @@ Description: Contains the CPU class, which simulates operation of a five stage C
 #include <iostream>
 #include "cpu.h"
 
-Stage::Stage(std::string n){
-	name = n;
-	this->initialize()
-}
-
-void Stage::initialize(){
-	pc = 0;
-	opcode = "NOP";
-	operands.clear()
-	values.clear();
-	valids.clear();
-	isEmpty = true;
-	isReady = false;
-}
-
-void Stage::display(){
-	std::cout << name << ": " << opcode << " ";
-
-	for(auto o : operands){
-		std::cout << o << " ";
-	}
-
-	std::cout << std::endl;
-} 
-
-int Stage::littoi(std::string literal){
-	literal = literal.erase(0,1);
-	return std::stoi(literal);
-}
-
-bool Stage::isAllValid(){}
+	Stage F("Fetch");      		//Fetch stage
+  	Stage DRF("Decode/RF");    	//Decode/Reg File stage
+ 	Stage ALU1("ALU First");   	//ALU 1st stage
+  	Stage ALU2("ALU Second");   //ALU 2nd stage
+  	Stage B("Branch");      	//Branch stage
+  	Stage D("Branch Delay");    //(Branch) Delay stage
+  	Stage M("Memory");      	//Memory stage
+  	Stage WB("Write Back");     //Write Back stage
 
 CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata){
-	this->initialize()
+
+	this->initialize();
 }
 
 void CPU::initialize(){
@@ -66,4 +44,6 @@ void CPU::display(){
 	WB.display();
 }
 
-int CPU::simulate(){}
+int CPU::simulate(){
+	return 0; //Temporary declare for compile test
+}
