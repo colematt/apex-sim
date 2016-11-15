@@ -42,7 +42,6 @@ public:
   int simulate(); //Perform this stage's actions
 
   //Utility functions
-  //TODO: design void advance(); //advances a ready instruction to next stage
   int littoi(std::string literal);
 
 }; //class Stage
