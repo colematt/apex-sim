@@ -17,7 +17,8 @@ Description: Driver for apex-sim. Contains functions controlling simulator high-
 using namespace std;
 
 //Simulator variables with external linkage
-static int cycle; //simulator's current cycle
+static int cycle; //simulator cycle current value
+static int pc;    //program counter current value
 static const char* instFile; //instruction input file
 
 //Display an interface help message
@@ -31,24 +32,33 @@ void help()
 }
 
 // Initialize the simulator to a known state.
-void initialize()
+void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
 {
   if (VERBOSE)
     cout << "Initializing ... " << endl;
-  //TODO Call to data::initialize()
-  //TODO Call to registers::initialize()
-  //TODO Call to cpu::initialize()
+
+  //Reset simulator state variables
+  cycle = 0;
+  pc = 4000;
+
+  //Initialize each of the instances by delegating to member functions
+  mycpu->initialize();
+  myregisters->initialize();
+  mydata->initialize();
 }
 
 // Display the simulator internal state.
-void display()
+void display(CPU &mycpu, Registers &myregisters, Data &mydata)
 {
   if (VERBOSE)
     cout << "Displaying simulator state ... " << endl;
+
+  //Print simulator state variables
+
+  //Display each of the instances by delegating to member functions
   //TODO Call to cpu::display()
   //TODO Call to registers::display()
   //TODO Call to data::display()
-  //TODO Call to code::display()
 }
 
 // Simulate the operation of the system for <num_cycles>, or until a HALT
@@ -63,9 +73,9 @@ int simulate(int num_cycles)
       cout << "Simulating cycle " << cycle << " ..." << endl;
 
     //cpu::simulate() returns 0 if execution should not continue
-    //(EOF, HALT or exeception encountered)
-    //if(!cpu::simulate())
-    //  break;
+    //(EOF, HALT or exception encountered)
+    if(!(apexCPU->simulate()))
+      break;
 
     //Cycle complete, increment the global cycle counter
     cycle++;
@@ -87,10 +97,14 @@ int main(int argc, char** argv)
     instFile = (const char*) argv[1];
   }
 
-  //Perform entry actions
-  cycle = 0;
+  //Instantiate Simulator classes
+  Code *apexCode = new Code(instFile);
+  Registers *apexRF = new Registers();
+  Data *apexData = new Data();
+  CPU *apexCPU = new CPU();
 
-  //TODO Instantiate Simulator classes
+  //Perform first initialization
+  initialize(apexCPU, apexRF, apexData);
 
   //Set up simulator command interface
   string command = "h"; //interface switch statement selector
@@ -111,13 +125,13 @@ int main(int argc, char** argv)
     //Perform appropriate action based on the command / parameter
     switch (command[0]) {
       case 'i':
-        initialize();
+        initialize(apexCPU, apexRF, apexData);
         break;
       case 's':
         simulate(n);
         break;
       case 'd':
-        display();
+        display(apexCPU, apexRF, apexData);
         break;
       case 'q': //quitting causes no action except to conclude this function
         break;
