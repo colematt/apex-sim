@@ -4,7 +4,8 @@ CLASS_FILES = 	cpu.cpp \
 	code.cpp \
 	register.cpp \
 	data.cpp \
-	stage.cpp
+	stage.cpp \
+	simulate.cpp
 
 all: apex-sim
 

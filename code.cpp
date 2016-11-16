@@ -89,3 +89,4 @@ Description: Contains the CODE class, which simulates reading instructions from 
     //Return Instruction object for use by cpu
     return instr;
   }
+  

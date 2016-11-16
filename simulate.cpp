@@ -1,105 +1,168 @@
 #define FORWARDING 0
+#include <vector>
+#include <string>
 #include "cpu.h"
+#include "apex.h"
 
 int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	/********WORK PHASE*********/
 	//F Stage
-	if (F.opcode == "ADD"){
 
-	}
-	else if (F.opcode == "SUB") {
-		/* code */
-	}
-	else if (F.opcode == "MOVC"){
+	std::vector<std::string> instr = mycode.getInstr(pc);
 
-	}
-	else if (F.opcode == "MUL"){
+	F.opcode = instr.at(0);
 
+	for (int i=1;i<instr.size();i++){
+		F.operands.push_back(instr.at(i));
 	}
-	else if (F.opcode == "AND"){
 
-	}
-	else if (F.opcode == "OR"){
-
-	}
-	else if (F.opcode == "EX-OR"){
-
-	}
-	else if (F.opcode == "LOAD"){
-
-	}
-	else if (F.opcode == "STORE"){
-
-	}
-	else if (F.opcode == "BZ"){
-
-	}
-	else if (F.opcode == "BNZ"){
-
-	}
-	else if (F.opcode == "BAL"){
-
-	}
-	else if (F.opcode == "JUMP"){
-
-	}
-	else if (F.opcode == "HALT"){
-
-	}
-	else if (F.opcode == "NOP"){
-
-	}
-	else{
-		std::cerr << "Unresolvable opcode: " << F.opcode << std::endl;
-		exit(1);
-	}
+	F.isEmpty = false;
+	F.isReady = true;
 
 	//DRF Stage
 	if (DRF.opcode == "ADD"){
 
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}		
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "SUB") {
-		/* code */
+
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "MOVC"){
 
+		DRF.values.push_back(myregisters.read(DRF.operands.at(0)));
+		DRF.valids.push_back(myregisters.isValid(DRF.operands.at(0)));
+
+		DRF.values.push_back(DRF.littoi(DRF.operands.at(1)));
+		DRF.valids.push_back(true);
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "MUL"){
 
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "AND"){
 
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "OR"){
 
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "EX-OR"){
 
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "LOAD"){
 
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}
+
+		DRF.values.push_back(DRF.littoi(DRF.operands.at(2)));
+		DRF.valids.push_back(true);
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "STORE"){
 
+		for (auto &operand : DRF.operands){
+			if(operand[0] != '#'){
+				DRF.values.push_back(myregisters.read(operand));
+				DRF.valids.push_back(myregisters.isValid(operand));
+			}
+		}
+
+		DRF.values.push_back(DRF.littoi(DRF.operands.at(2)));
+		DRF.valids.push_back(true);
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "BZ"){
 
+		DRF.values.push_back(DRF.littoi(DRF.operands.at(0)));
+		DRF.valids.push_back(true);
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "BNZ"){
 
+		DRF.values.push_back(DRF.littoi(DRF.operands.at(0)));
+		DRF.valids.push_back(true);
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "BAL"){
 
+		DRF.values.push_back(myregisters.read(DRF.operands.at(0)));
+		DRF.valids.push_back(myregisters.isValid(DRF.operands.at(0)));
+
+		DRF.values.push_back(DRF.littoi(DRF.operands.at(1)));
+		DRF.valids.push_back(true);
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "JUMP"){
 
+		DRF.values.push_back(myregisters.read(DRF.operands.at(0)));
+		DRF.valids.push_back(myregisters.isValid(DRF.operands.at(0)));
+
+		DRF.values.push_back(DRF.littoi(DRF.operands.at(1)));
+		DRF.valids.push_back(true);
+
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "HALT"){
-
+		DRF.isEmpty = false;
 	}
 	else if (DRF.opcode == "NOP"){
-
+		DRF.isEmpty = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << DRF.opcode << std::endl;
@@ -107,50 +170,48 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//B Stage
-	if (B.opcode == "ADD"){
+	if (B.opcode == "BZ"){
 
-	}
-	else if (B.opcode == "SUB") {
-		/* code */
-	}
-	else if (B.opcode == "MOVC"){
+		if(myregisters.read("Z") == 1){
+			pc = pc + B.values.at(0);
 
-	}
-	else if (B.opcode == "MUL"){
+			F.initialize();
+			DRF.initialize();
+		} else {
+			pc = pc + 4;
+		}
 
-	}
-	else if (B.opcode == "AND"){
-
-	}
-	else if (B.opcode == "OR"){
-
-	}
-	else if (B.opcode == "EX-OR"){
-
-	}
-	else if (B.opcode == "LOAD"){
-
-	}
-	else if (B.opcode == "STORE"){
-
-	}
-	else if (B.opcode == "BZ"){
-
+		B.isEmpty = false;
 	}
 	else if (B.opcode == "BNZ"){
 
+		if(myregisters.read("Z") == 1){
+			pc = pc + 4;
+		} else {
+			pc = pc + B.values.at(0);
+
+			F.initialize();
+			DRF.initialize();
+		}
+
+		B.isEmpty = false;
 	}
 	else if (B.opcode == "BAL"){
+		myregisters.write("X",pc + 4, 1);
+		pc = B.values.at(0) + B.values.at(1);
 
+		F.initialize();
+		DRF.initialize();
+
+		B.isEmpty = false;
 	}
 	else if (B.opcode == "JUMP"){
+		pc = B.values.at(0) + B.values.at(1);
 
-	}
-	else if (B.opcode == "HALT"){
+		F.initialize();
+		DRF.initialize();
 
-	}
-	else if (B.opcode == "NOP"){
-
+		B.isEmpty = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << B.opcode << std::endl;
@@ -158,50 +219,17 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//D Stage
-	if (D.opcode == "ADD"){
-
-	}
-	else if (D.opcode == "SUB") {
-		/* code */
-	}
-	else if (D.opcode == "MOVC"){
-
-	}
-	else if (D.opcode == "MUL"){
-
-	}
-	else if (D.opcode == "AND"){
-
-	}
-	else if (D.opcode == "OR"){
-
-	}
-	else if (D.opcode == "EX-OR"){
-
-	}
-	else if (D.opcode == "LOAD"){
-
-	}
-	else if (D.opcode == "STORE"){
-
-	}
-	else if (D.opcode == "BZ"){
-
+	if (D.opcode == "BZ"){
+		D.isEmpty = false;
 	}
 	else if (D.opcode == "BNZ"){
-
+		D.isEmpty = false;
 	}
 	else if (D.opcode == "BAL"){
-
+		D.isEmpty = false;
 	}
 	else if (D.opcode == "JUMP"){
-
-	}
-	else if (D.opcode == "HALT"){
-
-	}
-	else if (D.opcode == "NOP"){
-
+		D.isEmpty = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << D.opcode << std::endl;
@@ -209,49 +237,64 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 	//ALU1 Stage
 	if (ALU1.opcode == "ADD"){
+		ALU1.values.at(0) = ALU1.values.at(1) + ALU1.values.at(2);
+		ALU1.valids.at(0) = true;	
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "SUB") {
+		ALU1.values.at(0) = ALU1.values.at(1) - ALU1.values.at(2);
+		ALU1.valids.at(0) = true;
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "MOVC"){
+		ALU1.values.at(0) = ALU1.values.at(1) + 0;
+		ALU1.valids.at(0) = true;
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "MUL"){
+		ALU1.values.at(0) = ALU1.values.at(1) * ALU1.values.at(2);
+		ALU1.valids.at(0) = true;	
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "AND"){
+		ALU1.values.at(0) = ALU1.values.at(1) & ALU1.values.at(2);
+		ALU1.valids.at(0) = true;	
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "OR"){
+		ALU1.values.at(0) = ALU1.values.at(1) | ALU1.values.at(2);
+		ALU1.valids.at(0) = true;	
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "EX-OR"){
+		ALU1.values.at(0) = ALU1.values.at(1) ^ ALU1.values.at(2);
+		ALU1.valids.at(0) = true;	
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "LOAD"){
+		ALU1.values.at(1) = ALU1.values.at(1) + ALU1.values.at(2);
+		ALU1.valids.at(1) = true;
 
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "STORE"){
+		ALU1.values.at(1) = ALU1.values.at(1) + ALU1.values.at(2);
+		ALU1.valids.at(1) = true;	
 
-	}
-	else if (ALU1.opcode == "BZ"){
-
-	}
-	else if (ALU1.opcode == "BNZ"){
-
-	}
-	else if (ALU1.opcode == "BAL"){
-
-	}
-	else if (ALU1.opcode == "JUMP"){
-
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "HALT"){
-
+		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "NOP"){
-
+		ALU1.isEmpty = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU1.opcode << std::endl;
@@ -260,49 +303,62 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	//ALU2 Stage
 	if (ALU2.opcode == "ADD"){
+		if (ALU2.values.at(0) == 0){
+			myregisters.write("Z", 1, 1);
+		}
 
+		ALU2.isEmpty = false;
+		
 	}
 	else if (ALU2.opcode == "SUB") {
+		if (ALU2.values.at(0) == 0){
+			myregisters.write("Z", 1, 1);
+		}
 
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "MOVC"){
-
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "MUL"){
+		if (ALU2.values.at(0) == 0){
+			myregisters.write("Z", 1, 1);
+		}
 
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "AND"){
+		if (ALU2.values.at(0) == 0){
+			myregisters.write("Z", 1, 1);
+		}
 
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "OR"){
+		if (ALU2.values.at(0) == 0){
+			myregisters.write("Z", 1, 1);
+		}
 
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "EX-OR"){
+		if (ALU2.values.at(0) == 0){
+			myregisters.write("Z", 1, 1);
+		}
 
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "LOAD"){
-
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "STORE"){
-
-	}
-	else if (ALU2.opcode == "BZ"){
-
-	}
-	else if (ALU2.opcode == "BNZ"){
-
-	}
-	else if (ALU2.opcode == "BAL"){
-
-	}
-	else if (ALU2.opcode == "JUMP"){
-
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "HALT"){
-
+		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "NOP"){
-
+		ALU2.isEmpty = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU2.opcode << std::endl;
@@ -311,49 +367,55 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	//M Stage
 	if (M.opcode == "ADD"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "SUB") {
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "MOVC"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "MUL"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "AND"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "OR"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "EX-OR"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "LOAD"){
+		M.values.at(0) = mydata.readMem(M.values.at(1));
+		M.valids.at(0) = true;
 
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "STORE"){
-
+		mydata.writeMem(M.values.at(1), M.values.at(0));
+		M.valids.at(0) = true;
+		
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "BZ"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "BNZ"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "BAL"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "JUMP"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "HALT"){
-
+		M.isEmpty = false;
 	}
 	else if (M.opcode == "NOP"){
-
+		M.isEmpty = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << M.opcode << std::endl;
@@ -362,49 +424,50 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	//WB Stage
 	if (WB.opcode == "ADD"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "SUB") {
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "MOVC"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "MUL"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "AND"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "OR"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "EX-OR"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "LOAD"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "STORE"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "BZ"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "BNZ"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "BAL"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "JUMP"){
-
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "HALT"){
-
+		return 0; //Terminate program
+		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "NOP"){
-
+		WB.isEmpty = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << WB.opcode << std::endl;

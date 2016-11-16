@@ -29,7 +29,7 @@ public:
   CPU(Code &mycode, Registers &myregisters, Data &mydata);
   void initialize();
   void display();
-  int simulate();
+  int simulate(Code &apexCode, Registers &apexRF, Data &apexData);
 };
 
 #endif

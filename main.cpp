@@ -10,14 +10,15 @@ Description: Driver for apex-sim. Contains functions controlling simulator high-
 #include "cpu.h"
 #include "data.h"
 #include "register.h"
+#include "apex.h"
 
 #define VERBOSE 1
 
 using namespace std;
 
 //Simulator variables with external linkage
-static int cycle; //simulator cycle current value
-static int pc;    //program counter current value
+int cycle = 0; //simulator cycle current value
+int pc = 4000;    //program counter current value
 static const char* instFile; //instruction input file
 
 //Display an interface help message
@@ -63,7 +64,7 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
 // Simulate the operation of the system for <num_cycles>, or until a HALT
 //instruction is encountered, or until an error occurs in simulation.
 //Return the current cycle number after simulation pauses or halts.
-int simulate(int num_cycles, CPU &apexCPU)
+int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Data &apexData)
 {
   for (int c = cycle; c < cycle + num_cycles; c++)
   {
@@ -73,8 +74,8 @@ int simulate(int num_cycles, CPU &apexCPU)
 
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)
-    if(!(apexCPU.simulate()))
-      break;
+    if(!(apexCPU.simulate(apexCode, apexRF, apexData)))
+      break; //TODO Call quit function
 
     //Cycle complete, increment the global cycle counter
     cycle++;
@@ -126,7 +127,7 @@ int main(int argc, char** argv)
         initialize(*apexCPU, *apexRF, *apexData);
         break;
       case 's':
-        simulate(n, *apexCPU);
+        simulate(n, *apexCPU, *apexCode, *apexRF, *apexData);
         break;
       case 'd':
         display(*apexCPU, *apexRF, *apexData);

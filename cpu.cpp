@@ -8,10 +8,16 @@ Description: Contains the CPU class, which simulates operation of a five stage C
 #include <iostream>
 #include "cpu.h"
 
-CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) : F("Fetch"), 
- DRF("Decode/RF"), ALU1("ALU First"), ALU2("ALU Second"), B("Branch"), 
- D("Branch Delay"), M("Memory") , WB("Write Back") {
-
+CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
+ F("Fetch"),
+ DRF("Decode/RF"),
+ ALU1("ALU First"),
+ ALU2("ALU Second"),
+ B("Branch"),
+ D("Branch Delay"),
+ M("Memory"),
+ WB("Write Back") 
+{
 
 	this->initialize();
 }
@@ -37,7 +43,3 @@ void CPU::display(){
 	M.display();
 	WB.display();
 }
-
-//int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
-//	return 0; //Temporary declare for compile test
-//}
