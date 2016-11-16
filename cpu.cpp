@@ -12,6 +12,7 @@ CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) : F("Fetch"),
  DRF("Decode/RF"), ALU1("ALU First"), ALU2("ALU Second"), B("Branch"), 
  D("Branch Delay"), M("Memory") , WB("Write Back") {
 
+
 	this->initialize();
 }
 
