@@ -17,8 +17,7 @@ Description: Contains the CPU class, which simulates operation of a five stage C
   	Stage M("Memory");      	//Memory stage
   	Stage WB("Write Back");     //Write Back stage
 
-CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata){
-
+CPU::CPU(){
 	this->initialize();
 }
 
@@ -44,6 +43,6 @@ void CPU::display(){
 	WB.display();
 }
 
-int CPU::simulate(){
-	return 0; //Temporary declare for compile test
-}
+//int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
+//	return 0; //Temporary declare for compile test
+//}

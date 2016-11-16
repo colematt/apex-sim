@@ -15,12 +15,13 @@ Description: Header file for cpu.cpp
 
 class CPU {
 private:
+	
   
 public:
-  CPU(Code &mycode, Registers &myregisters, Data &mydata);
+  CPU();
   void initialize();
   void display();
-  int simulate();
+  int simulate(Code &mycode, Registers &myregisters, Data &mydata);
 };
 
 #endif
