@@ -503,19 +503,19 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//B Stage
-	if (B.opcode == "BZ"){
+	if (B.opcode == "BZ" ||
+			B.opcode == "BNZ" ||
+			B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
 		if (D.isEmpty == true && B.isEmpty == false && B.isReady == true){
-			
+			D.pc = B.pc;
+			D.opcode = B.opcode;
+			for (auto &operand : B.operands){
+				D.operands.push_back(operand);
+			}
+			B.isEmpty = true;
+			B.isReady = false;
 		}
-	}
-	else if (B.opcode == "BNZ"){
-
-	}
-	else if (B.opcode == "BAL"){
-
-	}
-	else if (B.opcode == "JUMP"){
-
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << B.opcode << std::endl;
@@ -627,6 +627,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (DRF.opcode == "MOVC"){
 		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
 			if (DRF.valids.at(1) == true){
+				ALU1.isEmpty = false;
+				ALU1.isReady = false;
 				ALU1.pc = DRF.pc;
 				ALU1.opcode = DRF.opcode;
 
@@ -642,6 +644,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (DRF.opcode == "STORE"){
 		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
 			if (DRF.valids.at(0) == true && DRF.valids.at(2) == true){
+				ALU1.isEmpty = false;
+				ALU1.isReady = false;
 				ALU1.pc = DRF.pc;
 				ALU1.opcode = DRF.opcode;
 
@@ -657,6 +661,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (DRF.opcode == "BZ" || DRF.opcode == "BNZ"){
 		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
 			if (DRF.valids.at(0) == true){
+				ALU1.isEmpty = false;
+				ALU1.isReady = false;
 				ALU1.pc = DRF.pc;
 				ALU1.opcode = DRF.opcode;
 
@@ -672,6 +678,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (DRF.opcode == "BAL" || DRF.opcode == "JUMP"){
 		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
 			if (DRF.valids.at(0) == true && DRF.valids.at(1) == true){
+				ALU1.isEmpty = false;
+				ALU1.isReady = false;
 				ALU1.pc = DRF.pc;
 				ALU1.opcode = DRF.opcode;
 
@@ -687,6 +695,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (DRF.opcode == "HALT" ||
 		DRF.opcode == "NOP"){
 		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
+			ALU1.isEmpty = false;
+			ALU1.isReady = false;
 			ALU1.pc = DRF.pc;
 			ALU1.opcode = DRF.opcode;
 
@@ -697,10 +707,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode: " << DRF.opcode << std::endl;
 		exit(1);
-	}
+	} //END DRF Stage
 
 	//F Stage
-
 	if (F.opcode == "ADD" ||
 		F.opcode == "SUB" ||
 		F.opcode == "MOVC" ||
@@ -718,17 +727,17 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		F.opcode == "NOP"){
 
 		if (DRF.isEmpty == true){
+			DRF.isEmpty = false;
+			DRF.isReady = false;
 			DRF.pc = F.pc;
 			DRF.opcode = F.opcode;
 			for (auto &operand : F.operands){
 				DRF.operands.push_back(operand);
 			}
-
 			F.isEmpty = true;
 			F.isReady = false;
-
-		} //TODO verify booleans to set
-	}
+		}
+	} //END F stage
 
 
 	else{
