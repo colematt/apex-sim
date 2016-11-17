@@ -25,15 +25,15 @@ public:
   //(it is ready to be forwarded and/or advanced)
   bool isReady;
 
-
   //Instruction contents
   int pc; //program counter value that issued this
+  int c; //simulator cycle "timestamp"
   std::string opcode; //(e.g. ADD) representing this instruction
   std::vector<std::string> operands;
   std::vector<int> values;
   std::vector<bool> valids;
 
-  //Constructors/Destructors
+  //Constructors/Destructors/Operators
   Stage(std::string n);
 
   //Interface functions

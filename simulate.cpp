@@ -745,5 +745,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		exit(1);
 	}
 
+	++cycle; // increment the cycle counter for timestamps
 	return 0; //Return for compile testing
 }

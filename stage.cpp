@@ -13,8 +13,10 @@ Stage::Stage(std::string n){
 	this->initialize();
 }
 
+//Reset the stage state
 void Stage::initialize(){
 	pc = 0;
+	c = cycle;
 	opcode = "NOP";
 	operands.clear();
 	values.clear();
@@ -31,7 +33,7 @@ void Stage::display(){
 	}
 
 	std::cout << std::endl;
-} 
+}
 
 int Stage::littoi(std::string literal){
 	literal = literal.erase(0,1);
