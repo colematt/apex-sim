@@ -11,27 +11,42 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 /******************************************************************************/
 	//WB Stage
 	if (WB.opcode == "ADD"){
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
+
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "SUB") {
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
+
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "MOVC"){
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
+
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "MUL"){
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
+
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "AND"){
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
+
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "OR"){
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
+
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "EX-OR"){
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
+
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "LOAD"){
+		myregisters.write(WB.operands.at(0), WB.values.at(0), WB.valids.at(0));
 		WB.isEmpty = false;
 	}
 	else if (WB.opcode == "STORE"){
@@ -187,6 +202,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	//ALU2 Stage
 	if (ALU2.opcode == "ADD"){
+		ALU1.values.at(0) = ALU1.values.at(1) + ALU1.values.at(2);
+		ALU1.valids.at(0) = true;
+
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
 		}
@@ -195,6 +213,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	}
 	else if (ALU2.opcode == "SUB") {
+		ALU1.values.at(0) = ALU1.values.at(1) - ALU1.values.at(2);
+		ALU1.valids.at(0) = true;
+
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
 		}
@@ -202,9 +223,15 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "MOVC"){
+		ALU1.values.at(0) = ALU1.values.at(1) + 0;
+		ALU1.valids.at(0) = true;
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "MUL"){
+		ALU1.values.at(0) = ALU1.values.at(1) * ALU1.values.at(2);
+		ALU1.valids.at(0) = true;
+
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
 		}
@@ -212,6 +239,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "AND"){
+		ALU1.values.at(0) = ALU1.values.at(1) & ALU1.values.at(2);
+		ALU1.valids.at(0) = true;
+
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
 		}
@@ -219,6 +249,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "OR"){
+		ALU1.values.at(0) = ALU1.values.at(1) | ALU1.values.at(2);
+		ALU1.valids.at(0) = true;
+
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
 		}
@@ -226,6 +259,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "EX-OR"){
+		ALU1.values.at(0) = ALU1.values.at(1) ^ ALU1.values.at(2);
+		ALU1.valids.at(0) = true;
+
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
 		}
@@ -233,9 +269,15 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "LOAD"){
+		ALU1.values.at(1) = ALU1.values.at(1) + ALU1.values.at(2);
+		ALU1.valids.at(1) = true;
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "STORE"){
+		ALU1.values.at(1) = ALU1.values.at(1) + ALU1.values.at(2);
+		ALU1.valids.at(1) = true;
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "HALT"){
@@ -251,57 +293,30 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	//ALU1 Stage
 	if (ALU1.opcode == "ADD"){
-		ALU1.values.at(0) = ALU1.values.at(1) + ALU1.values.at(2);
-		ALU1.valids.at(0) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "SUB") {
-		ALU1.values.at(0) = ALU1.values.at(1) - ALU1.values.at(2);
-		ALU1.valids.at(0) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "MOVC"){
-		ALU1.values.at(0) = ALU1.values.at(1) + 0;
-		ALU1.valids.at(0) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "MUL"){
-		ALU1.values.at(0) = ALU1.values.at(1) * ALU1.values.at(2);
-		ALU1.valids.at(0) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "AND"){
-		ALU1.values.at(0) = ALU1.values.at(1) & ALU1.values.at(2);
-		ALU1.valids.at(0) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "OR"){
-		ALU1.values.at(0) = ALU1.values.at(1) | ALU1.values.at(2);
-		ALU1.valids.at(0) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "EX-OR"){
-		ALU1.values.at(0) = ALU1.values.at(1) ^ ALU1.values.at(2);
-		ALU1.valids.at(0) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "LOAD"){
-		ALU1.values.at(1) = ALU1.values.at(1) + ALU1.values.at(2);
-		ALU1.valids.at(1) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "STORE"){
-		ALU1.values.at(1) = ALU1.values.at(1) + ALU1.values.at(2);
-		ALU1.valids.at(1) = true;
-
 		ALU1.isEmpty = false;
 	}
 	else if (ALU1.opcode == "HALT"){
@@ -465,13 +480,18 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//F Stage
-	std::vector<std::string> instr = mycode.getInstr(pc);
-	F.opcode = instr.at(0);
-	for (int i=1;i<instr.size();i++){
-		F.operands.push_back(instr.at(i));
+	if (F.isEmpty == true){
+		F.initialize();
+		std::vector<std::string> instr = mycode.getInstr(pc);
+
+		F.pc = pc;
+		F.opcode = instr.at(0);
+		for (int i=1;i<instr.size();i++){
+			F.operands.push_back(instr.at(i));
+		}
+		F.isEmpty = false;
+		F.isReady = true;
 	}
-	F.isEmpty = false;
-	F.isReady = true;
 
 /******************************************************************************/
 /************************STAGE ADVANCEMENT PHASE*******************************/
@@ -784,25 +804,26 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//DRF Stage
-	if (DRF.opcode == "ADD"){
-
-	}
-	else if (DRF.opcode == "SUB") {
+	if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true;){
+			if (DRF.valids.at(1) == true && DRF.valids.at(2) == true){
+				ALU1.pc = DRF.pc;
+				ALU1.opcode = DRF.opcode;
+			}
+		}
 
 	}
 	else if (DRF.opcode == "MOVC"){
-
-	}
-	else if (DRF.opcode == "MUL"){
-
-	}
-	else if (DRF.opcode == "AND"){
-
-	}
-	else if (DRF.opcode == "OR"){
-
-	}
-	else if (DRF.opcode == "EX-OR"){
+		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true;){
+			if (DRF.valids.at(1) == true){
+				ALU1.pc = DRF.pc;
+				ALU1.opcode = DRF.opcode;
+			}
 
 	}
 	else if (DRF.opcode == "LOAD"){
@@ -835,51 +856,37 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//F Stage
-	if (F.opcode == "ADD"){
 
-	}
-	else if (F.opcode == "SUB") {
+	if (F.opcode == "ADD" || 
+		F.opcode == "SUB" ||
+		F.opcode == "MOVC" ||
+		F.opcode == "MUL" ||
+		F.opcode == "AND" ||
+		F.opcode == "OR" ||
+		F.opcode == "EX-OR" ||
+		F.opcode == "LOAD" ||
+		F.opcode == "STORE" ||
+		F.opcode == "BZ" ||
+		F.opcode == "BNZ" ||
+		F.opcode == "BAL" ||
+		F.opcode == "JUMP" ||
+		F.opcode == "HALT" ||
+		F.opcode == "NOP"){
 
-	}
-	else if (F.opcode == "MOVC"){
+		if (DRF.isEmpty == true){
+			DRF.pc = F.pc;
+			DRF.opcode = F.opcode;
+			for (auto &operand : F.operands){
+				DRF.operands.push_back(operands);
+			}
 
-	}
-	else if (F.opcode == "MUL"){
+			F.isEmpty = true;
+			F.isReady = false;
 
+		} //TODO verify booleans to set
 	}
-	else if (F.opcode == "AND"){
 
-	}
-	else if (F.opcode == "OR"){
 
-	}
-	else if (F.opcode == "EX-OR"){
-
-	}
-	else if (F.opcode == "LOAD"){
-
-	}
-	else if (F.opcode == "STORE"){
-
-	}
-	else if (F.opcode == "BZ"){
-
-	}
-	else if (F.opcode == "BNZ"){
-
-	}
-	else if (F.opcode == "BAL"){
-
-	}
-	else if (F.opcode == "JUMP"){
-
-	}
-	else if (F.opcode == "HALT"){
-
-	}
-	else if (F.opcode == "NOP"){
-
-	}
 	else{
 		std::cerr << "Unresolvable opcode: " << F.opcode << std::endl;
 		exit(1);
