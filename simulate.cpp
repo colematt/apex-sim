@@ -196,7 +196,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//ALU1 Stage
-	if (ALU1.opcode == "ADD" || 
+	if (ALU1.opcode == "ADD" ||
 		ALU1.opcode == "SUB" ||
 		ALU1.opcode == "MOVC" ||
 		ALU1.opcode == "MUL" ||
@@ -504,7 +504,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	//B Stage
 	if (B.opcode == "BZ"){
-
+		if (D.isEmpty == true && B.isEmpty == false && B.isReady == true){
+			
+		}
 	}
 	else if (B.opcode == "BNZ"){
 
@@ -699,7 +701,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	//F Stage
 
-	if (F.opcode == "ADD" || 
+	if (F.opcode == "ADD" ||
 		F.opcode == "SUB" ||
 		F.opcode == "MOVC" ||
 		F.opcode == "MUL" ||
