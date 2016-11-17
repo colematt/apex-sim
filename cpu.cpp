@@ -8,11 +8,6 @@ Description: Contains the CPU class, which simulates operation of a five stage C
 #include <iostream>
 #include "cpu.h"
 
-bool in(std::set<std::string> set, std::string opcode){
- auto found = set.find(opcode);
- return !(found == set.end());
-}
-
 CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
  F("Fetch"),
  DRF("Decode/RF"),
