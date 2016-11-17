@@ -39,9 +39,10 @@ public:
   //Interface functions
   void initialize(); //Initialize the contents of this stage to empty with NOP
   void display(); //Display the contents of this stage: name, opcode, operands
+  bool advance(Stage &dest); //Advance a stage into destination stage
 
   //Utility functions
-  int littoi(std::string literal);
+  int littoi(std::string literal); //Convert a #literal to its int value
   bool isAllValid(); //For this instr are all sources valid or no sources
 
 }; //class Stage

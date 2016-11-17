@@ -383,122 +383,72 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 /******************************************************************************/
 
 	//WB Stage
-	if (WB.opcode == "ADD"){
-
-	}
-	else if (WB.opcode == "SUB") {
-
-	}
-	else if (WB.opcode == "MOVC"){
-
-	}
-	else if (WB.opcode == "MUL"){
-
-	}
-	else if (WB.opcode == "AND"){
-
-	}
-	else if (WB.opcode == "OR"){
-
-	}
-	else if (WB.opcode == "EX-OR"){
-
-	}
-	else if (WB.opcode == "LOAD"){
-
-	}
-	else if (WB.opcode == "STORE"){
-
-	}
-	else if (WB.opcode == "BZ"){
-
-	}
-	else if (WB.opcode == "BNZ"){
-
-	}
-	else if (WB.opcode == "BAL"){
-
-	}
-	else if (WB.opcode == "JUMP"){
-
-	}
-	else if (WB.opcode == "HALT"){
-
-	}
-	else if (WB.opcode == "NOP"){
-
+	if (WB.opcode == "ADD" ||
+			WB.opcode == "SUB" ||
+			WB.opcode == "MOVC" ||
+			WB.opcode == "MUL" ||
+			WB.opcode == "AND" ||
+			WB.opcode == "OR" ||
+			WB.opcode == "EX-OR" ||
+			WB.opcode == "LOAD" ||
+			WB.opcode == "STORE" ||
+			WB.opcode == "BZ" ||
+			WB.opcode == "BNZ" ||
+			WB.opcode == "BAL" ||
+			WB.opcode == "JUMP" ||
+			WB.opcode == "HALT" ||
+			WB.opcode == "NOP"){
+			//If the WB stage is not empty and ready, "vacate" it.
+			//The fields' contents will remain, but it will appear empty on checks
+			if (!WB.isEmpty && WB.isReady){
+				WB.isEmpty = true;
+				WB.isReady = false;
+			}
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << WB.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in WB: " << WB.opcode << std::endl;
 		exit(1);
 	}
 
 	//M Stage
-	if (M.opcode == "ADD"){
-
-	}
-	else if (M.opcode == "SUB") {
-
-	}
-	else if (M.opcode == "MOVC"){
-
-	}
-	else if (M.opcode == "MUL"){
-
-	}
-	else if (M.opcode == "AND"){
-
-	}
-	else if (M.opcode == "OR"){
-
-	}
-	else if (M.opcode == "EX-OR"){
-
-	}
-	else if (M.opcode == "LOAD"){
-
-	}
-	else if (M.opcode == "STORE"){
-
-	}
-	else if (M.opcode == "BZ"){
-
-	}
-	else if (M.opcode == "BNZ"){
-
-	}
-	else if (M.opcode == "BAL"){
-
-	}
-	else if (M.opcode == "JUMP"){
-
-	}
-	else if (M.opcode == "HALT"){
-
-	}
-	else if (M.opcode == "NOP"){
-
+	if (M.opcode == "ADD" ||
+			M.opcode == "SUB" ||
+			M.opcode == "MOVC" ||
+			M.opcode == "MUL" ||
+			M.opcode == "AND" ||
+			M.opcode == "OR" ||
+			M.opcode == "EX-OR" ||
+			M.opcode == "LOAD" ||
+			M.opcode == "STORE" ||
+			M.opcode == "BZ" ||
+			M.opcode == "BNZ" ||
+			M.opcode == "BAL" ||
+			M.opcode == "JUMP" ||
+			M.opcode == "HALT" ||
+			M.opcode == "NOP"){
+				//If the M stage is not empty and ready, and the WB stage is empty,
+				//Vacate M and advance to WB
+				if(!M.isEmpty && M.isReady && WB.isEmpty){
+					M->advance(WB);
+				}
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << M.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in M: " << M.opcode << std::endl;
 		exit(1);
 	}
 
 	//D Stage
-	if (D.opcode == "BZ"){
-
-	}
-	else if (D.opcode == "BNZ"){
-
-	}
-	else if (D.opcode == "BAL"){
-
-	}
-	else if (D.opcode == "JUMP"){
+	//WARNING: D contests with ALU2 to advance to M
+	if (D.opcode == "BZ" ||
+			D.opcode == "BNZ" ||
+			D.opcode == "BAL" ||
+			D.opcode == "JUMP" ||
+			D.opcode == "HALT" ||
+			D.opcode == "NOP"){
 
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << D.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in D: " << D.opcode << std::endl;
 		exit(1);
 	}
 
@@ -506,7 +456,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	if (B.opcode == "BZ" ||
 			B.opcode == "BNZ" ||
 			B.opcode == "BAL" ||
-			B.opcode == "JUMP"){
+			B.opcode == "JUMP" ||
+			B.opcode == "HALT" ||
+			B.opcode == "NOP"){
 		if (D.isEmpty == true && B.isEmpty == false && B.isReady == true){
 			D.pc = B.pc;
 			D.opcode = B.opcode;
@@ -523,6 +475,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//ALU2 Stage
+	//WARNING: ALU2 contests with D to advance to M
 	if (ALU2.opcode == "ADD" ||
 		ALU2.opcode == "SUB" ||
 		ALU2.opcode == "MUL" ||
