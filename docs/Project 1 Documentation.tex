@@ -6,6 +6,7 @@
 % --------
 \usepackage{blindtext} %for boilerplate text (\blindtext)
 \usepackage{geometry} %for paper dimensions and margins
+\usepackage{graphicx} % for including graphics
 
 % Page Setup
 % ----------
@@ -23,18 +24,42 @@ Brian Gracin \\
 \begin{document}
 % Emit title content
 % ------------------
+\pagenumbering{gobble}
 \maketitle
+\tableofcontents
+\listoffigures
 \newpage
+\pagenumbering{arabic}
 
 \section{Design}
-\subsection{\texttt{main} Function}
 \blindtext
+
+\subsection{Driver Program}
 
 \subsection{Classes}
-\blindtext
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{./figs/apex-sim-overview.pdf}
+  \caption{The APEX pipeline and class interactions.}
+  \label{fig:overview}
+\end{figure}
+
+Figure \ref{fig:overview} shows class interactions and data flow between each of the stages and support classes.
+
+\subsubsection{Code}
+
+\subsubsection{Data}
+
+\subsubsection{Registers}
+
+\subsubsection{CPU}
 
 \section{Implementation}
-\blindtext
+\subsection{Stages}
+
+\subsection{Stalls}
+
+\subsection{Forwarding}
 
 \section{Work Log}
 \blindtext
