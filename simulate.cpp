@@ -63,7 +63,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		M.isReady = true;
 	}
 	else if (M.opcode == "STORE"){
-		mydata.writeMem(M.values.at(0), M.values.at(1));
+		mydata.writeMem(M.values.at(1), M.values.at(0));
 		M.valids.at(0) = true;
 
 		M.isEmpty = false;
@@ -259,7 +259,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "STORE"){
-		ALU2.values.at(0) = ALU2.values.at(0) + ALU2.values.at(2);
+		ALU2.values.at(1) = ALU2.values.at(1) + ALU2.values.at(2);
 		ALU2.valids.at(1) = true;
 
 		ALU2.isReady = true;
@@ -315,9 +315,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		DRF.isEmpty = false;
 
-		if (DRF.valids.at(1) && DRF.valids.at(2))
+		if (DRF.valids.at(1) && DRF.valids.at(2)){
 			myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
 			DRF.isReady = true;
+		}
 	}
 	else if (DRF.opcode == "MOVC"){
 
@@ -374,9 +375,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		DRF.isEmpty = false;
 
-		if (DRF.valids.at(1))
+		if (DRF.valids.at(1)){
 			myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
 			DRF.isReady = true;
+		}
 	}
 
 	else if (DRF.opcode == "BZ" ||
