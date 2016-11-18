@@ -36,7 +36,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (WB.opcode == "HALT"){
 		WB.isEmpty = false;
 		WB.isReady = true;
-		return 0; //Terminate program		
+		return 0; //Terminate program
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << WB.opcode << std::endl;
