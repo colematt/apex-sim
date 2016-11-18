@@ -36,6 +36,15 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (WB.opcode == "HALT"){
 		WB.isEmpty = false;
 		WB.isReady = true;
+
+		M.isEmpty = true;
+		D.isEmpty = true;
+		B.isEmpty = true;
+		ALU2.isEmpty = true;
+		ALU1.isEmpty = true;
+		DRF.isEmpty = true;
+		F.isEmpty = true;
+		
 		return 0; //Terminate program
 	}
 	else{
