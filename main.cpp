@@ -31,6 +31,14 @@ void help()
   cout << "[h]   Display a help message" << endl;
 }
 
+//Quit the simulator
+void quit(CPU &mycpu, Registers &myregisters, Data &mydata){
+  if (VERBOSE)
+    cout << "Displaying final state and quitting simulator ..." << endl;
+  display(mycpu, myregisters, mydata);
+  return 0;
+}
+
 // Initialize the simulator to a known state.
 void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
 {
@@ -56,9 +64,9 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
   //Print simulator state variables
 
   //Display each of the instances by delegating to member functions
-  //TODO Call to cpu::display()
-  //TODO Call to registers::display()
-  //TODO Call to data::display()
+  mycpu.display();
+  myregisters.display();
+  mydata.display();
 }
 
 // Simulate the operation of the system for <num_cycles>, or until a HALT
@@ -74,8 +82,11 @@ int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Da
 
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)
-    if(!(apexCPU.simulate(apexCode, apexRF, apexData)))
-      break; //TODO Call quit function
+    if(!(apexCPU.simulate(apexCode, apexRF, apexData))){
+      cout << "Simulator HALT encounted on cycle " << cycle << endl;
+      quit(apexCPU, apexRF, apexData);
+      return 0;
+    }
 
     //Cycle complete, increment the global cycle counter
     cycle++;
@@ -110,7 +121,9 @@ int main(int argc, char** argv)
   string command = "h"; //interface switch statement selector
   int n = 1; // number of cycles or addresses modifier
 
-  /****** USER INTERFACE ******/
+/******************************************************************************/
+/**************************USER INTERFACE *************************************/
+/******************************************************************************/
   while (command != "q") {
     //On first execution of the interface, display the help message
     if (cycle == 0)
@@ -132,7 +145,8 @@ int main(int argc, char** argv)
       case 'd':
         display(*apexCPU, *apexRF, *apexData);
         break;
-      case 'q': //quitting causes no action except to conclude this function
+      case 'q': //simulator can quit by user selection or encountering HALT
+        quit(*apexCPU, *apexRF, *apexData);
         break;
       case 'h': //Falls through to default (which prints the help message)
       default: //Input wasn't recognized
@@ -141,7 +155,7 @@ int main(int argc, char** argv)
     }
   } // End User Interface
 
-  //TODO Perform any exiting actions?
+  quit(*apexCPU, *apexRF, *apexData);
 
   return 0;
 }
