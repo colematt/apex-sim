@@ -1,4 +1,4 @@
-CC=clang++
+CXX=clang++
 CCFLAGS = -std=c++11 -g -Wall
 CLASS_FILES = 	cpu.cpp \
 	code.cpp \

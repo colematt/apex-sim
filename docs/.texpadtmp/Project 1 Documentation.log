@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.6.15)  18 NOV 2016 15:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.6.15)  18 NOV 2016 15:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -209,12 +209,12 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
  [1
 
-{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] <./figs/apex-sim-overview.pdf, id=10, 755.82375pt x 514.92375pt>
+{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] <./figs/apex-sim-overview.pdf, id=10, 755.82375pt x 698.61pt>
 File: ./figs/apex-sim-overview.pdf Graphic file (type pdf)
  <use ./figs/apex-sim-overview.pdf>
 Package pdftex.def Info: ./figs/apex-sim-overview.pdf used on input line 42.
-(pdftex.def)             Requested size: 469.75502pt x 320.03513pt.
- [1 <./figs/apex-sim-overview.pdf>] [2] (/Users/matthew/Documents/Github/apex-sim/docs/.texpadtmp/Project 1 Documentation.aux) ) 
+(pdftex.def)             Requested size: 469.75502pt x 434.1997pt.
+ [1] [2 <./figs/apex-sim-overview.pdf>] (/Users/matthew/Documents/Github/apex-sim/docs/.texpadtmp/Project 1 Documentation.aux) ) 
 Here is how much of TeX's memory you used:
  2163 strings out of 493014
  32610 string characters out of 6133351
@@ -224,10 +224,10 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  37i,6n,29p,251b,236s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on "/Users/matthew/Documents/Github/apex-sim/docs/.texpadtmp/Project 1 Documentation.pdf" (3 pages, 63157 bytes).
+Output written on "/Users/matthew/Documents/Github/apex-sim/docs/.texpadtmp/Project 1 Documentation.pdf" (3 pages, 70851 bytes).
 PDF statistics:
- 47 PDF objects out of 1000 (max. 8388607)
- 33 compressed objects within 1 object stream
+ 54 PDF objects out of 1000 (max. 8388607)
+ 38 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

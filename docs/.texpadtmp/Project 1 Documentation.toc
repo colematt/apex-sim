@@ -1,12 +1,12 @@
 \contentsline {section}{\numberline {1}Design}{1}
 \contentsline {subsection}{\numberline {1.1}Driver Program}{1}
 \contentsline {subsection}{\numberline {1.2}Classes}{1}
-\contentsline {subsubsection}{\numberline {1.2.1}Code}{2}
-\contentsline {subsubsection}{\numberline {1.2.2}Data}{2}
-\contentsline {subsubsection}{\numberline {1.2.3}Registers}{2}
-\contentsline {subsubsection}{\numberline {1.2.4}CPU}{2}
-\contentsline {section}{\numberline {2}Implementation}{2}
-\contentsline {subsection}{\numberline {2.1}Stages}{2}
-\contentsline {subsection}{\numberline {2.2}Stalls}{2}
-\contentsline {subsection}{\numberline {2.3}Forwarding}{2}
-\contentsline {section}{\numberline {3}Work Log}{2}
+\contentsline {subsubsection}{\numberline {1.2.1}Code}{1}
+\contentsline {subsubsection}{\numberline {1.2.2}Data}{1}
+\contentsline {subsubsection}{\numberline {1.2.3}Registers}{1}
+\contentsline {subsubsection}{\numberline {1.2.4}CPU}{1}
+\contentsline {section}{\numberline {2}Implementation}{1}
+\contentsline {subsection}{\numberline {2.1}Stages}{1}
+\contentsline {subsection}{\numberline {2.2}Stalls}{1}
+\contentsline {subsection}{\numberline {2.3}Forwarding}{1}
+\contentsline {section}{\numberline {3}Work Log}{1}
