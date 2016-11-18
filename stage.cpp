@@ -6,6 +6,7 @@ Description: Contains the Stage class, which defines a cpu stage.
 */
 
 #include <iostream>
+#include "apex.h"
 #include "stage.h"
 
 Stage::Stage(std::string n){
@@ -47,22 +48,22 @@ void Stage::display(){
 //If an error occurs, return false
 bool Stage::advance(Stage &dest){
 	//Copy fields from this stage to destination stage
-	dest.pc = this.pc;
-	dest.c = this.pc;
-	dest.opcode = this.opcode;
+	dest.pc = this->pc;
+	dest.c = this->pc;
+	dest.opcode = this->opcode;
 
 	//Copy register fields
-	dest.operands->clear();
-	for(auto op : this.operands){
-		dest.operands->push_back(op);
+	dest.operands.clear();
+	for(auto op : this->operands){
+		dest.operands.push_back(op);
 	}
-	dest.values->clear();
-	for(auto v : this.values){
-		dest.values->push_back(v);
+	dest.values.clear();
+	for(auto v : this->values){
+		dest.values.push_back(v);
 	}
-	dest.valids->clear();
-	for(auto v : this.valids){
-		dest.valids->push_back(v);
+	dest.valids.clear();
+	for(auto v : this->valids){
+		dest.valids.push_back(v);
 	}
 
 	//Set destination stage's flags
@@ -70,8 +71,8 @@ bool Stage::advance(Stage &dest){
 	dest.isReady = false;
 
 	//Set this stage's flags
-	this.isEmpty = true;
-	this.isReady = false;
+	this->isEmpty = true;
+	this->isReady = false;
 
 	return true;
 }
@@ -86,7 +87,7 @@ int Stage::littoi(std::string literal){
 //Otherwise return false
 bool Stage::isAllValid(){
 	//A stage with no operands is always all valid (i.e. NOP or HALT)
-	if valids.empty()
+	if (valids.empty())
 		return true;
 	//Otherwise check to see if all the valids are true,
 	//returning false as soon as an invalid is found	

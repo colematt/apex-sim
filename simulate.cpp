@@ -429,7 +429,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 				//If the M stage is not empty and ready, and the WB stage is empty,
 				//Vacate M and advance to WB
 				if(!M.isEmpty && M.isReady && WB.isEmpty){
-					M->advance(WB);
+					M.advance(WB);
 				}
 	}
 	else{
@@ -445,7 +445,15 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			D.opcode == "JUMP" ||
 			D.opcode == "HALT" ||
 			D.opcode == "NOP"){
-
+		if (D.isEmpty == true && B.isEmpty == false && B.isReady == true){
+			D.pc = B.pc;
+			D.opcode = B.opcode;
+			for (auto &operand : B.operands){
+				D.operands.push_back(operand);
+			}
+			B.isEmpty = true;
+			B.isReady = false;
+		}
 	}
 	else{
 		std::cerr << "Unresolvable opcode in D: " << D.opcode << std::endl;
@@ -498,21 +506,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		}
 
 	}
-	else if (ALU2.opcode == "HALT" ||
-		ALU2.opcode == "NOP"){
-		if (M.isEmpty == true && ALU2.isEmpty == false && ALU2.isReady == true){
-			M.pc = ALU2.pc;
-			M.opcode = ALU2.opcode;
-
-			for (auto &operand : ALU2.operands){
-				M.operands.push_back(operand);
-			}
-
-			ALU2.isEmpty = true;
-			ALU2.isReady = true;
-		}
-
-	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU2.opcode << std::endl;
 		exit(1);
@@ -538,16 +531,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 			ALU1.isEmpty = true;
 			ALU1.isReady = false;
-		}
-	}
-	else if (ALU1.opcode == "HALT" ||
-		ALU1.opcode == "NOP"){
-		if (ALU2.isEmpty == true && ALU1.isEmpty == false && ALU1.isReady == true){
-			ALU2.pc = ALU1.pc;
-			ALU2.opcode = ALU1.opcode;
-
-			ALU1.isEmpty = true;
-			ALU1.isReady = true;
 		}
 	}
 	else{
