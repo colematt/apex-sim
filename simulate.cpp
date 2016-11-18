@@ -241,6 +241,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			DRF.valids.push_back(myregisters.isValid(operand));
 		}
 
+		myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
+
 		DRF.isEmpty = false;
 
 		if (DRF.valids.at(1) && DRF.valids.at(2))
@@ -253,6 +255,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		DRF.values.push_back(DRF.littoi(DRF.operands.at(1)));
 		DRF.valids.push_back(true);
+
+		myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
 
 		DRF.isEmpty = false;
 
@@ -268,6 +272,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			}
 		}
 
+		if(DRF.opcode == "LOAD")
+			myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
+
 		DRF.values.push_back(DRF.littoi(DRF.operands.at(2)));
 		DRF.valids.push_back(true);
 
@@ -276,6 +283,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		if (DRF.valids.at(1))
 			DRF.isReady = true;
 	}
+
 	else if (DRF.opcode == "BZ" ||
 		DRF.opcode == "BNZ"){
 
