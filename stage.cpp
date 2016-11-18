@@ -49,7 +49,7 @@ void Stage::display(){
 bool Stage::advance(Stage &dest){
 	//A stage should only advance if it is not empty, is ready,
 	//and the destination is empty
-	if (!this.isEmpty && this.isReady && dest.isEmpty){
+	if (!this->isEmpty && this->isReady && dest.isEmpty){
 		//Copy fields from this stage to destination stage
 		dest.pc = this->pc;
 		dest.c = this->pc;

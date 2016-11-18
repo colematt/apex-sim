@@ -34,8 +34,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		WB.isReady = true;
 	}
 	else if (WB.opcode == "HALT"){
-		return 0; //Terminate program
 		WB.isEmpty = false;
+		WB.isReady = true;
+		return 0; //Terminate program		
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << WB.opcode << std::endl;
@@ -59,12 +60,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		M.valids.at(0) = true;
 
 		M.isEmpty = false;
+		M.isReady = true;
 	}
 	else if (M.opcode == "STORE"){
 		mydata.writeMem(M.values.at(0), M.values.at(1));
 		M.valids.at(0) = true;
 
 		M.isEmpty = false;
+		M.isReady = true;
 	}
 	else if (M.opcode == "BZ" ||
 		M.opcode == "BNZ" ||
@@ -109,6 +112,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		}
 
 		B.isEmpty = false;
+		B.isReady = true;
 	}
 	else if (B.opcode == "BNZ"){
 
@@ -122,6 +126,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		}
 
 		B.isEmpty = false;
+		B.isReady = true;
 	}
 	else if (B.opcode == "BAL"){
 		myregisters.write("X",pc + 4, 1);
@@ -131,6 +136,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.initialize();
 
 		B.isEmpty = false;
+		B.isReady = true;
 	}
 	else if (B.opcode == "JUMP"){
 		pc = B.values.at(0) + B.values.at(1);
@@ -139,6 +145,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.initialize();
 
 		B.isEmpty = false;
+		B.isReady = true;
 	}
 	else if (B.opcode == "HALT" ||
 		B.opcode == "NOP"){
