@@ -47,32 +47,36 @@ void Stage::display(){
 //If advancement is successful, return true
 //If an error occurs, return false
 bool Stage::advance(Stage &dest){
-	//Copy fields from this stage to destination stage
-	dest.pc = this->pc;
-	dest.c = this->pc;
-	dest.opcode = this->opcode;
+	//A stage should only advance if it is not empty, is ready,
+	//and the destination is empty
+	if (!this.isEmpty && this.isReady && dest.isEmpty){
+		//Copy fields from this stage to destination stage
+		dest.pc = this->pc;
+		dest.c = this->pc;
+		dest.opcode = this->opcode;
 
-	//Copy register fields
-	dest.operands.clear();
-	for(auto op : this->operands){
-		dest.operands.push_back(op);
-	}
-	dest.values.clear();
-	for(auto v : this->values){
-		dest.values.push_back(v);
-	}
-	dest.valids.clear();
-	for(auto v : this->valids){
-		dest.valids.push_back(v);
-	}
+		//Copy register fields
+		dest.operands.clear();
+		for(auto op : this->operands){
+			dest.operands.push_back(op);
+		}
+		dest.values.clear();
+		for(auto v : this->values){
+			dest.values.push_back(v);
+		}
+		dest.valids.clear();
+		for(auto v : this->valids){
+			dest.valids.push_back(v);
+		}
 
-	//Set destination stage's flags
-	dest.isEmpty = false;
-	dest.isReady = false;
+		//Set destination stage's flags
+		dest.isEmpty = false;
+		dest.isReady = false;
 
-	//Set this stage's flags
-	this->isEmpty = true;
-	this->isReady = false;
+		//Set this stage's flags
+		this->isEmpty = true;
+		this->isReady = false;
+	}
 
 	return true;
 }
@@ -90,7 +94,7 @@ bool Stage::isAllValid(){
 	if (valids.empty())
 		return true;
 	//Otherwise check to see if all the valids are true,
-	//returning false as soon as an invalid is found	
+	//returning false as soon as an invalid is found
 	for(auto o : valids){
 		if(!o)
 			return false;
