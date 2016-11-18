@@ -84,7 +84,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	if (D.opcode == "BZ" ||
 		D.opcode == "BNZ" ||
 		D.opcode == "BAL" ||
-		D.opcode == "JUMP"){
+		D.opcode == "JUMP" ||
+		D.opcode == "HALT" ||
+		D.opcode == "NOP"){
 
 		D.isEmpty = false;
 		D.isReady = true;
@@ -138,6 +140,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		B.isEmpty = false;
 	}
+	else if (B.opcode == "HALT" ||
+		B.opcode == "NOP"){
+
+		B.isEmpty = false;
+		B.isReady = true;
+	}
 	else{
 		std::cerr << "Unresolvable opcode: " << B.opcode << std::endl;
 		exit(1);
@@ -150,9 +158,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.opcode == "AND" ||
 		ALU2.opcode == "OR" ||
 		ALU2.opcode == "EX-OR" ){
-		if (ALU2.valids.at(1) == true && ALU2.valids.at(2) == true){
+		if (ALU2.valids.at(1) && ALU2.valids.at(2)){
 			ALU2.values.at(0) = ALU2.values.at(1) + ALU2.values.at(2);
 			ALU2.valids.at(0) = true;
+
+			ALU2.isReady = true;
 
 			if (ALU2.values.at(0) == 0){
 				myregisters.write("Z", 1, 1);
@@ -169,25 +179,23 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "LOAD"){
-		if (ALU2.valids.at(1) == true && ALU2.valids.at(2) == true){
+		if (ALU2.valids.at(1) && ALU2.valids.at(2)){
 			ALU2.values.at(1) = ALU2.values.at(1) + ALU2.values.at(2);
 			ALU2.valids.at(1) = true;
+
+			ALU2.isReady = true;
 		}
 
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "STORE"){
-		if (ALU2.valids.at(0) == true && ALU2.valids.at(2) == true){
+		if (ALU2.valids.at(0) && ALU2.valids.at(2)){
 			ALU2.values.at(0) = ALU2.values.at(0) + ALU2.values.at(2);
 			ALU2.valids.at(1) = true;
+
+			ALU2.isReady = true;
 		}
 
-		ALU2.isEmpty = false;
-	}
-	else if (ALU2.opcode == "HALT"){
-		ALU2.isEmpty = false;
-	}
-	else if (ALU2.opcode == "NOP"){
 		ALU2.isEmpty = false;
 	}
 	else{
@@ -204,11 +212,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU1.opcode == "OR" ||
 		ALU1.opcode == "EX-OR" ||
 		ALU1.opcode == "LOAD" ||
-		ALU1.opcode == "STORE" ||
-		ALU1.opcode == "HALT" ||
-		ALU1.opcode == "NOP"){
-		ALU1.isEmpty = false;
-		ALU1.isReady = true;
+		ALU1.opcode == "STORE"){
+			ALU1.isEmpty = false;
+			ALU1.isReady = true;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU1.opcode << std::endl;
@@ -216,27 +222,22 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 
 	//DRF Stage
-	if (DRF.opcode == "ADD"){
+	if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
 
 		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
+			DRF.values.push_back(myregisters.read(operand));
+			DRF.valids.push_back(myregisters.isValid(operand));			
 		}
 
 		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "SUB") {
 
-		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
-		}
-
-		DRF.isEmpty = false;
+		if (DRF.valids.at(1) && DRF.valids.at(2))
+			DRF.isReady = true;
 	}
 	else if (DRF.opcode == "MOVC"){
 
@@ -247,54 +248,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.valids.push_back(true);
 
 		DRF.isEmpty = false;
+
+		DRF.isReady = true;
 	}
-	else if (DRF.opcode == "MUL"){
+	else if (DRF.opcode == "LOAD" ||
+		DRF.opcode == "STORE"){
 
 		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
-		}
-		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "AND"){
-
-		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
-		}
-
-		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "OR"){
-
-		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
-		}
-
-		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "EX-OR"){
-
-		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
-		}
-
-		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "LOAD"){
-
-		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
+			if(operand.at(0) != '#'){
 				DRF.values.push_back(myregisters.read(operand));
 				DRF.valids.push_back(myregisters.isValid(operand));
 			}
@@ -304,36 +265,21 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.valids.push_back(true);
 
 		DRF.isEmpty = false;
+
+		if (DRF.valids.at(1))
+			DRF.isReady = true;
 	}
-	else if (DRF.opcode == "STORE"){
-
-		for (auto &operand : DRF.operands){
-			if(operand[0] != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
-		}
-
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(2)));
-		DRF.valids.push_back(true);
-
-		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "BZ"){
+	else if (DRF.opcode == "BZ" ||
+		DRF.opcode == "BNZ"){
 
 		DRF.values.push_back(DRF.littoi(DRF.operands.at(0)));
 		DRF.valids.push_back(true);
 
 		DRF.isEmpty = false;
+		DRF.isReady = true;
 	}
-	else if (DRF.opcode == "BNZ"){
-
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(0)));
-		DRF.valids.push_back(true);
-
-		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "BAL"){
+	else if (DRF.opcode == "BAL" ||
+		DRF.opcode == "JUMP"){
 
 		DRF.values.push_back(myregisters.read(DRF.operands.at(0)));
 		DRF.valids.push_back(myregisters.isValid(DRF.operands.at(0)));
@@ -342,22 +288,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.valids.push_back(true);
 
 		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "JUMP"){
 
-		DRF.values.push_back(myregisters.read(DRF.operands.at(0)));
-		DRF.valids.push_back(myregisters.isValid(DRF.operands.at(0)));
-
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(1)));
-		DRF.valids.push_back(true);
-
-		DRF.isEmpty = false;
+		if (DRF.valids.at(0))
+			DRF.isReady = true;
 	}
-	else if (DRF.opcode == "HALT"){
+	else if (DRF.opcode == "HALT" ||
+		DRF.opcode == "NOP"){
 		DRF.isEmpty = false;
-	}
-	else if (DRF.opcode == "NOP"){
-		DRF.isEmpty = false;
+		DRF.isReady = true;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << DRF.opcode << std::endl;
@@ -445,15 +383,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			D.opcode == "JUMP" ||
 			D.opcode == "HALT" ||
 			D.opcode == "NOP"){
-		if (D.isEmpty == true && B.isEmpty == false && B.isReady == true){
-			D.pc = B.pc;
-			D.opcode = B.opcode;
-			for (auto &operand : B.operands){
-				D.operands.push_back(operand);
-			}
-			B.isEmpty = true;
-			B.isReady = false;
-		}
+				//If the D stage is not empty and ready, and the M stage is empty,
+				//Vacate D and advance to M
+				if(!D.isEmpty && D.isReady && M.isEmpty){
+					D.advance(M);
+					//Will need custom
+				}
 	}
 	else{
 		std::cerr << "Unresolvable opcode in D: " << D.opcode << std::endl;
@@ -467,15 +402,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			B.opcode == "JUMP" ||
 			B.opcode == "HALT" ||
 			B.opcode == "NOP"){
-		if (D.isEmpty == true && B.isEmpty == false && B.isReady == true){
-			D.pc = B.pc;
-			D.opcode = B.opcode;
-			for (auto &operand : B.operands){
-				D.operands.push_back(operand);
-			}
-			B.isEmpty = true;
-			B.isReady = false;
-		}
+				//If the B stage is not empty and ready, and the D stage is empty,
+				//Vacate B and advance to D
+				if(!B.isEmpty && B.isReady && D.isEmpty){
+					B.advance(D);
+				}
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << B.opcode << std::endl;
@@ -493,18 +424,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.opcode == "MOVC" ||
 		ALU2.opcode == "LOAD" ||
 		ALU2.opcode == "STORE"){
-		if (M.isEmpty == true && ALU2.isEmpty == false && ALU2.isReady == true){
-			M.pc = ALU2.pc;
-			M.opcode = ALU2.opcode;
-
-			for (auto &operand : ALU2.operands){
-				M.operands.push_back(operand);
-			}
-
-			ALU2.isEmpty = true;
-			ALU2.isReady = false;
-		}
-
+				//If the ALU2 stage is not empty and ready, and the M stage is empty,
+				//Vacate ALU2 and advance to B
+				if(!ALU2.isEmpty && ALU2.isReady && M.isEmpty){
+					ALU2.advance(M);
+					//Will need custom
+				}
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU2.opcode << std::endl;
@@ -521,17 +446,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU1.opcode == "MOVC" ||
 		ALU1.opcode == "LOAD" ||
 		ALU1.opcode == "STORE"){
-		if (ALU2.isEmpty == true && ALU1.isEmpty == false && ALU1.isReady == true){
-			ALU2.pc = ALU1.pc;
-			ALU2.opcode = ALU1.opcode;
-
-			for (auto &operand : ALU1.operands){
-				ALU2.operands.push_back(operand);
-			}
-
-			ALU1.isEmpty = true;
-			ALU1.isReady = false;
-		}
+				//If the ALU1 stage is not empty and ready, and the ALU2 stage is empty,
+				//Vacate ALU1 and advance to B
+				if(!ALU1.isEmpty && ALU1.isReady && ALU2.isEmpty){
+					ALU1.advance(ALU2);
+				}
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU1.opcode << std::endl;
@@ -545,100 +464,26 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.opcode == "AND" ||
 		DRF.opcode == "OR" ||
 		DRF.opcode == "EX-OR" ||
-		DRF.opcode == "LOAD"){
-		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
-			if (DRF.valids.at(1) == true && DRF.valids.at(2) == true){
-				ALU1.pc = DRF.pc;
-				ALU1.opcode = DRF.opcode;
-
-				for (auto &operand : DRF.operands){
-					ALU1.operands.push_back(operand);
+		DRF.opcode == "LOAD" ||
+		DRF.opcode == "MOVC" ||
+		DRF.opcode == "STORE"){
+				//If the DRF stage is not empty and ready, and the ALU1 stage is empty,
+				//Vacate DRF and advance to B
+				if(!DRF.isEmpty && DRF.isReady && ALU1.isEmpty){
+					DRF.advance(ALU1);
 				}
-
-				DRF.isEmpty = true;
-				DRF.isReady = false;
-			}
-		}
 	}
-	else if (DRF.opcode == "MOVC"){
-		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
-			if (DRF.valids.at(1) == true){
-				ALU1.isEmpty = false;
-				ALU1.isReady = false;
-				ALU1.pc = DRF.pc;
-				ALU1.opcode = DRF.opcode;
-
-				for (auto &operand : DRF.operands){
-					ALU1.operands.push_back(operand);
-				}
-
-				DRF.isEmpty = true;
-				DRF.isReady = false;
-			}
-		}
-	}
-	else if (DRF.opcode == "STORE"){
-		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
-			if (DRF.valids.at(0) == true && DRF.valids.at(2) == true){
-				ALU1.isEmpty = false;
-				ALU1.isReady = false;
-				ALU1.pc = DRF.pc;
-				ALU1.opcode = DRF.opcode;
-
-				for (auto &operand : DRF.operands){
-					ALU1.operands.push_back(operand);
-				}
-
-				DRF.isEmpty = true;
-				DRF.isReady = false;
-			}
-		}
-	}
-	else if (DRF.opcode == "BZ" || DRF.opcode == "BNZ"){
-		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
-			if (DRF.valids.at(0) == true){
-				ALU1.isEmpty = false;
-				ALU1.isReady = false;
-				ALU1.pc = DRF.pc;
-				ALU1.opcode = DRF.opcode;
-
-				for (auto &operand : DRF.operands){
-					ALU1.operands.push_back(operand);
-				}
-
-				DRF.isEmpty = true;
-				DRF.isReady = false;
-			}
-		}
-	}
-	else if (DRF.opcode == "BAL" || DRF.opcode == "JUMP"){
-		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
-			if (DRF.valids.at(0) == true && DRF.valids.at(1) == true){
-				ALU1.isEmpty = false;
-				ALU1.isReady = false;
-				ALU1.pc = DRF.pc;
-				ALU1.opcode = DRF.opcode;
-
-				for (auto &operand : DRF.operands){
-					ALU1.operands.push_back(operand);
-				}
-
-				DRF.isEmpty = true;
-				DRF.isReady = false;
-			}
-		}
-	}
-	else if (DRF.opcode == "HALT" ||
+	else if (DRF.opcode == "BZ" || 
+		DRF.opcode == "BNZ" ||
+		DRF.opcode == "BAL" || 
+		DRF.opcode == "JUMP" ||
+		DRF.opcode == "HALT" ||
 		DRF.opcode == "NOP"){
-		if (ALU1.isEmpty == true && DRF.isEmpty == false && DRF.isReady == true){
-			ALU1.isEmpty = false;
-			ALU1.isReady = false;
-			ALU1.pc = DRF.pc;
-			ALU1.opcode = DRF.opcode;
-
-			DRF.isEmpty = true;
-			DRF.isReady = false;
-		}
+				//If the DRF stage is not empty and ready, and the B stage is empty,
+				//Vacate DRF and advance to B
+				if(!DRF.isEmpty && DRF.isReady && B.isEmpty){
+					DRF.advance(B);
+				}
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << DRF.opcode << std::endl;
@@ -661,21 +506,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		F.opcode == "JUMP" ||
 		F.opcode == "HALT" ||
 		F.opcode == "NOP"){
-
-		if (DRF.isEmpty == true){
-			DRF.isEmpty = false;
-			DRF.isReady = false;
-			DRF.pc = F.pc;
-			DRF.opcode = F.opcode;
-			for (auto &operand : F.operands){
-				DRF.operands.push_back(operand);
-			}
-			F.isEmpty = true;
-			F.isReady = false;
-		}
+				//If the F stage is not empty and ready, and the DRF stage is empty,
+				//Vacate DRF and advance to B
+				if(!F.isEmpty && F.isReady && DRF.isEmpty){
+					F.advance(DRF);
+				}
 	} //END F stage
-
-
 	else{
 		std::cerr << "Unresolvable opcode: " << F.opcode << std::endl;
 		exit(1);
