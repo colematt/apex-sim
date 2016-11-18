@@ -231,7 +231,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		for (auto &operand : DRF.operands){
 			DRF.values.push_back(myregisters.read(operand));
-			DRF.valids.push_back(myregisters.isValid(operand));			
+			DRF.valids.push_back(myregisters.isValid(operand));
 		}
 
 		DRF.isEmpty = false;
@@ -338,6 +338,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			WB.opcode == "NOP"){
 			//If the WB stage is not empty and ready, "vacate" it.
 			//The fields' contents will remain, but it will appear empty on checks
+			//WARNING: Do NOT use the advance() function -- WB has nowhere to advance.
 			if (!WB.isEmpty && WB.isReady){
 				WB.isEmpty = true;
 				WB.isReady = false;
@@ -366,9 +367,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			M.opcode == "NOP"){
 				//If the M stage is not empty and ready, and the WB stage is empty,
 				//Vacate M and advance to WB
-				if(!M.isEmpty && M.isReady && WB.isEmpty){
-					M.advance(WB);
-				}
+				M.advance(WB);
 	}
 	else{
 		std::cerr << "Unresolvable opcode in M: " << M.opcode << std::endl;
@@ -383,11 +382,20 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			D.opcode == "JUMP" ||
 			D.opcode == "HALT" ||
 			D.opcode == "NOP"){
-				//If the D stage is not empty and ready, and the M stage is empty,
-				//Vacate D and advance to M
-				if(!D.isEmpty && D.isReady && M.isEmpty){
+
+				/* Only one of ALU2 and D can advance to M:
+				Therefore if both are ready to advance, set D to !isReady
+				and do not advance it. On the next work phase, it gets set
+				to isReady (it isReady after EVERY work phase)
+				D takes no priority over ALU2 because it does no more work
+				after B phase, and it flushes F/DRF in B. There should be
+				no conflicts with ALU2 for instructions dispatched after
+				the instruction in B.                                  */
+				if (D.isReady && !ALU2.isReady){
 					D.advance(M);
-					//Will need custom
+				}
+				else{
+					D.isReady = false;
 				}
 	}
 	else{
@@ -402,19 +410,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			B.opcode == "JUMP" ||
 			B.opcode == "HALT" ||
 			B.opcode == "NOP"){
-				//If the B stage is not empty and ready, and the D stage is empty,
-				//Vacate B and advance to D
-				if(!B.isEmpty && B.isReady && D.isEmpty){
-					B.advance(D);
-				}
+				B.advance(D);
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << B.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in B: " << B.opcode << std::endl;
 		exit(1);
 	}
 
 	//ALU2 Stage
-	//WARNING: ALU2 contests with D to advance to M
 	if (ALU2.opcode == "ADD" ||
 		ALU2.opcode == "SUB" ||
 		ALU2.opcode == "MUL" ||
@@ -424,15 +427,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.opcode == "MOVC" ||
 		ALU2.opcode == "LOAD" ||
 		ALU2.opcode == "STORE"){
-				//If the ALU2 stage is not empty and ready, and the M stage is empty,
-				//Vacate ALU2 and advance to B
-				if(!ALU2.isEmpty && ALU2.isReady && M.isEmpty){
-					ALU2.advance(M);
-					//Will need custom
-				}
+				ALU2.advance(D);
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << ALU2.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in ALU2: " << ALU2.opcode << std::endl;
 		exit(1);
 	}
 
@@ -446,14 +444,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU1.opcode == "MOVC" ||
 		ALU1.opcode == "LOAD" ||
 		ALU1.opcode == "STORE"){
-				//If the ALU1 stage is not empty and ready, and the ALU2 stage is empty,
-				//Vacate ALU1 and advance to B
-				if(!ALU1.isEmpty && ALU1.isReady && ALU2.isEmpty){
-					ALU1.advance(ALU2);
-				}
+				ALU1.advance(ALU2);
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << ALU1.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in ALU1: " << ALU1.opcode << std::endl;
 		exit(1);
 	}
 
@@ -467,26 +461,18 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.opcode == "LOAD" ||
 		DRF.opcode == "MOVC" ||
 		DRF.opcode == "STORE"){
-				//If the DRF stage is not empty and ready, and the ALU1 stage is empty,
-				//Vacate DRF and advance to B
-				if(!DRF.isEmpty && DRF.isReady && ALU1.isEmpty){
-					DRF.advance(ALU1);
-				}
+				DRF.advance(ALU1);
 	}
-	else if (DRF.opcode == "BZ" || 
+	else if (DRF.opcode == "BZ" ||
 		DRF.opcode == "BNZ" ||
-		DRF.opcode == "BAL" || 
+		DRF.opcode == "BAL" ||
 		DRF.opcode == "JUMP" ||
 		DRF.opcode == "HALT" ||
 		DRF.opcode == "NOP"){
-				//If the DRF stage is not empty and ready, and the B stage is empty,
-				//Vacate DRF and advance to B
-				if(!DRF.isEmpty && DRF.isReady && B.isEmpty){
-					DRF.advance(B);
-				}
+				DRF.advance(B);
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << DRF.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in DRF: " << DRF.opcode << std::endl;
 		exit(1);
 	} //END DRF Stage
 
@@ -506,16 +492,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		F.opcode == "JUMP" ||
 		F.opcode == "HALT" ||
 		F.opcode == "NOP"){
-				//If the F stage is not empty and ready, and the DRF stage is empty,
-				//Vacate DRF and advance to B
-				if(!F.isEmpty && F.isReady && DRF.isEmpty){
-					F.advance(DRF);
-				}
-	} //END F stage
-	else{
-		std::cerr << "Unresolvable opcode: " << F.opcode << std::endl;
-		exit(1);
+				F.advance(DRF);
 	}
+	else{
+		std::cerr << "Unresolvable opcode in F: " << F.opcode << std::endl;
+		exit(1);
+	} //End F stage
 
 	++cycle; // increment the cycle counter for timestamps
 	return 0; //Return for compile testing
