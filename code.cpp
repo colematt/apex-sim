@@ -35,7 +35,7 @@ Description: Contains the CODE class, which simulates reading instructions from 
         inputString.erase(0, pos + 1);
 
         //On HALT, opcode was leaking into operands. If inputString and holderString equal
-        //there are no opcode. Set inputString to " " to skip operand parsing.
+        //there are no operands. Set inputString to " " to skip operand parsing.
         if(inputString == holderString) inputString = " ";
 
         Code::instructions.push_back(holderString);
@@ -64,6 +64,13 @@ Description: Contains the CODE class, which simulates reading instructions from 
 
         i = 0;
       }
+    }
+
+    while (Code::instructions.size() < 1000){
+    	Code::instructions.push_back("NOP");
+    	Code::instructions.push_back(" ");
+    	Code::instructions.push_back(" ");
+    	Code::instructions.push_back(" ");
     }   
   }
 

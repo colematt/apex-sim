@@ -74,8 +74,9 @@ bool Stage::advance(Stage &dest){
 		dest.isReady = false;
 
 		//Set this stage's flags
-		this->isEmpty = true;
-		this->isReady = false;
+		//this->isEmpty = true;
+		//this->isReady = false;
+		this->initialize();
 	}
 
 	return true;

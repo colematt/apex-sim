@@ -87,6 +87,9 @@ int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Da
       return 0;
     }
 
+    apexCPU.display();
+    apexRF.display();
+
     //Cycle complete, increment the global cycle counter
     cycle++;
   }
@@ -153,8 +156,5 @@ int main(int argc, char** argv)
         break;
     }
   } // End User Interface
-
-  quit(*apexCPU, *apexRF, *apexData);
-
   return 0;
 }
