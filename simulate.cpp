@@ -184,6 +184,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.valids.at(0) = true;
 
 		ALU2.isEmpty = false;
+		ALU2.isReady = true;
 	}
 	else if (ALU2.opcode == "LOAD"){
 		if (ALU2.valids.at(1) && ALU2.valids.at(2)){
@@ -205,6 +206,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		ALU2.isEmpty = false;
 	}
+	else if (ALU2.opcode == "NOP"){
+			ALU2.isEmpty = true;
+			ALU2.isReady = true;
+	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU2.opcode << std::endl;
 		exit(1);
@@ -222,6 +227,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU1.opcode == "STORE"){
 			ALU1.isEmpty = false;
 			ALU1.isReady = true;
+	} 
+	else if(ALU1.opcode == "NOP"){
+		ALU1.isEmpty = true;
+		ALU1.isReady = true;
 	}
 	else{
 		std::cerr << "Unresolvable opcode: " << ALU1.opcode << std::endl;
@@ -325,10 +334,13 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		F.pc = pc;
 		F.opcode = instr.at(0);
 		for (int i=1;i<instr.size();i++){
-			F.operands.push_back(instr.at(i));
+			if (instr.at(i) != " ")
+				F.operands.push_back(instr.at(i));
 		}
 		F.isEmpty = false;
 		F.isReady = true;
+
+		pc += 4;;
 	}
 
 /******************************************************************************/
@@ -406,7 +418,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 				after B phase, and it flushes F/DRF in B. There should be
 				no conflicts with ALU2 for instructions dispatched after
 				the instruction in B.                                  */
-				if (D.isReady && !ALU2.isReady){
+				if ((D.isReady && !ALU2.isReady) || ALU2.opcode == "NOP"){
 					D.advance(M);
 				}
 				else{
@@ -442,7 +454,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.opcode == "MOVC" ||
 		ALU2.opcode == "LOAD" ||
 		ALU2.opcode == "STORE"){
-				ALU2.advance(D);
+				ALU2.advance(M);
+	}
+	else if(ALU2.opcode == "NOP"){
+		WB.isEmpty = true;
+		WB.isReady = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode in ALU2: " << ALU2.opcode << std::endl;
@@ -460,6 +476,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU1.opcode == "LOAD" ||
 		ALU1.opcode == "STORE"){
 				ALU1.advance(ALU2);
+	}
+	else if(ALU1.opcode == "NOP"){
+		WB.isEmpty = true;
+		WB.isReady = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode in ALU1: " << ALU1.opcode << std::endl;
@@ -514,6 +534,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		exit(1);
 	} //End F stage
 
-	++cycle; // increment the cycle counter for timestamps
-	return 0; //Return for compile testing
+	//++cycle; // increment the cycle counter for timestamps
+	return 1; //Return for compile testing
 }

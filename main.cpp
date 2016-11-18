@@ -74,7 +74,7 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
 //Return the current cycle number after simulation pauses or halts.
 int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Data &apexData)
 {
-  for (int c = cycle; c < cycle + num_cycles; c++)
+  for (int c = cycle; c < num_cycles; c++)
   {
     //Perform one cycle of simulation
     if (VERBOSE)

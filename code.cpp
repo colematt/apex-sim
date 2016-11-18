@@ -80,9 +80,7 @@ Description: Contains the CODE class, which simulates reading instructions from 
 
     //Set operand fields for Instruction object if any
     for (int i = 0; i < 3; i++){
-      if (Code::instructions.at (addr) != " "){
-        instr.push_back(Code::instructions.at(addr));
-      }
+      instr.push_back(Code::instructions.at(addr));
       addr++;
     }
 
