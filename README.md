@@ -14,13 +14,17 @@ Note for Binghamton University users: this software is compatible with the `remo
 
 ## Installation
 
-1. In the makefile, set the value of the `CXX` variable to your C++ compiler path.
-2. Build the software using the `apex-sim` or `all` target.
+In the makefile, set the value of the `CXX` variable to your C++ compiler path. Build the software using the `apex-sim` or `all` target.
 
 ```
 $ make -C $(APEX_HOME)
 ```
-3. To remove build files, use the `clean` target.
+
+To remove build files, use the `clean` target.
+
+```
+$ make -C $(APEX_HOME) clean
+```
 
 ## Usage
 
