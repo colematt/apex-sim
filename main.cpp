@@ -56,8 +56,13 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
   //Print simulator state variables
 
   //Display each of the instances by delegating to member functions
+  cout << "-----------\n" << "CPU" << "-----------\n";
   mycpu.display();
+
+  cout << "-----------\n" << "Registers" << "-----------\n";
   myregisters.display();
+
+  cout << "-----------\n" << "Data Memory" << "-----------\n";
   mydata.display();
 }
 

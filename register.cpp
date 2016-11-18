@@ -32,8 +32,7 @@ void Registers::display(){
   std::string myname = "";
   int myvalue = 0;
   bool myvalid = true;
-
-  std::cout << "Register File and Flags:" << std::endl;
+  
   for (auto it = this->reg_file.begin(); it != this->reg_file.end(); ++it) {
     myname = it->first;
     std::tie(myvalue, myvalid) = it->second;

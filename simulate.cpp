@@ -79,7 +79,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		M.isReady = true;
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << M.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in M: " << M.opcode << std::endl;
 		exit(1);
 	}
 
@@ -95,7 +95,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		D.isReady = true;
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << D.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in D: " << D.opcode << std::endl;
 		exit(1);
 	}
 
@@ -154,7 +154,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		B.isReady = true;
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << B.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in B: " << B.opcode << std::endl;
 		exit(1);
 	}
 
@@ -167,7 +167,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
-		} 
+		}
 		else {
 			myregisters.write("Z", 0, 1);
 		}
@@ -181,7 +181,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
-		} 
+		}
 		else {
 			myregisters.write("Z", 0, 1);
 		}
@@ -195,7 +195,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
-		} 
+		}
 		else {
 			myregisters.write("Z", 0, 1);
 		}
@@ -209,7 +209,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
-		} 
+		}
 		else {
 			myregisters.write("Z", 0, 1);
 		}
@@ -223,7 +223,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
-		} 
+		}
 		else {
 			myregisters.write("Z", 0, 1);
 		}
@@ -237,7 +237,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		if (ALU2.values.at(0) == 0){
 			myregisters.write("Z", 1, 1);
-		} 
+		}
 		else {
 			myregisters.write("Z", 0, 1);
 		}
@@ -271,7 +271,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 			ALU2.isReady = true;
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << ALU2.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in ALU2: " << ALU2.opcode << std::endl;
 		exit(1);
 	}
 
@@ -287,13 +287,13 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU1.opcode == "STORE"){
 			ALU1.isEmpty = false;
 			ALU1.isReady = true;
-	} 
+	}
 	else if(ALU1.opcode == "NOP"){
 		ALU1.isEmpty = true;
 		ALU1.isReady = true;
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << ALU1.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in ALU1: " << ALU1.opcode << std::endl;
 		exit(1);
 	}
 
@@ -416,7 +416,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.isReady = true;
 	}
 	else{
-		std::cerr << "Unresolvable opcode: " << DRF.opcode << std::endl;
+		std::cerr << "Unresolvable opcode in DRF: " << DRF.opcode << std::endl;
 		exit(1);
 	}
 
