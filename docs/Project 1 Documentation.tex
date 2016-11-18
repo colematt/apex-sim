@@ -54,7 +54,23 @@ Finally, we opensource our work under the MIT license through a GitHub repositor
 
 \subsection{Driver Program}
 \label{sec:driver}
-The \codename entry point file is \texttt{main.cpp}. This program shepherds execution through the lifecycle of the program and provides a user interface for interacting with the simulator.
+The \codename entry point file is \texttt{main.cpp}. Besides maintaining simulator state variables for the current cycle, program counter and instructions filename, this program shepherds execution through the lifecycle of the program and provides a user interface for interacting with the simulator. The functionality of the driver program is as follows:
+\begin{enumerate}
+  \item Verify sanity of command line inputs (lines 107-116).
+  \item Instantiate class instances for the simulator (lines 119-122).
+  \item Perform the initialization of each pipeline stage (line 125).
+  \item Prepare and begin the simulator user interface's operations (lines 128-134).
+  \item Parse user interface inputs and delegate actions to interface helper functions (lines 134-161).
+\end{enumerate}
+
+\texttt{main.cpp} also provides helper functions which delegate work down to class instances. These functions are:
+\begin{itemize}
+  \item \texttt{help()} displays the user interface keyboard shortcuts. It's invoked at startup, on request from the user, and whenever the user provides an input which is not recognized.
+  \item \texttt{initialize()} resets the simulator state, and invokes the class instances' own \texttt{\textit{classname}.initialize()} functions which reset the instances' internal state.
+  \item \texttt{display()} displays the simulator internal 
+\end{itemize}
+
+
 
 \subsection{Classes}
 \label{sec:classes}
