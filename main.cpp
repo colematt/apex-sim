@@ -31,14 +31,6 @@ void help()
   cout << "[h]   Display a help message" << endl;
 }
 
-//Quit the simulator
-void quit(CPU &mycpu, Registers &myregisters, Data &mydata){
-  if (VERBOSE)
-    cout << "Displaying final state and quitting simulator ..." << endl;
-  display(mycpu, myregisters, mydata);
-  return 0;
-}
-
 // Initialize the simulator to a known state.
 void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
 {
@@ -67,6 +59,13 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
   mycpu.display();
   myregisters.display();
   mydata.display();
+}
+
+//Quit the simulator
+void quit(CPU &mycpu, Registers &myregisters, Data &mydata){
+  if (VERBOSE)
+    cout << "Displaying final state and quitting simulator ..." << endl;
+  display(mycpu, myregisters, mydata);
 }
 
 // Simulate the operation of the system for <num_cycles>, or until a HALT
