@@ -55,7 +55,7 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
 
   //Print simulator state variables
   cout << "cycle: " << cycle << " pc: " << pc << endl;
-  
+
   //Display each of the instances by delegating to member functions
   cout << "-----------\n" << "CPU" << "-----------\n";
   mycpu.display();
@@ -70,7 +70,7 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
 //Quit the simulator
 void quit(CPU &mycpu, Registers &myregisters, Data &mydata){
   if (VERBOSE)
-    cout << "Displaying final state and quitting simulator ..." << endl;
+    cout << "Quitting simulator ..." << endl;
   display(mycpu, myregisters, mydata);
 }
 
