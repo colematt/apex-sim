@@ -57,13 +57,13 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
   cout << "cycle: " << cycle << " pc: " << pc << endl;
 
   //Display each of the instances by delegating to member functions
-  cout << "-----------\n" << "CPU" << "-----------\n";
+  cout << "-----------\n" << "CPU\n" << "-----------\n";
   mycpu.display();
 
-  cout << "-----------\n" << "Registers" << "-----------\n";
+  cout << "-----------\n" << "Registers\n" << "-----------\n";
   myregisters.display();
 
-  cout << "-----------\n" << "Data Memory" << "-----------\n";
+  cout << "-----------\n" << "Data Memory\n" << "-----------\n";
   mydata.display();
 }
 
