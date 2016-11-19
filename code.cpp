@@ -14,6 +14,10 @@ Description: Contains the CODE class, which simulates reading instructions from 
     this->readCode(codeFile);
   }
 
+  Code::~Code(){
+  	
+  }
+
   //Read contents of file into a vector of instruction_t
   void Code::readCode(const char* codeFile){
     

@@ -18,6 +18,8 @@ private:
 public:
 	Data(); //initialize the memory with all positions set to zero
 
+	~Data(); //Deconstructor
+
 	void initialize();
 
   	//Read one byte-address from memory at <addr>

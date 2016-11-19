@@ -12,6 +12,10 @@ Description: Contains the DATA class, which simulates reading and writing main m
     this->initialize();
   }
 
+  Data::~Data(){
+  	
+  }
+
   //Initialize vector size and vector positions
   void Data::initialize(){
     memory.resize(4000);

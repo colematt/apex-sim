@@ -93,8 +93,10 @@ int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Da
       return 0;
     }
 
-    apexCPU.display();
-    apexRF.display();
+    if(VERBOSE){
+	    apexCPU.display();
+	    apexRF.display();
+	}
 
     //Cycle complete, increment the global cycle counter
     cycle++;

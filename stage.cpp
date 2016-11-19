@@ -21,7 +21,9 @@ void Stage::initialize(){
 	opcode = "NOP";
 	operands.clear();
 	values.clear();
+	values.resize(3, 0);
 	valids.clear();
+	valids.resize(3, false);
 	isEmpty = true;
 	isReady = false;
 }

@@ -17,8 +17,10 @@ private:
 public:
 	//Instantiates a Code object given a file to read from
 	Code(const char* codeFile);
+
+	~Code(); //Deconstructor
 	
-	//Reads contents of file into a vector os strings
+	//Reads contents of file into a vector of strings
 	void readCode(const char* codeFile);
 
 	//Returns instruction object given instruction pointer value.

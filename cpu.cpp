@@ -8,6 +8,7 @@ Description: Contains the CPU class, which simulates operation of a five stage C
 #include <iostream>
 #include "cpu.h"
 
+//Constructors for stages explicitly called before constructor body begins
 CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
  F("Fetch"),
  DRF("Decode/RF"),
@@ -20,6 +21,10 @@ CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
 {
 
 	this->initialize();
+}
+
+CPU::~CPU(){
+
 }
 
 void CPU::initialize(){

@@ -50,7 +50,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode: " << WB.opcode << std::endl;
 		exit(1);
-	}
+	}//End WB Stage
 
 	//M Stage
 	if (M.opcode == "ADD" ||
@@ -70,6 +70,118 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 		M.isEmpty = false;
 		M.isReady = true;
+
+		//ALU2
+		//Forward loaded data to src1 or src2 for ARITH operations
+		if (ALU2.opcode == "ADD" ||
+		ALU2.opcode == "SUB" ||
+		ALU2.opcode == "MUL" ||
+		ALU2.opcode == "AND" ||
+		ALU2.opcode == "OR" ||
+		ALU2.opcode == "EX-OR"){
+			if (ALU2.operands.at(1) == M.operands.at(0)){
+				ALU2.values.at(1) = M.values.at(0);
+				ALU2.valids.at(1) = M.valids.at(0);
+			}
+
+			if (ALU2.operands.at(2) == M.operands.at(0)){
+				ALU2.values.at(2) = M.values.at(0);
+				ALU2.valids.at(2) = M.valids.at(0);
+			}
+		}
+
+		//Forward loaded data to src1 or dest1 for Store operations
+		if (ALU2.opcode == "STORE"){
+			if (ALU2.operands.at(0) == M.operands.at(0)){
+				ALU2.values.at(0) = M.values.at(0);
+				ALU2.valids.at(0) = M.valids.at(0);
+			}
+			if (ALU2.operands.at(1) == M.operands.at(0)){
+				ALU2.values.at(1) = M.values.at(0);
+				ALU2.valids.at(1) = M.valids.at(0);
+			}
+		}
+
+		//ALU1
+		//Forward loaded data to src1 or src2 for ARITH operations
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == M.operands.at(0)){
+				ALU1.values.at(1) = M.values.at(0);
+				ALU1.valids.at(1) = M.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == M.operands.at(0)){
+				ALU1.values.at(2) = M.values.at(0);
+				ALU1.valids.at(2) = M.valids.at(0);
+			}
+		}
+
+		//Forward loaded data to src1 or dest1 for Store operations
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == M.operands.at(0)){
+				ALU1.values.at(0) = M.values.at(0);
+				ALU1.valids.at(0) = M.valids.at(0);
+			}
+			if (ALU1.operands.at(1) == M.operands.at(0)){
+				ALU1.values.at(1) = M.values.at(0);
+				ALU1.valids.at(1) = M.valids.at(0);
+			}
+		}
+
+		//B
+		//Forward loaded data to src1 or src2 for ARITH operations
+		if (B.opcode == "BAL" ||
+		B.opcode == "JUMP"){
+			if (B.operands.at(0) == M.operands.at(0)){
+				B.values.at(0) = M.values.at(0);
+				B.valids.at(0) = M.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward loaded data to src1 or src2 for ARITH operations
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == M.operands.at(0)){
+				DRF.values.at(1) = M.values.at(0);
+				DRF.valids.at(1) = M.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == M.operands.at(0)){
+				DRF.values.at(2) = M.values.at(0);
+				DRF.valids.at(2) = M.valids.at(0);
+			}
+		}
+
+		//Forward loaded data to src1 or dest1 for Store operations
+		if (DRF.opcode == "STORE"){
+			if (DRF.operands.at(0) == M.operands.at(0)){
+				DRF.values.at(0) = M.values.at(0);
+				DRF.valids.at(0) = M.valids.at(0);
+			}
+			if (DRF.operands.at(1) == M.operands.at(0)){
+				DRF.values.at(1) = M.values.at(0);
+				DRF.valids.at(1) = M.valids.at(0);
+			}
+		}
+
+		//Forward loaded data to src1 for Branch operations
+		if (DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == M.operands.at(0)){
+				DRF.values.at(0) = M.values.at(0);
+				DRF.valids.at(0) = M.valids.at(0);
+			}
+		}
 	}
 	else if (M.opcode == "STORE"){
 		mydata.writeMem(M.values.at(1), M.values.at(0));
@@ -90,7 +202,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in M: " << M.opcode << std::endl;
 		exit(1);
-	}
+	}//End M Stage
 
 	//D Stage
 	if (D.opcode == "BZ" ||
@@ -106,7 +218,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in D: " << D.opcode << std::endl;
 		exit(1);
-	}
+	}//End D Stage
 
 	//B Stage
 	if (B.opcode == "BZ"){
@@ -165,7 +277,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in B: " << B.opcode << std::endl;
 		exit(1);
-	}
+	}//End B Stage
 
 	//ALU2 Stage
 	if (ALU2.opcode == "ADD"){
@@ -180,6 +292,90 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		else {
 			myregisters.write("Z", 0, 1);
 		}
+
+		//ALU1
+		//Forward result of dest to ARITH src1 or src2
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (ALU1.opcode == "LOAD"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE src1
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == ALU2.operands.at(0)){
+				ALU1.values.at(0) = ALU2.values.at(0);
+				ALU1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+
+		//B
+		//Forward result of dest to BAL, or JUMP src1
+		if (B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
+			if (B.operands.at(0) == ALU2.operands.at(0)){
+				B.values.at(0) = ALU2.values.at(0);
+				B.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward result of dest to ARITH src1 or src2
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == ALU2.operands.at(0)){
+				DRF.values.at(2) = ALU2.values.at(0);
+				DRF.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (DRF.opcode == "LOAD"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE, BAL, or JUMP src1
+		if (DRF.opcode == "STORE" ||
+			DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == ALU2.operands.at(0)){
+				DRF.values.at(0) = ALU2.values.at(0);
+				DRF.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "SUB"){
@@ -194,6 +390,90 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		else {
 			myregisters.write("Z", 0, 1);
 		}
+
+		//ALU1
+		//Forward result of dest to ARITH src1 or src2
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (ALU1.opcode == "LOAD"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE src1
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == ALU2.operands.at(0)){
+				ALU1.values.at(0) = ALU2.values.at(0);
+				ALU1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+
+		//B
+		//Forward result of dest to BAL, or JUMP src1
+		if (B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
+			if (B.operands.at(0) == ALU2.operands.at(0)){
+				B.values.at(0) = ALU2.values.at(0);
+				B.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward result of dest to ARITH src1 or src2
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == ALU2.operands.at(0)){
+				DRF.values.at(2) = ALU2.values.at(0);
+				DRF.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (DRF.opcode == "LOAD"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE, BAL, or JUMP src1
+		if (DRF.opcode == "STORE" ||
+			DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == ALU2.operands.at(0)){
+				DRF.values.at(0) = ALU2.values.at(0);
+				DRF.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "MUL"){
@@ -208,6 +488,90 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		else {
 			myregisters.write("Z", 0, 1);
 		}
+
+		//ALU1
+		//Forward result of dest to ARITH src1 or src2
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (ALU1.opcode == "LOAD"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE src1
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == ALU2.operands.at(0)){
+				ALU1.values.at(0) = ALU2.values.at(0);
+				ALU1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+
+		//B
+		//Forward result of dest to BAL, or JUMP src1
+		if (B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
+			if (B.operands.at(0) == ALU2.operands.at(0)){
+				B.values.at(0) = ALU2.values.at(0);
+				B.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward result of dest to ARITH src1 or src2
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == ALU2.operands.at(0)){
+				DRF.values.at(2) = ALU2.values.at(0);
+				DRF.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (DRF.opcode == "LOAD"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE, BAL, or JUMP src1
+		if (DRF.opcode == "STORE" ||
+			DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == ALU2.operands.at(0)){
+				DRF.values.at(0) = ALU2.values.at(0);
+				DRF.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "AND"){
@@ -222,6 +586,90 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		else {
 			myregisters.write("Z", 0, 1);
 		}
+
+		//ALU1
+		//Forward result of dest to ARITH src1 or src2
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (ALU1.opcode == "LOAD"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE src1
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == ALU2.operands.at(0)){
+				ALU1.values.at(0) = ALU2.values.at(0);
+				ALU1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+
+		//B
+		//Forward result of dest to BAL, or JUMP src1
+		if (B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
+			if (B.operands.at(0) == ALU2.operands.at(0)){
+				B.values.at(0) = ALU2.values.at(0);
+				B.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward result of dest to ARITH src1 or src2
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == ALU2.operands.at(0)){
+				DRF.values.at(2) = ALU2.values.at(0);
+				DRF.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (DRF.opcode == "LOAD"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE, BAL, or JUMP src1
+		if (DRF.opcode == "STORE" ||
+			DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == ALU2.operands.at(0)){
+				DRF.values.at(0) = ALU2.values.at(0);
+				DRF.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "OR"){
@@ -236,6 +684,89 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		else {
 			myregisters.write("Z", 0, 1);
 		}
+
+		//ALU1
+		//Forward result of dest to ARITH src1 or src2
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (ALU1.opcode == "LOAD"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE src1
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == ALU2.operands.at(0)){
+				ALU1.values.at(0) = ALU2.values.at(0);
+				ALU1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//B
+		//Forward result of dest to BAL, or JUMP src1
+		if (B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
+			if (B.operands.at(0) == ALU2.operands.at(0)){
+				B.values.at(0) = ALU2.values.at(0);
+				B.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward result of dest to ARITH src1 or src2
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == ALU2.operands.at(0)){
+				DRF.values.at(2) = ALU2.values.at(0);
+				DRF.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (DRF.opcode == "LOAD"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE, BAL, or JUMP src1
+		if (DRF.opcode == "STORE" ||
+			DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == ALU2.operands.at(0)){
+				DRF.values.at(0) = ALU2.values.at(0);
+				DRF.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "EX-OR"){
@@ -250,11 +781,178 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		else {
 			myregisters.write("Z", 0, 1);
 		}
+
+		//ALU1
+		//Forward result of dest to ARITH src1 or src2
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (ALU1.opcode == "LOAD"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE src1
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == ALU2.operands.at(0)){
+				ALU1.values.at(0) = ALU2.values.at(0);
+				ALU1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+
+		//B
+		//Forward result of dest to BAL, or JUMP src1
+		if (B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
+			if (B.operands.at(0) == ALU2.operands.at(0)){
+				B.values.at(0) = ALU2.values.at(0);
+				B.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward result of dest to ARITH src1 or src2
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == ALU2.operands.at(0)){
+				DRF.values.at(2) = ALU2.values.at(0);
+				DRF.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (DRF.opcode == "LOAD"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE, BAL, or JUMP src1
+		if (DRF.opcode == "STORE" ||
+			DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == ALU2.operands.at(0)){
+				DRF.values.at(0) = ALU2.values.at(0);
+				DRF.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
 		ALU2.isEmpty = false;
 	}
 	else if (ALU2.opcode == "MOVC"){
 		ALU2.values.at(0) = ALU2.values.at(1) + 0;
 		ALU2.valids.at(0) = true;
+
+		//ALU1
+		//Forward result of dest to ARITH src1 or src2
+		if (ALU1.opcode == "ADD" ||
+		ALU1.opcode == "SUB" ||
+		ALU1.opcode == "MUL" ||
+		ALU1.opcode == "AND" ||
+		ALU1.opcode == "OR" ||
+		ALU1.opcode == "EX-OR"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (ALU1.opcode == "LOAD"){
+			if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE src1
+		if (ALU1.opcode == "STORE"){
+			if (ALU1.operands.at(0) == ALU2.operands.at(0)){
+				ALU1.values.at(0) = ALU2.values.at(0);
+				ALU1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+
+		//B
+		//Forward result of dest to BAL, or JUMP src1
+		if (B.opcode == "BAL" ||
+			B.opcode == "JUMP"){
+			if (B.operands.at(0) == ALU2.operands.at(0)){
+				B.values.at(0) = ALU2.values.at(0);
+				B.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+
+		//DRF
+		//Forward result of dest to ARITH src1 or src2
+		if (DRF.opcode == "ADD" ||
+		DRF.opcode == "SUB" ||
+		DRF.opcode == "MUL" ||
+		DRF.opcode == "AND" ||
+		DRF.opcode == "OR" ||
+		DRF.opcode == "EX-OR"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+
+			if (DRF.operands.at(2) == ALU2.operands.at(0)){
+				DRF.values.at(2) = ALU2.values.at(0);
+				DRF.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to LOAD src1
+		if (DRF.opcode == "LOAD"){
+			if (DRF.operands.at(1) == ALU2.operands.at(0)){
+				DRF.values.at(1) = ALU2.values.at(0);
+				DRF.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+
+		//Forward result of dest to STORE, BAL, or JUMP src1
+		if (DRF.opcode == "STORE" ||
+			DRF.opcode == "BAL" ||
+			DRF.opcode == "JUMP"){
+			if (DRF.operands.at(0) == ALU2.operands.at(0)){
+				DRF.values.at(0) = ALU2.values.at(0);
+				DRF.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
 
 		ALU2.isEmpty = false;
 		ALU2.isReady = true;
@@ -282,7 +980,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in ALU2: " << ALU2.opcode << std::endl;
 		exit(1);
-	}
+	}//End ALU2 Stage
 
 	//ALU1 Stage
 	if (ALU1.opcode == "ADD" ||
@@ -304,7 +1002,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in ALU1: " << ALU1.opcode << std::endl;
 		exit(1);
-	}
+	}//End ALU1 Stage
 
 	//DRF Stage
 	if (DRF.opcode == "ADD" ||
@@ -314,12 +1012,17 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.opcode == "OR" ||
 		DRF.opcode == "EX-OR"){
 
-		DRF.values.clear();
-		DRF.valids.clear();
+		DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
+		DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
 
-		for (auto &operand : DRF.operands){
-			DRF.values.push_back(myregisters.read(operand));
-			DRF.valids.push_back(myregisters.isValid(operand));
+		if (!DRF.valids.at(1)){
+			DRF.values.at(1) = myregisters.read(DRF.operands.at(1));
+			DRF.valids.at(1) = myregisters.isValid(DRF.operands.at(1));
+		}
+
+		if (!DRF.valids.at(2)){
+			DRF.values.at(2) = myregisters.read(DRF.operands.at(2));
+			DRF.valids.at(2) = myregisters.isValid(DRF.operands.at(2));
 		}
 
 		DRF.isEmpty = false;
@@ -331,14 +1034,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 	else if (DRF.opcode == "MOVC"){
 
-		DRF.values.clear();
-		DRF.valids.clear();
+		DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
+		DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
 
-		DRF.values.push_back(myregisters.read(DRF.operands.at(0)));
-		DRF.valids.push_back(myregisters.isValid(DRF.operands.at(0)));
-
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(1)));
-		DRF.valids.push_back(true);
+		DRF.values.at(1) = DRF.littoi(DRF.operands.at(1));
+		DRF.valids.at(1) = true;
 
 		myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
 
@@ -348,18 +1048,16 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	}
 	else if (DRF.opcode == "STORE"){
 
-		DRF.values.clear();
-		DRF.valids.clear();
-
-		for (auto &operand : DRF.operands){
-			if(operand.at(0) != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
+		if (!DRF.valids.at(0)){
+			DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
+			DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
 		}
 
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(2)));
-		DRF.valids.push_back(true);
+		DRF.values.at(1) = myregisters.read(DRF.operands.at(1));
+		DRF.valids.at(1) = myregisters.isValid(DRF.operands.at(1));
+
+		DRF.values.at(2) = DRF.littoi(DRF.operands.at(2));
+		DRF.valids.at(2) = true;
 
 		DRF.isEmpty = false;
 
@@ -369,18 +1067,16 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 	else if (DRF.opcode == "LOAD"){
 
-		DRF.values.clear();
-		DRF.valids.clear();
+		DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
+		DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
 
-		for (auto &operand : DRF.operands){
-			if(operand.at(0) != '#'){
-				DRF.values.push_back(myregisters.read(operand));
-				DRF.valids.push_back(myregisters.isValid(operand));
-			}
-		}
+		if (!DRF.valids.at(1)){
+			DRF.values.at(1) = myregisters.read(DRF.operands.at(1));
+			DRF.valids.at(1) = myregisters.isValid(DRF.operands.at(1));
+		}	
 
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(2)));
-		DRF.valids.push_back(true);
+		DRF.values.at(2) = DRF.littoi(DRF.operands.at(2));
+		DRF.valids.at(2) = true;
 
 		DRF.isEmpty = false;
 
@@ -393,11 +1089,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (DRF.opcode == "BZ" ||
 		DRF.opcode == "BNZ"){
 
-		DRF.values.clear();
-		DRF.valids.clear();
-
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(0)));
-		DRF.valids.push_back(true);
+		DRF.values.at(0) = DRF.littoi(DRF.operands.at(0));
+		DRF.valids.at(0) = true;
 
 		DRF.isEmpty = false;
 		DRF.isReady = true;
@@ -405,14 +1098,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else if (DRF.opcode == "BAL" ||
 		DRF.opcode == "JUMP"){
 
-		DRF.values.clear();
-		DRF.valids.clear();
+		DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
+		DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
 
-		DRF.values.push_back(myregisters.read(DRF.operands.at(0)));
-		DRF.valids.push_back(myregisters.isValid(DRF.operands.at(0)));
-
-		DRF.values.push_back(DRF.littoi(DRF.operands.at(1)));
-		DRF.valids.push_back(true);
+		DRF.values.at(1) = DRF.littoi(DRF.operands.at(1));
+		DRF.valids.at(1) = true;
 
 		DRF.isEmpty = false;
 
@@ -427,7 +1117,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in DRF: " << DRF.opcode << std::endl;
 		exit(1);
-	}
+	}//End DRF Stage
 
 	//F Stage
 	if (F.isEmpty == true){
@@ -444,7 +1134,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		F.isReady = true;
 
 		pc += 4;;
-	}
+	}//End F Stage
 
 /******************************************************************************/
 /************************STAGE ADVANCEMENT PHASE*******************************/
@@ -477,7 +1167,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in WB: " << WB.opcode << std::endl;
 		exit(1);
-	}
+	}//End WB Stage
 
 	//M Stage
 	if (M.opcode == "ADD" ||
@@ -502,7 +1192,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in M: " << M.opcode << std::endl;
 		exit(1);
-	}
+	}//End M Stage
 
 	//D Stage
 	//WARNING: D contests with ALU2 to advance to M
@@ -521,7 +1211,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 				after B phase, and it flushes F/DRF in B. There should be
 				no conflicts with ALU2 for instructions dispatched after
 				the instruction in B.                                  */
-				if ((D.isReady && !ALU2.isReady) || ALU2.opcode == "NOP"){
+				if (D.isReady && !ALU2.isReady){
+					D.advance(M);
+				}
+				else if (ALU2.opcode == "NOP"){
 					D.advance(M);
 				}
 				else{
@@ -531,7 +1224,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in D: " << D.opcode << std::endl;
 		exit(1);
-	}
+	}//End D Stage
 
 	//B Stage
 	if (B.opcode == "BZ" ||
@@ -545,7 +1238,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in B: " << B.opcode << std::endl;
 		exit(1);
-	}
+	}//End B Stage
 
 	//ALU2 Stage
 	if (ALU2.opcode == "ADD" ||
@@ -556,17 +1249,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU2.opcode == "EX-OR" ||
 		ALU2.opcode == "MOVC" ||
 		ALU2.opcode == "LOAD" ||
-		ALU2.opcode == "STORE"){
+		ALU2.opcode == "STORE" ||
+		ALU2.opcode == "NOP"){
 				ALU2.advance(M);
-	}
-	else if(ALU2.opcode == "NOP"){
-		WB.isEmpty = true;
-		WB.isReady = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode in ALU2: " << ALU2.opcode << std::endl;
 		exit(1);
-	}
+	}//End ALU2 Stage
 
 	//ALU1 Stage
 	if (ALU1.opcode == "ADD" ||
@@ -577,17 +1267,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		ALU1.opcode == "EX-OR" ||
 		ALU1.opcode == "MOVC" ||
 		ALU1.opcode == "LOAD" ||
-		ALU1.opcode == "STORE"){
+		ALU1.opcode == "STORE" ||
+		ALU1.opcode == "NOP"){
 				ALU1.advance(ALU2);
-	}
-	else if(ALU1.opcode == "NOP"){
-		WB.isEmpty = true;
-		WB.isReady = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode in ALU1: " << ALU1.opcode << std::endl;
 		exit(1);
-	}
+	}//End ALU1 Stage
 
 	//DRF Stage
 	if (DRF.opcode == "ADD" ||
@@ -605,14 +1292,17 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 		DRF.opcode == "BNZ" ||
 		DRF.opcode == "BAL" ||
 		DRF.opcode == "JUMP" ||
-		DRF.opcode == "HALT" ||
-		DRF.opcode == "NOP"){
+		DRF.opcode == "HALT"){
 				DRF.advance(B);
+	}
+	else if(DRF.opcode == "NOP"){
+		DRF.isEmpty = true;
+		DRF.isReady = false;
 	}
 	else{
 		std::cerr << "Unresolvable opcode in DRF: " << DRF.opcode << std::endl;
 		exit(1);
-	} //END DRF Stage
+	} //End DRF Stage
 
 	//F Stage
 	if (F.opcode == "ADD" ||
@@ -635,8 +1325,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 	else{
 		std::cerr << "Unresolvable opcode in F: " << F.opcode << std::endl;
 		exit(1);
-	} //End F stage
+	} //End F Stage
 
-	//++cycle; // increment the cycle counter for timestamps
-	return 1; //Return for compile testing
+	return 1; //Return 1 for cycle complete and no Halt processed
 }

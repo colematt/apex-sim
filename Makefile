@@ -10,7 +10,7 @@ CLASS_FILES = 	cpu.cpp \
 all: apex-sim
 
 apex-sim:
-	$(CC) $(CCFLAGS) main.cpp $(CLASS_FILES) -o apex-sim
+	$(CXX) $(CCFLAGS) main.cpp $(CLASS_FILES) -o apex-sim
 
 .PHONY: clean
 clean:

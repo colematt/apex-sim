@@ -11,6 +11,10 @@ Registers::Registers(){
   this->initialize();
 }
 
+Registers::~Registers(){
+	
+}
+
 //Initialize the RF with all registers/flags set to zero
 //and all validities set to true
 void Registers::initialize(){
