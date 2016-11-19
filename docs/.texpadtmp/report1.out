@@ -1,0 +1,13 @@
+\BOOKMARK [1][-]{section.1}{Design}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Driver Program}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Classes}{section.1}% 3
+\BOOKMARK [3][-]{subsubsection.1.2.1}{Code}{subsection.1.2}% 4
+\BOOKMARK [3][-]{subsubsection.1.2.2}{Data}{subsection.1.2}% 5
+\BOOKMARK [3][-]{subsubsection.1.2.3}{Registers}{subsection.1.2}% 6
+\BOOKMARK [3][-]{subsubsection.1.2.4}{CPU and Stages}{subsection.1.2}% 7
+\BOOKMARK [1][-]{section.2}{Implementation}{}% 8
+\BOOKMARK [2][-]{subsection.2.1}{Stage-wise Reverse Order Execution}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.2}{Stalls}{section.2}% 10
+\BOOKMARK [2][-]{subsection.2.3}{Forwarding}{section.2}% 11
+\BOOKMARK [1][-]{section.3}{Work Log}{}% 12
+\BOOKMARK [1][-]{appendix.A}{Appendix: Screen Captures}{}% 13
