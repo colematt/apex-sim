@@ -1,2 +1,6 @@
-\contentsline {figure}{\numberline {1}{\ignorespaces APEX pipeline and class interactions.}}{1}{figure.1}
-\contentsline {figure}{\numberline {2}{\ignorespaces APEX pipeline forwarding paths.}}{5}{figure.2}
+\contentsline {figure}{\numberline {1}{\ignorespaces APEX pipeline and class data flows.}}{1}{figure.1}
+\contentsline {figure}{\numberline {2}{\ignorespaces APEX pipeline forwarding paths.}}{7}{figure.2}
+\contentsline {figure}{\numberline {3}{\ignorespaces Final Pipeline Contents and Register File of SimpleTestInput1}}{9}{figure.3}
+\contentsline {figure}{\numberline {4}{\ignorespaces Final Memory Contents of SimpleTestInput1}}{10}{figure.4}
+\contentsline {figure}{\numberline {5}{\ignorespaces Final Pipeline Contents and Register File of SimpleTestInput2}}{11}{figure.5}
+\contentsline {figure}{\numberline {6}{\ignorespaces Final Memory Contents of SimpleTestInput2}}{12}{figure.6}

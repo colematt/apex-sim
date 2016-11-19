@@ -16,8 +16,8 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces APEX pipeline and class interactions.}}{1}{figure.1}}
-\newlabel{fig:overview}{{1}{1}{APEX pipeline and class interactions}{figure.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces APEX pipeline and class data flows.}}{1}{figure.1}}
+\newlabel{fig:overview}{{1}{1}{APEX pipeline and class data flows}{figure.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Design}{1}{section.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Driver Program}{2}{subsection.1.1}}
 \newlabel{sec:driver}{{1.1}{2}{Driver Program}{subsection.1.1}{}}
@@ -29,16 +29,28 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.4}CPU and Stages}{4}{subsubsection.1.2.4}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Implementation}{4}{section.2}}
 \newlabel{sec:implementation}{{2}{4}{Implementation}{section.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Work Phase}{4}{subsection.2.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Advance Phase}{4}{subsection.2.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Stalls}{4}{subsection.2.3}}
-\newlabel{sec:stalls}{{2.3}{4}{Stalls}{subsection.2.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Forwarding}{4}{subsection.2.4}}
-\newlabel{sec:forwarding}{{2.4}{4}{Forwarding}{subsection.2.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces APEX pipeline forwarding paths.}}{5}{figure.2}}
-\newlabel{fig:forwarding}{{2}{5}{APEX pipeline forwarding paths}{figure.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.1}LOAD instruction in Memory stage}{5}{subsubsection.2.4.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.2}Arithmetic or MOVC instructions in ALU2 stage}{5}{subsubsection.2.4.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.3}BAL instructions in Branch, Delay, or Memory stage}{5}{subsubsection.2.4.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Production}{5}{section.3}}
-\newlabel{sec:production}{{3}{5}{Production}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Stage-wise Reverse Order Execution}{4}{subsection.2.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Stalls}{5}{subsection.2.2}}
+\newlabel{sec:stalls}{{2.2}{5}{Stalls}{subsection.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Forwarding}{5}{subsection.2.3}}
+\newlabel{sec:forwarding}{{2.3}{5}{Forwarding}{subsection.2.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces APEX Instruction Source and Destination Sets}}{6}{table.1}}
+\newlabel{tab:instsets}{{1}{6}{APEX Instruction Source and Destination Sets}{table.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{LOAD instruction after Memory stage}{6}{section*.4}}
+\@writefile{toc}{\contentsline {paragraph}{Arithmetic or MOVC instructions after ALU2 stage}{6}{section*.5}}
+\@writefile{toc}{\contentsline {paragraph}{BAL instructions after Branch Stage}{6}{section*.6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces APEX pipeline forwarding paths.}}{7}{figure.2}}
+\newlabel{fig:forwarding}{{2}{7}{APEX pipeline forwarding paths}{figure.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Work Log}{7}{section.3}}
+\newlabel{sec:worklog}{{3}{7}{Work Log}{section.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Chronological Work Log}}{8}{table.2}}
+\newlabel{tab:worklog}{{2}{8}{Chronological Work Log}{table.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Final Pipeline Contents and Register File of SimpleTestInput1}}{9}{figure.3}}
+\newlabel{fig:sti1pipereg}{{3}{9}{Final Pipeline Contents and Register File of SimpleTestInput1}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix: Screen Captures}{9}{appendix.A}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Final Memory Contents of SimpleTestInput1}}{10}{figure.4}}
+\newlabel{fig:sti1mem}{{4}{10}{Final Memory Contents of SimpleTestInput1}{figure.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Final Pipeline Contents and Register File of SimpleTestInput2}}{11}{figure.5}}
+\newlabel{fig:sti2pipereg}{{5}{11}{Final Pipeline Contents and Register File of SimpleTestInput2}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Final Memory Contents of SimpleTestInput2}}{12}{figure.6}}
+\newlabel{fig:sti2mem}{{6}{12}{Final Memory Contents of SimpleTestInput2}{figure.6}{}}
