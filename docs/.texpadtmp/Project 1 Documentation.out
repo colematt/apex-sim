@@ -4,11 +4,13 @@
 \BOOKMARK [3][-]{subsubsection.1.2.1}{Code}{subsection.1.2}% 4
 \BOOKMARK [3][-]{subsubsection.1.2.2}{Data}{subsection.1.2}% 5
 \BOOKMARK [3][-]{subsubsection.1.2.3}{Registers}{subsection.1.2}% 6
-\BOOKMARK [3][-]{subsubsection.1.2.4}{CPU}{subsection.1.2}% 7
-\BOOKMARK [3][-]{subsubsection.1.2.5}{Stages}{subsection.1.2}% 8
-\BOOKMARK [1][-]{section.2}{Implementation}{}% 9
-\BOOKMARK [2][-]{subsection.2.1}{Work Phase}{section.2}% 10
-\BOOKMARK [2][-]{subsection.2.2}{Advance Phase}{section.2}% 11
-\BOOKMARK [2][-]{subsection.2.3}{Stalls}{section.2}% 12
-\BOOKMARK [2][-]{subsection.2.4}{Forwarding}{section.2}% 13
-\BOOKMARK [1][-]{section.3}{Production}{}% 14
+\BOOKMARK [3][-]{subsubsection.1.2.4}{CPU and Stages}{subsection.1.2}% 7
+\BOOKMARK [1][-]{section.2}{Implementation}{}% 8
+\BOOKMARK [2][-]{subsection.2.1}{Work Phase}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.2}{Advance Phase}{section.2}% 10
+\BOOKMARK [2][-]{subsection.2.3}{Stalls}{section.2}% 11
+\BOOKMARK [2][-]{subsection.2.4}{Forwarding}{section.2}% 12
+\BOOKMARK [3][-]{subsubsection.2.4.1}{LOAD instruction in Memory stage}{subsection.2.4}% 13
+\BOOKMARK [3][-]{subsubsection.2.4.2}{Arithmetic or MOVC instructions in ALU2 stage}{subsection.2.4}% 14
+\BOOKMARK [3][-]{subsubsection.2.4.3}{BAL instructions in Branch, Delay, or Memory stage}{subsection.2.4}% 15
+\BOOKMARK [1][-]{section.3}{Production}{}% 16

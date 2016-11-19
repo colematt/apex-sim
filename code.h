@@ -21,6 +21,7 @@ public:
 	~Code(); //Deconstructor
 	
 	//Reads contents of file into a vector of strings
+
 	void readCode(const char* codeFile);
 
 	//Returns instruction object given instruction pointer value.
