@@ -1,4 +1,4 @@
--# APEX ISA Semantics		
+# APEX ISA Semantics		
 
 | Opcode | Operands              | Semantics           |		
 |--------|-----------------------|---------------------|		
