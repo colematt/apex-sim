@@ -1,11 +1,12 @@
 CXX=clang++
 CCFLAGS = -std=c++11 -g -Wall
-CLASS_FILES = 	cpu.cpp \
+CLASS_FILES = \
+	cpu.cpp \
 	code.cpp \
-	register.cpp \
 	data.cpp \
-	stage.cpp \
-	simulate.cpp
+	register.cpp \
+	simulate.cpp \
+	stage.cpp 
 
 all: apex-sim
 
