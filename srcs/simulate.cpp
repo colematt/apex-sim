@@ -1252,7 +1252,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
 
 			DRF.isEmpty = false;
 
-			if (DRF.valids.at(0))
+			if (DRF.valids.at(1))
 				DRF.isReady = true;
 		}
 
