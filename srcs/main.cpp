@@ -2,7 +2,7 @@
 File:     main.cpp
 Authors:  Matthew Cole <mcole8@binghamton.edu>
           Brian Gracin <bgracin1@binghamton.edu>
-Description: Driver for apex-sim. Contains functions controlling simulator high-level behavior.
+Description: Driver for apex-sim.
 */
 #include <iostream>
 #include <string>
@@ -12,98 +12,10 @@ Description: Driver for apex-sim. Contains functions controlling simulator high-
 #include "register.h"
 #include "apex.h"
 
-#define VERBOSE 1
-
 using namespace std;
 
-//Simulator variables with external linkage
-int cycle = 0; //simulator cycle current value
-int pc = 4000;    //program counter current value
+//Simulator variables without external linkage
 static const char* instFile; //instruction input file
-
-//Display an interface help message
-void help()
-{
-  cout << "[i]   Initialize the simulator state" << endl;
-  cout << "[s n] Simulate <n> number of cycles" << endl;
-  cout << "[d n] Display the simulator internal state" << endl;
-  cout << "[q]   Quit the simulator" << endl;
-  cout << "[h]   Display a help message" << endl;
-}
-
-// Initialize the simulator to a known state.
-void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
-{
-  if (VERBOSE)
-    cout << "Initializing ... " << endl;
-
-  //Reset simulator state variables
-  cycle = 0;
-  pc = 4000;
-
-  //Initialize each of the instances by delegating to member functions
-  mycpu.initialize();
-  myregisters.initialize();
-  mydata.initialize();
-}
-
-// Display the simulator internal state.
-void display(CPU &mycpu, Registers &myregisters, Data &mydata)
-{
-  if (VERBOSE)
-    cout << "Displaying simulator state ... " << endl;
-
-  //Print simulator state variables
-  cout << "cycle: " << cycle << " pc: " << pc << endl;
-
-  //Display each of the instances by delegating to member functions
-  cout << "-----------\n" << "CPU\n" << "-----------\n";
-  mycpu.display();
-
-  cout << "-----------\n" << "Registers\n" << "-----------\n";
-  myregisters.display();
-
-  cout << "-----------\n" << "Data Memory\n" << "-----------\n";
-  mydata.display();
-}
-
-//Quit the simulator
-void quit(CPU &mycpu, Registers &myregisters, Data &mydata){
-  if (VERBOSE)
-    cout << "Quitting simulator ..." << endl;
-  display(mycpu, myregisters, mydata);
-}
-
-// Simulate the operation of the system for <num_cycles>, or until a HALT
-//instruction is encountered, or until an error occurs in simulation.
-//Return the current cycle number after simulation pauses or halts.
-int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Data &apexData)
-{
-  for (int c = cycle; c < num_cycles; c++)
-  {
-    //Perform one cycle of simulation
-    if (VERBOSE)
-      cout << "Simulating cycle " << cycle << " ..." << endl;
-
-    //cpu::simulate() returns 0 if execution should not continue
-    //(EOF, HALT or exception encountered)
-    if(!(apexCPU.simulate(apexCode, apexRF, apexData))){
-      cout << "Simulator HALT encounted on cycle " << cycle << endl;
-      quit(apexCPU, apexRF, apexData);
-      return 0;
-    }
-
-    if(VERBOSE){
-	    apexCPU.display();
-	    apexRF.display();
-	}
-
-    //Cycle complete, increment the global cycle counter
-    cycle++;
-  }
-
-  return cycle;
-}
 
 int main(int argc, char** argv)
 {
@@ -129,11 +41,10 @@ int main(int argc, char** argv)
 
   //Set up simulator command interface
   string command = "h"; //interface switch statement selector
-  int n = 1; // number of cycles or addresses modifier
+  int n = 1; // number of cycles modifier
+  int a1, a2 = 0; //address bounds modifier
 
-/******************************************************************************/
-/**************************USER INTERFACE *************************************/
-/******************************************************************************/
+  //Run user interface
   while (command != "q") {
     //On first execution of the interface, display the help message
     if (cycle == 0)

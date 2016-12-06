@@ -3,8 +3,9 @@ CXXFLAGS = -std=c++11 -g -Wall
 CXX_INCLUDE = -I./srcs
 APEX_SRC = srcs
 CLASS_FILES = \
-	$(APEX_SRC)/cpu.cpp \
+	$(APEX_SRC)/apex.cpp \
 	$(APEX_SRC)/code.cpp \
+	$(APEX_SRC)/cpu.cpp \
 	$(APEX_SRC)/data.cpp \
 	$(APEX_SRC)/register.cpp \
 	$(APEX_SRC)/simulate.cpp \
