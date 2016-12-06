@@ -15,6 +15,8 @@ Description: Header file for stage.cpp
 class Stage {
 private:
     std::string name;
+    int latency;
+    int lcounter;
 
 public:
   //the stage is occupied by an inflight instruction
@@ -34,7 +36,7 @@ public:
   std::vector<bool> valids;
 
   //Constructors/Destructors/Operators
-  Stage(std::string n);
+  Stage(std::string n, int l=1);
 
   //Interface functions
   void initialize(); //Initialize the contents of this stage to empty with NOP
