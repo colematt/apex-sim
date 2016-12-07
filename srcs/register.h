@@ -21,11 +21,11 @@ private:
   //register := {string name:(int value, bool valid)}
   std::map<std::string, std::tuple<int,bool>> reg_file;
 
-  //map <pReg, rReg>
+  //Front end table := {string pReg, string rReg}
   std::map<std::string, std::string> front_end;
 
-  //maps <rReg, tuple<pReg, most recent bit>>
-  std::map<std::string, std::tuple<string,bool>> back_end;
+  //Back end table := {string rReg, string pReg}
+  std::map<std::string, std::string> back_end;
 
   //holds list of physical registers that are ready to to be used
   std::queue<std::string> free_list;
