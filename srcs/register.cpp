@@ -49,22 +49,41 @@ void Registers::display(){
 }
 
 //Create new instance of an R reg
-std::string Registers::getRenamed(std::string archReg){
+std::string Registers::getRenamed(std::string rReg){
   std::string physReg = this->free_list.pop();
   std::string regHolder;
+  int valueCarry = 0;
 
-  this->front_end[physReg] = archReg;
+  //Check if P reg entry in table already
+  //If it is modify entry with new R reg
+  //If it is not push P reg and R reg key value pair
+  auto iit = this->front_end.find(physReg);
+  if (iit != this->front_end.end()){
+    this->front_end[physReg] = archReg;
+  } else {
+    this->front_end->push(physReg, archReg);
+  }
 
-  //Only update back_end if entry exists
+  //Check back end to see if there is commited value for R reg
+  //If there is one set mapped P reg valid to false
   auto it = this->back_end.find(rReg);
   if (it != this->back_end.end()) {
-    regHolder = std::get<0>(itt->second;
-    this->back_end[rReg] = std::make_tuple(regHolder, false); //Set current to false
-  } else 
+    regHolder = it->second;
+
+    auto itt = this->reg_file.find(regHolder);
+    if (itt != this->reg_file.end()) {
+      valueCarry = std::get<0>(itt->second);
+      this->reg_file[regHolder] = std::make_tuple(valueCarry, false);
+    } else {
+      std::string what_arg = reg + " is not a valid register";
+      throw std::invalid_argument(what_arg);
+    }
+  }
 
   return physReg;
 }
 
+//Commit new value to R reg
 void Registers::commit(std::string pReg){
   std::string rReg;
   std::string prevReg;
@@ -84,11 +103,9 @@ void Registers::commit(std::string pReg){
     prevReg = std::get<0>(itt->second;
     this->back_end[rReg] = std::make_tuple(pReg, true); //Set new P reg value
   } else {
-    std::string what_arg = reg + " is not a valid register";
-    throw std::invalid_argument(what_arg);
+    this->back_end.push(rReg, std::make_tuple(pReg, true));
   }
 
-  this->front_end[pReg] = ""; //Remove mapped R reg
   this->free_list.push(pReg); //Push P reg back into free list
 
 }
