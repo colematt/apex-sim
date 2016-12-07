@@ -11,6 +11,7 @@ Description: header file for register.cpp
 #include <tuple>
 #include <exception>
 #include <stdexcept>
+#include <queue>
 
 #ifndef REGISTER_H
 #define REGISTER_H
