@@ -31,6 +31,7 @@ int main(int argc, char** argv)
   }
 
   //Instantiate Simulator classes
+  //TODO: Add instances of IQ and ROB
   Code *apexCode = new Code(instFile);
   Registers *apexRF = new Registers();
   Data *apexData = new Data();
@@ -40,40 +41,60 @@ int main(int argc, char** argv)
   initialize(*apexCPU, *apexRF, *apexData);
 
   //Set up simulator command interface
-  string command = "h"; //interface switch statement selector
-  int n = 1; // number of cycles modifier
-  int a1, a2 = 0; //address bounds modifier
+  string cmd; //interface switch statement selector
+  string mod; //the "d" command takes a modifier
+  int n, a1, a2; // number of cycles modifier
 
   //Run user interface
-  while (command != "q") {
+  while (true) {
     //On first execution of the interface, display the help message
     if (cycle == 0)
       help();
 
     //Get the next command. If command takes the n parameter, ingest it also
-    cin >> command;
-    if (command == "s")
-      cin >> n;
+    cin >> cmd;
 
-    //Perform appropriate action based on the command / parameter
-    switch (command[0]) {
-      case 'i':
-        initialize(*apexCPU, *apexRF, *apexData);
-        break;
-      case 's':
-        simulate(n, *apexCPU, *apexCode, *apexRF, *apexData);
-        break;
-      case 'd':
-        display(*apexCPU, *apexRF, *apexData);
-        break;
-      case 'q': //simulator can quit by user selection or encountering HALT
-        quit(*apexCPU, *apexRF, *apexData);
-        break;
-      case 'h': //Falls through to default (which prints the help message)
-      default: //Input wasn't recognized
-        help();
-        break;
+    //Process the command. If command takes additional parameters, ingest them.
+    if (cmd == "i") {
+      initialize(*apexCPU, *apexRF, *apexData);
     }
-  } // End User Interface
+    else if (cmd== "s"){
+      cin >> n;
+      simulate(n, *apexCPU, *apexCode, *apexRF, *apexData);
+    }
+    else if (cmd == "d"){
+      //Ingest modifiers
+      cin >> mod;
+
+      if (mod == "mem")
+        cin >> a1 >> a2;
+        //Display memory
+        display(*apexCPU, *apexRF, *apexData, mod, a1, a2);
+      else {
+        //Display memory
+        display(*apexCPU, *apexRF, *apexData, mod);
+      }
+    }
+    else if (cmd == "urf"){
+      //Ingest modifier
+      cin >> n;
+      //Set URF size
+      if (VERBOSE >= 1)
+        std::cout << "Setting URF Size to " << n << " registers ... " << std::endl;
+      apexRF->setNumReg(n);
+    }
+    else if (cmd == "q"){
+      quit(*apexCPU, *apexRF, *apexData);
+      break;
+    }
+    else if (cmd == "h"){
+      help();
+    }
+    else{
+      std::cerr << "Did not understand " << cmd << " !" << std::endl;
+      help();
+    }
+  } // End User Interface while-loop
+
   return 0;
 }

@@ -8,6 +8,10 @@ Description: Header file to hold globally aware variables
 #ifndef APEX_H
 #define APEX_H
 
+//VERBOSE 0 : No diagnostic output. Only output required by specification.
+//VERBOSE 1 : Some diagnostic output. Notify on each major action.
+//VERBOSE 2 : More diagnostic output. VERBOSE 1 + mini report after a cycle.
+//VERBOSE 3 : All diagnostic output. Currently equal to VERBOSE 2.
 #define VERBOSE 1
 
 extern int pc;    //STATE: program counter current value
@@ -26,7 +30,7 @@ extern int committed_store; //STAT: number of STORE instructions committed
 // Helper functions
 void help();
 void initialize(CPU &mycpu, Registers &myregisters, Data &mydata);
-void display(CPU &mycpu, Registers &myregisters, Data &mydata);
+void display(CPU &mycpu, Registers &myregisters, Data &mydata, string mod, int a1=0, int a2=3996);
 void stats();
 int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Data &apexData);
 void quit(CPU &mycpu, Registers &myregisters, Data &mydata);

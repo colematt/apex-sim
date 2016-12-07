@@ -27,19 +27,20 @@ int committed_store = 0;
 //Display an interface help message
 void help()
 {
-  std::cout << "Command        | Action\n"
-            << "---------------|---------------------------------------------\n"
-            << "i              |Initialize the simulator state\n"
-            << "s <n>          |Simulate <n> number of cycles\n"
-            << "d              |Display the simulator internal state\n"
-            << "dmt            |Display Front Rename and Back Register Alias tables\n"
-            << "diq            |Display Issue Queue entries and status\n"
-            << "drob           |Display ROB contents\n"
-            << "dmem <a1> <a2> |Display memory from address <a1> to <a2>\n"
-            << "dstats         |Display Stats\n"
-            << "urf <n>        |Set URF Size to <n> physical registers\n"
-            << "q              |Quit the simulator\n"
-            << "h              |Display this help message" << std::endl;
+  std::cout << "Command         | Action\n"
+            << "----------------|---------------------------------------------\n"
+            << "i               |Initialize the simulator state\n"
+            << "s <n>           |Simulate <n> number of cycles\n"
+            << "d all           |Display the full simulator internal state\n"
+            << "d cpu           |Display CPU stage contents\n"
+            << "d rt            |Display Front-end and Back-end Register Tables\n"
+            << "d iq            |Display Issue Queue entries and status\n"
+            << "d rob           |Display ROB contents\n"
+            << "d mem <a1> <a2> |Display memory from address <a1> to <a2>\n"
+            << "d stats         |Display Stats\n"
+            << "urf <n>         |Set URF Size to <n> physical registers\n"
+            << "q               |Quit the simulator\n"
+            << "h               |Display this help message" << std::endl;
 }
 
 // Initialize the simulator to a known state.
@@ -64,11 +65,39 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
   mycpu.initialize();
   myregisters.initialize();
   mydata.initialize();
-}
+} //end initialize()
 
 // Display the simulator internal state.
-void display(CPU &mycpu, Registers &myregisters, Data &mydata)
+// TODO: Add more pass-by-reference arguments, to IQ, ROB classes?
+void display(CPU &mycpu, Registers &myregisters, Data &mydata, string mod, int a1=0, int a2=3996)
 {
+  //Sanitize inputs
+  if  !(mod == "all" ||
+        mod == "cpu" ||
+        mod == "rt"  ||
+        mod == "iq"  ||
+        mod == "rob" ||
+        mod == "mem" ||
+        mod == "stats"){
+            std::cerr << "Display modifier " << mod << " not understood."
+            mod = "none";
+        }
+  }
+  if ((mod == "all" || mod == "mem") && a1 < 0){
+    std::cerr << "Memory range start is out of bounds. Setting to 0." << std::endl;
+    a1 = 0;
+  }
+  if ((mod == "all" || mod == "mem") && a2 > 3996){
+    std::cerr << "Memory range stop is out of bounds. Setting to 3996." << std::endl;
+    a2 = 3996;
+  }
+  if ((mod == "all" || mod == "mem") && (a1 > a2)){
+    //We assert a1 <= a2. Swap a1, a2 if assertion is false.
+    a1 = a1 ^ a2;
+    a2 = a1 ^ a2;
+    a1 = a1 ^ a2;
+  }
+
   if (VERBOSE >= 1)
     std::cout << "Displaying simulator state ... " << std::endl;
 
@@ -76,15 +105,37 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata)
   std::cout << "cycle: " << cycle << " pc: " << pc << std::endl;
 
   //Display each of the instances by delegating to member functions
-  std::cout << "-----------\n" << "CPU\n" << "-----------\n";
-  mycpu.display();
-
-  std::cout << "-----------\n" << "Registers\n" << "-----------\n";
-  myregisters.display();
-
-  std::cout << "-----------\n" << "Data Memory\n" << "-----------\n";
-  mydata.display();
-}
+  if (mod == "all" || mod == "cpu"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "CPU\n" << "-----------\n";
+    mycpu.display();
+  }
+  if (mod == "all" || mod == "rt"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "Registers\n" << "-----------\n";
+    myregisters.display();
+  }
+  if (mod == "all" || mod == "iq"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "Issue Queue\n" << "-----------\n";
+    //TODO: Add call to IQ::display() function
+  }
+  if (mod == "all" || mod == "rob"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "Reorder Buffer\n" << "-----------\n";
+    //TODO: Add call to ROB::display() function
+  }
+  if (mod == "all" || mod == "mem"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "Data Memory\n" << "-----------\n";
+    mydata.display(a1, a2);
+  }
+  if (mod == "all" || mod == "stats"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "Statistics\n" << "-----------\n";
+    stats();
+  }
+} // end simulate()
 
 //Display simulator stats
 void stats()

@@ -28,8 +28,8 @@ public:
   	//Write one byte to memory at <addr>
   	void writeMem(int addr, int value);
 
-  	//Display first 100 non-zero contents of memory
-  	void display();
+  	//Display addressable contents of memory from a1 to a2 inclusive
+  	void display(int a1, int a2);
 
 };
 #endif

@@ -20,7 +20,7 @@
 \title{Apex Instruction Set Architecture Simulator (\texttt{apex-sim}) \\ Phase 1 Documentation}
 \author{Matthew Cole \\ \texttt{mcole8@binghamton.edu}
 \and
-Brian Gracin \\ 
+Brian Gracin \\
 	\texttt{bgracin1@binghamton.edu}}
 \date{19 November 2016}
 
@@ -80,53 +80,53 @@ The \codename entry point file is \texttt{main.cpp}. Besides maintaining simulat
 \codename models each major component of the APEX system as a standalone class. These classes are discussed in the following sections.
 
 \subsubsection{Code}
-The code class performs two roles. 
-First, during its construction, it reads a text file into a vector container. This decision was made because random access into a vector is trivial, while random access into a text file whose lines are not a constant length (as in the APEX ISA) is extremely challenging. 
-Second, those instructions are tokenized by first separating the opcode from its operands by searching for a whitespace character from the beginning of the string, then separating the remainder of the string on commas. 
+The code class performs two roles.
+First, during its construction, it reads a text file into a vector container. This decision was made because random access into a vector is trivial, while random access into a text file whose lines are not a constant length (as in the APEX ISA) is extremely challenging.
+Second, those instructions are tokenized by first separating the opcode from its operands by searching for a whitespace character from the beginning of the string, then separating the remainder of the string on commas.
 
-The final result is that the Code class allows us to receive a pre-parsed instruction simply by specifying a program counter value corresponding to a line in the input text file. 
-As stated in the specification, with a 0-based index, the $k^{th}$ line is the instruction corresponding to program counter value $4000 + 4k$. 
+The final result is that the Code class allows us to receive a pre-parsed instruction simply by specifying a program counter value corresponding to a line in the input text file.
+As stated in the specification, with a 0-based index, the $k^{th}$ line is the instruction corresponding to program counter value $4000 + 4k$.
 Instructions can be easily read into the Fetch stage using the \texttt{std::vector<std::string> Code::getInstr(int addr)} member function.
 
 Unlike the other classes, Code does not provide a means of modifying the values it contains. This is because a code segment is ordinarily not writeable by programs once execution has begun (with exceptions such as Just-In-Time code). \codename models this behavior by prohibiting modifying a Code object after construction. Its contents can be found by reading the source code input text file; accordingly, \codename Code objects do not have a \texttt{display()} method, unlike many of the other component classes.
 
 \subsubsection{Data}
 The Data class is similar to the code because it provides the ability for the APEX pipeline to interact with main memory for long-term storage.
-(Note: the APEX pipeline does not have a concept of cache levels; the pipeline writes and reads directly from memory). 
-As a result, Data instances provide an API consisting of two functions: \texttt{int Data::readMem(int addr)} and \texttt{void Data::writeMem(int addr, int value)}. 
+(Note: the APEX pipeline does not have a concept of cache levels; the pipeline writes and reads directly from memory).
+As a result, Data instances provide an API consisting of two functions: \texttt{int Data::readMem(int addr)} and \texttt{void Data::writeMem(int addr, int value)}.
 These function as basic class accessor and mutator respectively.
 Because APEX has no concept of memory-to-memory operations, only two Data manipulation instructions exist: LOAD and STORE.
 \codename only uses the Data accessor and mutator functions in the Memory (MEM) stage.
 
-Underneath this exposed interface, the Data class uses a vector container consisting of 4000 integer values. 
-Although 4000 integers exist, in the APEX specification, only 4-byte aligned values are addressable. 
+Underneath this exposed interface, the Data class uses a vector container consisting of 4000 integer values.
+Although 4000 integers exist, in the APEX specification, only 4-byte aligned values are addressable.
 Therefore, the unaligned addresses remain unused, and the aligned values of the vector are limited in size to 4 bytes wide (half the width of a 64-bit system integer primitive). This was done for developer convenience, and it is transparent to the user in practice.
 
 \subsubsection{Registers}
 \codename models a register file containing infinite virtual read and write ports using the Registers class.
-Each register in the register file has three components: a key \-- a string containing the name of the register, and a two-tuple value \-- an integer containing the \textit{value} of the register and a bool containing the \textit{validity}. 
+Each register in the register file has three components: a key \-- a string containing the name of the register, and a two-tuple value \-- an integer containing the \textit{value} of the register and a bool containing the \textit{validity}.
 The validity of the register is used for simple interlocking as a means of managing flow dependencies across a register.
 This (and the process of stalling) is further discussed in section \ref{sec:stalls}.
 
-A Registers instance contains sixteen general purpose registers labelled with the strings "R0" through "R15". 
+A Registers instance contains sixteen general purpose registers labelled with the strings "R0" through "R15".
 There are also two special purpose registers "X" and "Z".
 Strictly speaking, we do not perform any checking for source code which attempts to use these registers.
 However, from the Specification, the "X" register is understood to be used to store the most recent return address (i.e. PC + 4) for BAL calls, and the "Z" register is set only as the last arithmetic value calculated in the second ALU (ALU2) stage (i.e. for BZ/BNZ instructions).
 These special purpose registers are not to be employed by an APEX programmer for general use.
 Forwarding destination set general purpose registers and the "X" and "Z" registers is discussed in section \ref{sec:forwarding}.
 
-The Registers class provides two accessors and one mutator. There are two accessors, one for each of value and validity of a given register key. 
+The Registers class provides two accessors and one mutator. There are two accessors, one for each of value and validity of a given register key.
 The reason for only having one mutator is to require an update of validity each time a value is set in the Write Back (WB) phase.
-Underneath this exposed interface, the Registers class is an associative map mapping a string to a two-tuple of integer and bool primitives. 
-This design decision allows strings representing register names in the assembly code to randomly access values without further translating the string each time to extract the register number, and allows registers to be named without any indication of ordering (i.e. "X" or "Z"). 
+Underneath this exposed interface, the Registers class is an associative map mapping a string to a two-tuple of integer and bool primitives.
+This design decision allows strings representing register names in the assembly code to randomly access values without further translating the string each time to extract the register number, and allows registers to be named without any indication of ordering (i.e. "X" or "Z").
 This would have been substantially more difficult with a vector accessed by offset index.
 
 \subsubsection{CPU and Stages}
-The CPU class in \codename contains a total of eight instances Stage classes, as described in the Specification. The CPU class therefore serves two purposes. 
-First, it provides a \texttt{simulate()} function which causes work to occur in each stage. 
-Second \texttt{simulate()} allows communication between classes for advancing the in-flight instructions and for forwarding.  
-CPU's delegation and inter-class communication is similar to a Visitor design pattern without abstract class implementations. 
-This design decision was made solely for expediency. 
+The CPU class in \codename contains a total of eight instances Stage classes, as described in the Specification. The CPU class therefore serves two purposes.
+First, it provides a \texttt{simulate()} function which causes work to occur in each stage.
+Second \texttt{simulate()} allows communication between classes for advancing the in-flight instructions and for forwarding.
+CPU's delegation and inter-class communication is similar to a Visitor design pattern without abstract class implementations.
+This design decision was made solely for expediency.
 We acknowledge that a more robust design would use a combination of a Visitor design pattern with threaded instances of each class to simulate simultaneous execution of each stage's work (as opposed to our reverse-order shepherding model, described in section \ref{sec:implementation}).
 
 The \codename CPU class also provides delegation functions which call \texttt{initialize()}, \texttt{display()} on its Stage instances on behalf of \texttt{main.cpp} during simulator execution.
@@ -137,37 +137,37 @@ The \codename CPU class also provides delegation functions which call \texttt{in
 In this section, we will discuss three key aspects of our simulator's execution: the stage-wise reverse-ordered execution, simple interlocking and stalls, and register value forwarding.
 
 \subsection{Stage-wise Reverse Order Execution}
-\codename uses stage-wise reverse order execution as a means of simulating the flow of inflight instructions through the pipeline. 
-This execution consists of two phases using the \texttt{CPU::simulate(...)} function: a working phase (\texttt{simulate.cpp: 9-1138}) and an advancing phase (\texttt{simulate.cpp: 1139-1332}). 
-What is meant by \textit{stage-wise} is that work is done piecemeal for each phase, and what is meant by \textit{reverse order} is that \codename performs the actions for the WB stage first, then perform actions for each stage in reverse order of the pipeline, with the Fetch (F) stage last. 
-This has a few benefits. 
-First, it ensures that an inflight instruction doesn't progress all the way through the pipeline in one advancing phase! 
-Second, it allows us to model forwarding as the product of a finished stage in the working phase sending its destination register value to an instruction "earlier" in the pipeline. 
+\codename uses stage-wise reverse order execution as a means of simulating the flow of inflight instructions through the pipeline.
+This execution consists of two phases using the \texttt{CPU::simulate(...)} function: a working phase (\texttt{simulate.cpp: 9-1138}) and an advancing phase (\texttt{simulate.cpp: 1139-1332}).
+What is meant by \textit{stage-wise} is that work is done piecemeal for each phase, and what is meant by \textit{reverse order} is that \codename performs the actions for the WB stage first, then perform actions for each stage in reverse order of the pipeline, with the Fetch (F) stage last.
+This has a few benefits.
+First, it ensures that an inflight instruction doesn't progress all the way through the pipeline in one advancing phase!
+Second, it allows us to model forwarding as the product of a finished stage in the working phase sending its destination register value to an instruction "earlier" in the pipeline.
 Third, it ensures that as forwarding occurs, if multiple stages attempt to forward to the same earlier stage, only the most recently computed value remains (earlier values are overwritten).
 
-During the working phase, the \texttt{simulate()} function "visits" each of the stages and performs work specific to the opcode of the inflight instruction "residing" in that stage. 
-After the work is completed for each stage, it is advanced. 
-We discuss the process of deciding whether a stage can do work or not in section \ref{sec:stalls}. 
-In reality, there is no instruction type being sent from stage to stage as a tangible token of inter-stage communication. 
-Rather, during the advancement phase the contents of one stage are overwritten into the following stage, then the previous stage is marked as \textit{empty} (its contents are not actually deleted as this is an expensive process when it must be done eight times per cycle, and because it is a risk for memory leaks or segmentation faults). 
+During the working phase, the \texttt{simulate()} function "visits" each of the stages and performs work specific to the opcode of the inflight instruction "residing" in that stage.
+After the work is completed for each stage, it is advanced.
+We discuss the process of deciding whether a stage can do work or not in section \ref{sec:stalls}.
+In reality, there is no instruction type being sent from stage to stage as a tangible token of inter-stage communication.
+Rather, during the advancement phase the contents of one stage are overwritten into the following stage, then the previous stage is marked as \textit{empty} (its contents are not actually deleted as this is an expensive process when it must be done eight times per cycle, and because it is a risk for memory leaks or segmentation faults).
 This process occurs using the \texttt{Stage::advance(Stage\& dest)} member function (\texttt{stage.cpp:51-85}).
-Additionally, we make a special case for the fetch stage: after a HALT instruction has been received, the Fetch stage continues to fetch NOP instructions to keep the pipeline primed. 
+Additionally, we make a special case for the fetch stage: after a HALT instruction has been received, the Fetch stage continues to fetch NOP instructions to keep the pipeline primed.
 Once the HALT instruction is advanced to the WB stage, all stages are marked as empty and execution of the simulator is terminated during the following working phase.
 
 \subsection{Stalls}
 \label{sec:stalls}
-It is necessary to model instructions stalling in the pipeline. 
+It is necessary to model instructions stalling in the pipeline.
 \codename does this using three mechanisms.
-The trivial mechanism is that empty stages don't advance. 
+The trivial mechanism is that empty stages don't advance.
 This is determined using the Stage's \texttt{isEmpty} field, which is set to false each time a stage advances, and is set to true each time a stage receives an instruction advanced by its predecessor stage (or in the special case of the F stage, each time it fetches the instruction at the program counter's current value).
 An instruction cannot advance until its work is completed in a working phase for the stage in which it currently resides.
 This knowledge is contained in the Stage class' \texttt{isReady} field, and until a stage is marked as \textit{ready}, it will remain in that stage, stalled.
 
 Also, an instruction cannot do its work until each operand needed for that stage is read and marked \textit{valid} (i.e. no earlier in-flight instructions will update that register's value after a later instruction has read an earlier value from the register file in the DRF stage).
 This models the effect of flow dependencies and the solution of simple interlocking, and is done as follows:
-Registers in the Register File are marked as invalid as soon as an instruction with that register as a destination exits the DRF stage. 
+Registers in the Register File are marked as invalid as soon as an instruction with that register as a destination exits the DRF stage.
 The validity of that destination register is reset when the instruction writes the value to the Register File in the WB stage.
-A following instruction's value can be marked valid in one of two ways: it is read from the Register File and the register in the Register File has been reset valid, or it can receive a register value marked \texttt{locally valid} through forwarding. 
+A following instruction's value can be marked valid in one of two ways: it is read from the Register File and the register in the Register File has been reset valid, or it can receive a register value marked \texttt{locally valid} through forwarding.
 This \textit{local validity} occurs when the destination register has been computed - for example, the MOVC instruction's destination register becomes \textit{locally valid} upon being computed in the ALU2 stage, but the Register File's instance of that register becomes reset as valid in the later WB stage.
 
 \subsection{Forwarding}
@@ -187,7 +187,7 @@ The forwarding paths used by \codename are shown in figure \ref{fig:forwarding},
     LOAD							& 0 & 1 \\
     STORE							& 1 & 0 \\
     BAL, JUMP						& - & 0 \\
-    BZ, BNZ 						& - & - \\ 
+    BZ, BNZ 						& - & - \\
     HALT, NOP						& - & - \\
   \end{tabular}
 \end{table}
@@ -224,15 +224,15 @@ Table \ref{tab:worklog} is a broad, chronological overview of work performed by 
   \caption{Chronological Work Log}
   \label{tab:worklog}
   \begin{tabular}{l|p{2.75in}|p{2.75in}}
-    Date & Matthew's Task & Brian's Task \\
-    \hline
+  Date         & Matthew's Task & Brian's Task \\
+  \hline
 	Oct 26, 2016 & Initial repository setup 				& \\
 	Oct 29, 2016 & Initial file push, wrote Makefile 	& \\
 	Oct 30, 2016 & Driver program structured 			& \\
 	Oct 31, 2016 & Driver program user interface			&  \\
 	Nov 8, 2016  & 										& Code and Data classes structured \\
 	Nov 10, 2016 & Initial work on Register File			& \\
-	Nov 12, 2016 & Class Display functions, 
+	Nov 12, 2016 & Class Display functions,
 	exception handling, register file 					& Header files corrected; guards added, initial build and troubleshooting \\
 	Nov 13, 2016 & Documentation and report; CPU class boilerplate & Instruction parsing corrections, CPU class operations \\
 	Nov 14, 2016 & CPU Pipelining & Compilation tests, updated Code class to reflect new byte addressability standard \\
@@ -241,9 +241,9 @@ Table \ref{tab:worklog} is a broad, chronological overview of work performed by 
 	Nov 17, 2016 & Added quitting functionality, wrote test cases, added advance function to reduce code redundancy & Updated logic for setting register validity (squashed bugs!) Corrected pointer/non-pointer errors in references, improved Work phase for execution efficiency \\
 	Nov 18, 2016 & Finished documentation. & Completed pipelining. Completed forwarding. Screen captures of working product. \textbf{Checkpointed Release 1.0!} \\
 	Nov 19, 2016 & Final repository pushes. \textbf{Checkpointed Release 1.1!} & \\
-	
-	
-	 
+	\hline
+	Dec 4, 2016  & Fixed issues identified by Teaching Assistants. \textbf{Checkpointed Release 1.2!} &  \\
+	Dec 5, 2016  & Moved source files into their own directory, updated Makefile. Updated UI for new commands specified in Phase 2. Added stats mechanisms. Updated display methods & Began modifying Registers class to support URF operations. Created Front-end, Back-end table, Free-list. Prototyped API functions to class.\\
   \end{tabular}
 \end{table}
 
@@ -274,5 +274,3 @@ Table \ref{tab:worklog} is a broad, chronological overview of work performed by 
 \end{figure}
 
 \end{document}
-
-
