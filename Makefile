@@ -14,24 +14,12 @@ CLASS_FILES = \
 	$(APEX_SRC)/simulate.cpp \
 	$(APEX_SRC)/stage.cpp
 
-# LaTeX variables
-PAPERNAME = report2
-TEXFILES = *.tex *.bib
-
-
-all: apex-sim $(PAPERNAME).pdf
+all: apex-sim
 
 apex-sim:
 	$(CXX) $(CXX_INCLUDE) $(CXXFLAGS) srcs/main.cpp $(CLASS_FILES) -o apex-sim
-
-$(PAPERNAME).pdf: $(TEXFILES)
-	pdflatex $(PAPERNAME).tex
-	bibtex $(PAPERNAME)
-	pdflatex $(PAPERNAME).tex
-	pdflatex $(PAPERNAME).tex
 
 .PHONY: clean
 clean:
 	rm -rfv *~ *.o
 	rm -fv apex-sim
-	rm -fv $(PAPERNAME).out *.dvi *.aux *.log *.blg *.bbl *.bak *~
