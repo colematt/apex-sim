@@ -14,12 +14,15 @@ ROB::~ROB();
 //Display the contents of the ROB
 //Each row is cycle#, opcode of the contained sta
 void ROB::display(){
-
+	std::cout << "Cycle : Opcode"
+	for (auto e : reorder_buffer){
+		std::cout << e.c << " : " << e.opcode << endl;
+	}
 }
 
 //Initialize the ROB to empty state
 void ROB::initialize(){
-
+	reorder_buffer.clear();
 }
 
 //Remove head from ROB and
