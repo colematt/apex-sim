@@ -50,19 +50,15 @@ void Registers::display(){
 
 //Create new instance of an R reg
 std::string Registers::getRenamed(std::string rReg){
-  std::string physReg = this->free_list.pop();
+  std::string physReg;
+  std::string archReg;
   std::string regHolder;
   int valueCarry = 0;
 
-  //Check if P reg entry in table already
-  //If it is modify entry with new R reg
-  //If it is not push P reg and R reg key value pair
-  auto iit = this->front_end.find(physReg);
-  if (iit != this->front_end.end()){
-    this->front_end[physReg] = archReg;
-  } else {
-    this->front_end->push(physReg, archReg);
-  }
+  this->free_list.pop();
+
+  //Update or insert pReg value with physReg as key and archReg as value
+  this->front_end[physReg] = archReg;
 
   //Check back end to see if there is commited value for R reg
   //If there is one set mapped P reg valid to false
@@ -75,7 +71,7 @@ std::string Registers::getRenamed(std::string rReg){
       valueCarry = std::get<0>(itt->second);
       this->reg_file[regHolder] = std::make_tuple(valueCarry, false);
     } else {
-      std::string what_arg = reg + " is not a valid register";
+      std::string what_arg = rReg + " is not a valid register";
       throw std::invalid_argument(what_arg);
     }
   }
@@ -93,18 +89,11 @@ void Registers::commit(std::string pReg){
   if (it != this->front_end.end()) {
     rReg = it->second;
   } else {
-    std::string what_arg = reg + " is not a valid register";
+    std::string what_arg = pReg + " is not a valid register";
     throw std::invalid_argument(what_arg);
   }
-
-  //Get P reg matched to R reg in back end list
-  auto itt = this->back_end.find(rReg);
-  if (itt != this->back_end.end()) {
-    prevReg = std::get<0>(itt->second;
-    this->back_end[rReg] = std::make_tuple(pReg, true); //Set new P reg value
-  } else {
-    this->back_end.push(rReg, std::make_tuple(pReg, true));
-  }
+  
+  this->back_end[rReg] = pReg; //Set new P reg value
 
   this->free_list.push(pReg); //Push P reg back into free list
 
@@ -156,11 +145,11 @@ bool Registers::physIsValid(std::string reg){
 //Throws std::invalid_argument exception if mapping doesn't exist
 int Registers::read(std::string reg){
   int myvalue;
-  std::string myReg
+  std::string myReg;
 
   auto it = this->back_end.find(reg);
   if (it != this->back_end.end()) {
-    myReg = std::get<0>(it->second);
+    myReg = (it->second);
   } else {
     std::string what_arg = reg + " is not a valid register";
     throw std::invalid_argument(what_arg);
@@ -175,11 +164,11 @@ int Registers::read(std::string reg){
 //Throws std::invalid_argument exception if mapping doesn't exist
 bool Registers::isValid(std::string reg){
   bool myvalid;
-  std::string myReg
+  std::string myReg;
 
   auto it = this->back_end.find(reg);
   if (it != this->back_end.end()) {
-    myReg = std::get<0>(it->second);
+    myReg = (it->second);
   } else {
     std::string what_arg = reg + " is not a valid register";
     throw std::invalid_argument(what_arg);

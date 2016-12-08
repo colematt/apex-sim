@@ -5,7 +5,6 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Contains helper functions controlling simulator high-level behavior.
 */
 #include <iostream>
-#include <string>
 #include "code.h"
 #include "cpu.h"
 #include "data.h"
@@ -55,7 +54,7 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
   dispatched = 0;
   no_dispatch = 0;
   issued = 0;
-  no_issue = 0;
+  no_issued = 0;
   resolved = 0;
   committed = 0;
   committed_load = 0;
@@ -69,20 +68,19 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
 
 // Display the simulator internal state.
 // TODO: Add more pass-by-reference arguments, to IQ, ROB classes?
-void display(CPU &mycpu, Registers &myregisters, Data &mydata, string mod, int a1=0, int a2=3996)
+void display(CPU &mycpu, Registers &myregisters, Data &mydata, std::string mod, int a1, int a2)
 {
   //Sanitize inputs
-  if  !(mod == "all" ||
-        mod == "cpu" ||
-        mod == "rt"  ||
-        mod == "iq"  ||
-        mod == "rob" ||
-        mod == "mem" ||
-        mod == "stats"){
-            std::cerr << "Display modifier " << mod << " not understood."
+  if  (mod != "all" ||
+        mod != "cpu" ||
+        mod != "rt"  ||
+        mod != "iq"  ||
+        mod != "rob" ||
+        mod != "mem" ||
+        mod != "stats"){
+            std::cerr << "Display modifier " << mod << " not understood.";
             mod = "none";
-        }
-  }
+  }  
   if ((mod == "all" || mod == "mem") && a1 < 0){
     std::cerr << "Memory range start is out of bounds. Setting to 0." << std::endl;
     a1 = 0;
@@ -148,9 +146,9 @@ void stats()
             << " Resolution=" << resolved
             << " Commit=" << committed << std::endl;
 
-  std::cout << "IPC: " << ((double) committed + (double) resolved) / (double) cycles << std::endl;
+  std::cout << "IPC: " << ((double) committed + (double) resolved) / (double) cycle << std::endl;
   std::cout << "# cycles dispatch stalled: " << no_dispatch << std::endl;
-  std::cout << "# cycles with no issue: " << no_issue << std::endl;
+  std::cout << "# cycles with no issue: " << no_issued << std::endl;
   std::cout << "# LOAD instructions committed: " << committed_load << std::endl;
   std::cout << "# STORE instructions committed: " << committed_store << std::endl;
 }

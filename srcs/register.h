@@ -47,7 +47,7 @@ public:
   std::string getRenamed(std::string);
 
   //TODO create function that updates back_end list
-  void commit(std::string pReg, std::string rReg);
+  void commit(std::string pReg);
   //TODO create function to release physical registers
   //TODO
 

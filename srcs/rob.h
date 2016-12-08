@@ -6,6 +6,7 @@ Description: Header file for rob.cpp
 */
 
 #include "stage.h"
+#include "register.h"
 #include <queue>
 
 #ifndef ROB_H
@@ -20,10 +21,10 @@ private:
 public:
 	ROB();
 	~ROB();
-	void commit();
+	void commit(Registers &reg);
 	void addStage(Stage &stage); //Add new stage object to reorder buffer
 								 //Stage comes from simulate.cpp through a function in stage.cpp (advance)
-	bool headReady(int cycle); //Return if head matches cycle value passed
+	bool headMatch(int cycle); //Return if head matches cycle value passed
 };
 
 #endif

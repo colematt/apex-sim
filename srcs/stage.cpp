@@ -9,7 +9,7 @@ Description: Contains the Stage class, which defines a cpu stage.
 #include "apex.h"
 #include "stage.h"
 
-Stage::Stage(std::string n, int l=1){
+Stage::Stage(std::string n, int l){
 	latency = l;
 	name = n;
 	this->initialize();

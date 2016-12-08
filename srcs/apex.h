@@ -5,6 +5,12 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Header file to hold globally aware variables
 */
 
+#include <string>
+#include "code.h"
+#include "cpu.h"
+#include "data.h"
+#include "register.h"
+
 #ifndef APEX_H
 #define APEX_H
 
@@ -30,7 +36,7 @@ extern int committed_store; //STAT: number of STORE instructions committed
 // Helper functions
 void help();
 void initialize(CPU &mycpu, Registers &myregisters, Data &mydata);
-void display(CPU &mycpu, Registers &myregisters, Data &mydata, string mod, int a1=0, int a2=3996);
+void display(CPU &mycpu, Registers &myregisters, Data &mydata, std::string mod="all", int a1=0, int a2=3996);
 void stats();
 int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Data &apexData);
 void quit(CPU &mycpu, Registers &myregisters, Data &mydata);
