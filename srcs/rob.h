@@ -36,7 +36,7 @@ public:
 	//Check if head matches the cycle value passed
 	bool headMatch(int cycle);
 
-
+	void flush(int cycle); //Traverse from head to end until find a stage with cycle > then passed and remove from that stage down
 };
 
 #endif

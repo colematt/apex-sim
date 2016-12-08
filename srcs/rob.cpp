@@ -31,13 +31,14 @@ void ROB::initialize(){
 void ROB::commit(Registers &reg){
 	std::string pReg;
 	pReg = this->reorder_buffer.front().operands.at(0);
+	this->reorder_buffer.pop_front();
 	reg.commit(pReg);
 }
 
 //Add a Stage instance to ROB
 void ROB::addStage(Stage &stage){
 	if (this->reorder_buffer.size() < this.max_size){
-		this->reorder_buffer.push(stage);
+		this->reorder_buffer.push_back(stage);
 	}
 }
 
@@ -59,3 +60,5 @@ bool ROB::headMatch(int cycle){
 
 	return false;
 }
+
+void ROB::flush(int cycle);
