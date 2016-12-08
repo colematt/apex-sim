@@ -11,6 +11,17 @@ ROB::ROB();
 
 ROB::~ROB();
 
+//Display the contents of the ROB
+//Each row is cycle#, opcode of the contained sta
+void ROB::display(){
+
+}
+
+//Initialize the ROB to empty state
+void ROB::initialize(){
+
+}
+
 //Remove head from ROB and
 //call registers' commit function,
 //updating backend table and free list

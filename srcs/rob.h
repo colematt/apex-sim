@@ -7,7 +7,7 @@ Description: Header file for rob.cpp
 
 #include "stage.h"
 #include "register.h"
-#include <queue>
+#include <deque>
 
 #ifndef ROB_H
 #define ROB_H
@@ -15,11 +15,14 @@ Description: Header file for rob.cpp
 class ROB{
 private:
 	int max_size = 40;
-	std::queue<Stage> reorder_buffer;
+	std::deque<Stage> reorder_buffer;
 
 public:
 	ROB();
 	~ROB();
+
+	void display();
+	void initialize();
 
 	//Remove head from ROB and
 	//call registers' commit function,
@@ -32,6 +35,8 @@ public:
 
 	//Check if head matches the cycle value passed
 	bool headMatch(int cycle);
+
+
 };
 
 #endif
