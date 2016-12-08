@@ -1,6 +1,3 @@
-# Ignore the LaTeX editor's temp files
-docs/.texpadtmp
-
 ## Standard C++ .gitignore
 # Prerequisites
 *.d
