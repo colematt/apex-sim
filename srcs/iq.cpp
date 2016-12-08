@@ -44,4 +44,22 @@ void IQ::updateSrc(std::string reg, int val){
 	}
 }
 
-void IQ::flush(int cycle);
+// Flush all entries in the IQ with
+// whose cycle time stamp is >=
+// a specified time stamp
+void IQ::flush(int cycle){
+	// ASSUMPTION: the entries in the IQ and ROB are
+	// sorted at all times by their timestamp of creation (c)
+
+	// Point an iterator at the start of the IQ
+	std::deque<int>::const_iterator it = issue_queue.begin();
+
+	// Traverse until encountering an entry
+	// whose cycle timestamp indicates it must be flushed
+	while(it->c < cycle){
+		++it;
+	}
+
+	// flush the elements from the current iterator to end:
+	issue_queue.erase(it, issue_queue.end());
+}

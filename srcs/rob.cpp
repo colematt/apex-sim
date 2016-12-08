@@ -61,4 +61,19 @@ bool ROB::headMatch(int cycle){
 	return false;
 }
 
-void ROB::flush(int cycle);
+void ROB::flush(int cycle){
+		// ASSUMPTION: the entries in the IQ and ROB are
+		// sorted at all times by their timestamp of creation (c)
+
+		// Point an iterator at the start of the IQ
+		std::deque<int>::const_iterator it = reorder_buffer.begin();
+
+		// Traverse until encountering an entry
+		// whose cycle timestamp indicates it must be flushed
+		while(it->c < cycle){
+			++it;
+		}
+
+		// flush the elements from the current iterator to end:
+		reorder_buffer.erase(it, reorder_buffer.end());
+}
