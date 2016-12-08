@@ -67,7 +67,7 @@ void ROB::flush(int cycle){
 		// sorted at all times by their timestamp of creation (c)
 
 		// Point an iterator at the start of the IQ
-		std::deque<int>::const_iterator it = reorder_buffer.begin();
+		std::deque<Stage>::const_iterator it = reorder_buffer.begin();
 
 		// Traverse until encountering an entry
 		// whose cycle timestamp indicates it must be flushed

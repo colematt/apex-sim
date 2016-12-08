@@ -51,7 +51,7 @@ void IQ::flush(int cycle){
 	// sorted at all times by their timestamp of creation (c)
 
 	// Point an iterator at the start of the IQ
-	std::deque<int>::const_iterator it = issue_queue.begin();
+	std::deque<Stage>::const_iterator it = issue_queue.begin();
 
 	// Traverse until encountering an entry
 	// whose cycle timestamp indicates it must be flushed
