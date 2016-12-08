@@ -11,7 +11,9 @@ ROB::ROB();
 
 ROB::~ROB();
 
-//Remove head from ROB and call registers commit function to update backend table and free list
+//Remove head from ROB and
+//call registers' commit function,
+//updating backend table and free list
 void ROB::commit(Registers &reg){
 	std::string pReg;
 	pReg = this->reorder_buffer.front().operands.at(0);
@@ -20,10 +22,13 @@ void ROB::commit(Registers &reg){
 
 //Add a Stage instance to ROB
 void ROB::addStage(Stage &stage){
-	this->reorder_buffer.push(stage);
+	if (this->reorder_buffer.size() < this.max_size){
+		this->reorder_buffer.push(stage);
+	}
 }
 
-//Given a cycle value gets cycle value of current head and returns if they are equal (==)
+//Given a cycle value gets cycle value of current head
+//and returns if they are equal (==)
 bool ROB::headMatch(int cycle){
 	int size = 0;
 	int headCycle = 0;
