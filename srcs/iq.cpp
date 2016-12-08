@@ -11,17 +11,17 @@ IQ::IQ();
 
 IQ::~IQ();
 
-//Display the contents of the ROB
-//Each row is cycle#, opcode of the contained sta
-void ROB::display(){
+//Display the contents of the IQ
+//Each row is cycle#, opcode of the contained stage
+void IQ::display(){
 	std::cout << "Cycle : Opcode"
 	for (auto e : reorder_buffer){
 		std::cout << e.c << " : " << e.opcode << endl;
 	}
 }
 
-//Initialize the ROB to empty state
-void ROB::initialize(){
+//Initialize the IQ to empty state
+void IQ::initialize(){
 	reorder_buffer.clear();
 }
 
@@ -44,9 +44,8 @@ void IQ::updateSrc(std::string reg, int val){
 	}
 }
 
-// Flush all entries in the IQ with
-// whose cycle time stamp is >=
-// a specified time stamp
+// Flush all entries in the IQ with whose cycle time stamp
+// is >= specified time stamp (used when branch is taken)
 void IQ::flush(int cycle){
 	// ASSUMPTION: the entries in the IQ and ROB are
 	// sorted at all times by their timestamp of creation (c)

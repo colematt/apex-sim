@@ -12,7 +12,7 @@ ROB::ROB();
 ROB::~ROB();
 
 //Display the contents of the ROB
-//Each row is cycle#, opcode of the contained sta
+//Each row is cycle#, opcode of the contained stage
 void ROB::display(){
 	std::cout << "Cycle : Opcode"
 	for (auto e : reorder_buffer){
@@ -25,8 +25,7 @@ void ROB::initialize(){
 	reorder_buffer.clear();
 }
 
-//Remove head from ROB and
-//call registers' commit function,
+//Remove head from ROB and call registers' commit function,
 //updating backend table and free list
 void ROB::commit(Registers &reg){
 	std::string pReg;
@@ -61,6 +60,8 @@ bool ROB::headMatch(int cycle){
 	return false;
 }
 
+// Flush all entries in the ROB with whose cycle time stamp
+// is >= specified time stamp (used when branch is taken)
 void ROB::flush(int cycle){
 		// ASSUMPTION: the entries in the IQ and ROB are
 		// sorted at all times by their timestamp of creation (c)
