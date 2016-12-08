@@ -43,7 +43,7 @@ void help()
 }
 
 // Initialize the simulator to a known state.
-void initialize(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
+void initialize(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
 {
   if (VERBOSE >= 1)
     std::cout << "Initializing ... " << std::endl;
@@ -67,7 +67,7 @@ void initialize(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, 
 } //end initialize()
 
 // Display the simulator internal state.
-void display(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq,
+void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq,
   std::string mod="all", int a1=0, int a2=3996)
 {
   //Sanitize inputs
@@ -185,9 +185,9 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters, D
 }
 
 //Quit the simulator
-void quit(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
+void quit(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
 {
   if (VERBOSE >= 1)
     std::cout << "Quitting simulator ..." << std::endl;
-  display(mycpu, myregisters, mydata);
+  display(mycpu, myregisters, mydata, myrob, myiq, a1=0, a2=100);
 }
