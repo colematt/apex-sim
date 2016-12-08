@@ -14,13 +14,11 @@ Description: Contains the CODE class, which simulates reading instructions from 
     this->readCode(codeFile);
   }
 
-  Code::~Code(){
-  	
-  }
-
+  Code::~Code(){}
+  
   //Read contents of file into a vector of instruction_t
   void Code::readCode(const char* codeFile){
-    
+
     std::string inputString;
     std::string holderString;
     size_t pos = 0;
@@ -75,7 +73,7 @@ Description: Contains the CODE class, which simulates reading instructions from 
     	Code::instructions.push_back(" ");
     	Code::instructions.push_back(" ");
     	Code::instructions.push_back(" ");
-    }   
+    }
   }
 
   //Get instruction given index of instruction pointer
@@ -98,4 +96,3 @@ Description: Contains the CODE class, which simulates reading instructions from 
     //Return Instruction object for use by cpu
     return instr;
   }
-  

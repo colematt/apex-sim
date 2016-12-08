@@ -43,7 +43,7 @@ void help()
 }
 
 // Initialize the simulator to a known state.
-void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
+void initialize(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
 {
   if (VERBOSE >= 1)
     std::cout << "Initializing ... " << std::endl;
@@ -67,8 +67,8 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata)
 } //end initialize()
 
 // Display the simulator internal state.
-// TODO: Add more pass-by-reference arguments, to IQ, ROB classes?
-void display(CPU &mycpu, Registers &myregisters, Data &mydata, std::string mod, int a1, int a2)
+void display(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq,
+  std::string mod="all", int a1=0, int a2=3996)
 {
   //Sanitize inputs
   if  (mod != "all" ||
@@ -80,7 +80,7 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata, std::string mod, 
         mod != "stats"){
             std::cerr << "Display modifier " << mod << " not understood.";
             mod = "none";
-  }  
+  }
   if ((mod == "all" || mod == "mem") && a1 < 0){
     std::cerr << "Memory range start is out of bounds. Setting to 0." << std::endl;
     a1 = 0;
@@ -116,12 +116,12 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata, std::string mod, 
   if (mod == "all" || mod == "iq"){
     if (VERBOSE >= 1)
       std::cout << "-----------\n" << "Issue Queue\n" << "-----------\n";
-    //TODO: Add call to IQ::display() function
+    myiq.display();
   }
   if (mod == "all" || mod == "rob"){
     if (VERBOSE >= 1)
       std::cout << "-----------\n" << "Reorder Buffer\n" << "-----------\n";
-    //TODO: Add call to ROB::display() function
+    myrob.display();
   }
   if (mod == "all" || mod == "mem"){
     if (VERBOSE >= 1)
@@ -152,10 +152,11 @@ void stats()
   std::cout << "# LOAD instructions committed: " << committed_load << std::endl;
   std::cout << "# STORE instructions committed: " << committed_store << std::endl;
 }
+
 // Simulate the operation of the system for <num_cycles>, or until a HALT
 //instruction is encountered, or until an error occurs in simulation.
 //Return the current cycle number after simulation pauses or halts.
-int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Data &apexData)
+int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
 {
   for (int c = cycle; c < num_cycles; c++)
   {
@@ -165,15 +166,15 @@ int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Da
 
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)
-    if(!(apexCPU.simulate(apexCode, apexRF, apexData))){
+    if(!(mycpu.simulate(mycpu, mycode, myregisters, mydata, myrob, myiq))){
       std::cout << "Simulator HALT encounted on cycle " << cycle << std::endl;
-      quit(apexCPU, apexRF, apexData);
+      quit(mycpu, mycode, myregisters, mydata, myrob, myiq);
       return 0;
     }
 
     if(VERBOSE >= 2){
-	    apexCPU.display();
-	    apexRF.display();
+	    mycpu.display();
+	    myregisters.display();
 	}
 
     //Cycle complete, increment the global cycle counter
@@ -184,7 +185,7 @@ int simulate(int num_cycles, CPU &apexCPU, Code &apexCode, Registers &apexRF, Da
 }
 
 //Quit the simulator
-void quit(CPU &mycpu, Registers &myregisters, Data &mydata)
+void quit(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
 {
   if (VERBOSE >= 1)
     std::cout << "Quitting simulator ..." << std::endl;

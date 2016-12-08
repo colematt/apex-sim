@@ -36,7 +36,7 @@ public:
   void display(); //Displays object members' values
 
   //Simulates one cycle of cpu usage.
-  int simulate(Code &apexCode, Registers &apexRF, Data &apexData);
+  int simulate(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq);
 };
 
 #endif

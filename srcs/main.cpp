@@ -31,12 +31,12 @@ int main(int argc, char** argv)
   }
 
   //Instantiate Simulator classes
-  //TODO: Add instances of IQ and ROB
-
   Code *apexCode = new Code(instFile);
   Registers *apexRF = new Registers();
   Data *apexData = new Data();
   CPU *apexCPU = new CPU(*apexCode, *apexRF, *apexData);
+  ROB *apexROB = new ROB();
+  IQ *apexIQ = new IQ();
 
   //Perform first initialization
   initialize(*apexCPU, *apexRF, *apexData);

@@ -4,7 +4,7 @@
 #include "cpu.h"
 #include "apex.h"
 
-int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata){
+int CPU::simulate(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq){
 
 /******************************************************************************/
 /************************STAGE ADVANCEMENT PHASE*******************************/
