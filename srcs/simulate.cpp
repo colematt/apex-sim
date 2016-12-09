@@ -15,7 +15,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// 1. Commit ROB's head entry
 	// 2. Increment stats counters
 	// 3. Mark that FU stage empty (prepare to "advance" into that stage)
-	if !(myrob.isEmpty()){
+	if (!myrob.isEmpty()){
 		if (ALU3.isReady() && myrob.match(ALU3)){
 			myrob.commit(myregisters);
 			committed++;
@@ -34,7 +34,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			}
 			else {
 				committed_store++;
-				committed++
+				committed++;
 			}
 			LSFU3.empty = true;
 		}
@@ -50,36 +50,36 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// Advanced by ROB COMMITTING
 
 	/****ALU2 STAGE****/
-	if (ALU2.isReady && ALU3.isEmpty){
+	if (ALU2.isReady() && ALU3.isEmpty()){
 
 	}
 	/****ALU1 STAGE****/
-	if (ALU1.isReady && ALU2.isEmpty){
+	if (ALU1.isReady() && ALU2.isEmpty()){
 
 	}
 	/****MUL2 STAGE****/
 	// Advanced by ROB COMMITTING
 
 	/****MUL1 STAGE****/
-	if (MUL1.isReady && (MUL1.lcounter == 0) && MUL2.isEmpty){
+	if (MUL1.isReady() && MUL2.isEmpty()){
 
 	}
 	/****LSFU3 STAGE****/
 	// Advanced by ROB COMMITTING
 
 	/****LSFU2 STAGE****/
-	if (LSFU2.isReady && LSFU3.isEmpty){
+	if (LSFU2.isReady() && LSFU3.isEmpty()){
 
 	}
 	/****LSFU1 STAGE****/
-	if (LSFU1.isReady && LSFU2.isEmpty){
+	if (LSFU1.isReady() && LSFU2.isEmpty()){
 
 	}
 	/****B STAGE****/
 	// B stage does not "advance", it empties and updates stats counters.
 	// This is because B stage does not have a destination register
 	// and so it doesn't commit.
-	if (B.isReady)
+	if (B.isReady())
 	/****IQ****/
 
 	/****DRF2 STAGE****/
@@ -132,7 +132,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// If is_halting == true, do not fetch further instructions.
 	// If a HALT is fetched, set is_halting = true.
 	// These conditions are needed in the STOPPING PHASE.
-	if !(is_halting){
+	if (!is_halting){
 		//Fetch the next instruction
 	}
 	if (F.opcode == "HALT")
@@ -186,7 +186,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF2.opcode == "HALT" &&
 			myiq.isEmpty() &&
 			myrob.isEmpty()){
-		cycle++
+		cycle++;
 		return 0;
 	}
 	else{

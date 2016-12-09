@@ -22,10 +22,12 @@ public:
   //the stage is occupied by an inflight instruction
   //(it will always have an instruction loaded, but that instruction may have
   // advanced to a follow-on stage; it should not be "simulated" again)
-  bool isEmpty;
+  bool empty;
+  bool isEmpty();
   //the stage has completed its work for the inflight instruction
   //(it is ready to be forwarded and/or advanced)
-  bool isReady;
+  bool ready;
+  bool isReady();
 
   //Instruction contents
   int pc; //program counter value that issued this

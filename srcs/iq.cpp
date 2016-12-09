@@ -5,30 +5,33 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Contains the IQ class, which simulates the operation of a Instruction Queue.
 */
 
+#include <iostream>
 #include "iq.h"
 
 IQ::IQ(){
 	this->initialize();
 }
 
-IQ::~IQ();
+IQ::~IQ(){
 
-bool isEmpty(){
-	return reorder_buffer.empty();
+}
+
+bool IQ::isEmpty(){
+	return issue_queue.empty();
 }
 
 //Display the contents of the IQ
 //Each row is cycle#, opcode of the contained stage
 void IQ::display(){
-	std::cout << "Cycle : Opcode"
-	for (auto e : reorder_buffer){
-		std::cout << e.c << " : " << e.opcode << endl;
+	std::cout << "Cycle : Opcode";
+	for (auto e : issue_queue){
+		std::cout << e.c << " : " << e.opcode << std::endl;
 	}
 }
 
 //Initialize the IQ to empty state
 void IQ::initialize(){
-	reorder_buffer.clear();
+	issue_queue.clear();
 }
 
 //Dispatch an instruction to IQ 
@@ -99,7 +102,7 @@ void IQ::flush(int cycle){
 	// sorted at all times by their timestamp of creation (c)
 
 	// Point an iterator at the start of the IQ
-	std::deque<Stage>::const_iterator it = issue_queue.begin();
+	std::deque<Stage>::iterator it = issue_queue.begin();
 
 	// Traverse until encountering an entry
 	// whose cycle timestamp indicates it must be flushed
