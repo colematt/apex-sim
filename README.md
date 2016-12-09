@@ -39,13 +39,13 @@ Once execution begins, the following commands can be used:
 |Command            | Action |
 |:-----------------:|--------|
 | `i`               | Initialize the simulator state |
-| `s <n>`           | Simulate <n> number of cycles |
+| `s <n>`           | Simulate \<n\> number of cycles |
 | `d all`           | Display the full simulator internal state |
 | `d cpu`           | Display CPU stage contents |
 | `d rt`            | Display Front-end and Back-end Register Tables |
 | `d iq`            |Display Issue Queue entries and status |
 | `d rob`           |Display ROB contents |
-| `d mem <a1> <a2>` |Display memory from address <a1> to <a2> |
+| `d mem <a1> <a2>` |Display memory from address \<a1\> to \<a2\> |
 | `d stats`         |Display Stats |
 | `urf <n>`         |Set URF Size to <n> physical registers |
 | `q`               |Quit the simulator |
