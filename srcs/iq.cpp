@@ -40,6 +40,8 @@ void IQ::initialize(){
 
 //Dispatch an instruction to IQ
 void IQ::dispatchInst(Stage &stage){
+	stage.empty = false;
+	stage.ready = false;
 	this->issue_queue.push_back(stage);
 }
 
@@ -98,6 +100,53 @@ void IQ::updateSrc(std::string reg, int val){
 		}
 	}
 }
+
+//TODO
+bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
+	//for (auto& e : issue_queue){
+	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();)
+		if (i->isReady()){
+			if(i->opcode == "ADD" ||
+				i->opcode == "SUB" ||
+				i->opcode == "AND" ||
+				i->opcode == "OR" ||
+				i->opcode == "EX-OR" ||
+				i->opcode == "MOV"){
+
+				i->advance(ALU);
+				return true;
+			}
+
+			if(i->opcode == "MUL"){
+				
+				return true;
+			}
+
+			if(i->opcode == "LOAD" ||
+				i->opcode == "STORE"){
+
+				return true;
+			}
+
+			if(i->opcode == "BAL" ||
+				i->opcode == "JUMP" ||
+				i->opcode == "BZ" ||
+				i->opcode == "BNZ"){
+
+				return true;
+			}
+		else{
+			++i;
+		}
+
+		}
+	}
+	//Failed to issue instruction
+	return false;
+}
+
+//TODO
+//void checkReady(){}
 
 // Flush all entries in the IQ with whose cycle time stamp
 // is >= specified time stamp (used when branch is taken)

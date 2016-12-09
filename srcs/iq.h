@@ -33,7 +33,10 @@ public:
 
 	void updateSrc(std::string reg, int val);
 
-	void issueInst();
+	bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B);
+
+	//TODO
+	//void checkReady();
 
 	void flush(int cycle);
 };

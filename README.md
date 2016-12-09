@@ -38,8 +38,8 @@ Once execution begins, the following commands can be used:
 
 | Command | Action                           |
 |---------|----------------------------------|
-| `i`     | Initialize the simulator state   |
-| `s n`   | Simulate `n` number of cycles    |
-| `d`     | Display simulator internal state |
-| `q`     | Quit the simulator               |
-| `h`     | Display a help message           |
+| <kbd>i</kbd>     | Initialize the simulator state   |
+| <kbd>s n</kbd>   | Simulate `n` number of cycles    |
+| <kbd>d</kbd>     | Display simulator internal state |
+| <kbd>q</kbd>     | Quit the simulator               |
+| <kbd>h</kbd>     | Display a help message           |
