@@ -12,10 +12,8 @@ ROB::ROB(){
 	this->initialize();
 }
 
-ROB::~ROB();
+ROB::~ROB(){
 
-bool isEmpty(){
-	return reorder_buffer.empty()
 }
 
 //Display the contents of the ROB
@@ -23,13 +21,17 @@ bool isEmpty(){
 void ROB::display(){
 	std::cout << "Cycle : Opcode";
 	for (auto e : reorder_buffer){
-		std::cout << e.c << " : " << e.opcode << endl;
+		std::cout << e.c << " : " << e.opcode << std::endl;
 	}
 }
 
 //Initialize the ROB to empty state
 void ROB::initialize(){
 	reorder_buffer.clear();
+}
+
+bool ROB::isEmpty(){
+	return reorder_buffer.empty();
 }
 
 //Remove head from ROB and call registers' commit function,
@@ -43,7 +45,7 @@ void ROB::commit(Registers &reg){
 
 //Add a Stage instance to ROB
 void ROB::addStage(Stage &stage){
-	if (this->reorder_buffer.size() < this.max_size){
+	if (this->reorder_buffer.size() < this->max_size){
 		this->reorder_buffer.push_back(stage);
 	}
 }
@@ -52,7 +54,7 @@ void ROB::addStage(Stage &stage){
 //and returns if they are equal (==)
 bool ROB::match(Stage& stage){
 	// If stage is empty, it cannot match the ROB head entry!
-	if stage.isEmpty()
+	if (stage.isEmpty())
 		return false;
 
 	int size = 0;
@@ -60,10 +62,10 @@ bool ROB::match(Stage& stage){
 	int headCycle = 0;
 
 	size = this->reorder_buffer.size();
-	passedCycle = stage.cycle;
+	passedCycle = stage.c;
 
 	if(size > 0){
-		headCycle = this->reorder_buffer.front().cycle;
+		headCycle = this->reorder_buffer.front().c;
 	}
 
 	if(headCycle == passedCycle){
@@ -80,7 +82,7 @@ void ROB::flush(int cycle){
 		// sorted at all times by their timestamp of creation (c)
 
 		// Point an iterator at the start of the IQ
-		std::deque<Stage>::const_iterator it = reorder_buffer.begin();
+		std::deque<Stage>::iterator it = this->reorder_buffer.begin();
 
 		// Traverse until encountering an entry
 		// whose cycle timestamp indicates it must be flushed
@@ -89,5 +91,5 @@ void ROB::flush(int cycle){
 		}
 
 		// flush the elements from the current iterator to end:
-		reorder_buffer.erase(it, reorder_buffer.end());
+		this->reorder_buffer.erase(it, reorder_buffer.end());
 }

@@ -26,14 +26,14 @@ void Stage::initialize(){
 	values.resize(3, 0);
 	valids.clear();
 	valids.resize(3, false);
-	isEmpty = true;
-	isReady = false;
+	empty = true;
+	ready = false;
 }
 
 //Pretty print a Stage's contents
 void Stage::display(){
 	//Display the contents if the stage is not empty.
-	if (!(isEmpty)){
+	if (!(empty)){
 		std::cout << name << ": " << opcode << " ";
 		for(auto o : operands){
 			std::cout << o << " ";
@@ -53,7 +53,7 @@ void Stage::display(){
 bool Stage::advance(Stage &dest){
 	//A stage should only advance if it is not empty, is ready,
 	//and the destination is empty
-	if (!this->isEmpty && this->isReady && dest.isEmpty){
+	if (!this->empty && this->ready && dest.empty){
 		//Copy fields from this stage to destination stage
 		dest.pc = this->pc;
 		dest.c = this->pc;
@@ -75,8 +75,8 @@ bool Stage::advance(Stage &dest){
 		}
 
 		//Set destination stage's flags
-		dest.isEmpty = false;
-		dest.isReady = false;
+		dest.empty = false;
+		dest.ready = false;
 
 		//Set this stage's flags
 		//this->isEmpty = true;
@@ -85,6 +85,18 @@ bool Stage::advance(Stage &dest){
 	}
 
 	return true;
+}
+
+bool Stage::isEmpty(){
+	return empty;
+}
+
+bool Stage::isReady(){
+
+	if (ready && (latency == 0))
+		return true;
+	
+	return false;
 }
 
 //Convert a string of the form "#(int)" to an int value
