@@ -86,12 +86,25 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// If HALT is in this stage, do not advance it. Its presence here is part of
 	// the STOPPING logic! There are no instructions behind it
 	// because F stage has stopped fetching. All other opcodes advance into IQ.
-	if (DRF2.opcode != "HALT"){
-		//TODO: Advance the contents into the IQ
-		myiq->
+	if (DRF2.opcode == "HALT"){
+		//Dispatch fails
+		no_dispatch++;
 	}
 	else {
+		if (DRF2.isReady() && !DRF2.isEmpty()){
+			//Advance the contents of DRF2 into the IQ
+			myiq.dispatchInst(DRF2);
 
+			//Empty DRF2
+			DRF2.empty = true;
+
+			//Increment stats counters
+			dispatched++;
+		}
+		else {
+			//Dispatch fails
+			no_dispatch++;
+		}
 	}
 
 	/****DRF1 STAGE****/

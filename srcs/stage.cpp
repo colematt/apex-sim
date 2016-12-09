@@ -82,9 +82,11 @@ bool Stage::advance(Stage &dest){
 		//this->isEmpty = true;
 		//this->isReady = false;
 		this->initialize();
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 bool Stage::isEmpty(){
@@ -95,7 +97,7 @@ bool Stage::isReady(){
 
 	if (ready && (latency == 0))
 		return true;
-	
+
 	return false;
 }
 
