@@ -61,7 +61,7 @@ int main(int argc, char** argv)
     }
     else if (cmd== "s"){
       cin >> n;
-      simulate(n, *apexCPU, *apexCode, *apexRF, *apexData);
+      simulate(n, *apexCode, *apexRF, *apexData);
     }
     else if (cmd == "d"){
       //Ingest modifiers

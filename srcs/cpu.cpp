@@ -19,7 +19,6 @@ CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
  M("Memory"),
  WB("Write Back")
 {
-
 	this->initialize();
 }
 
@@ -28,6 +27,8 @@ CPU::~CPU(){
 }
 
 void CPU::initialize(){
+  is_halting = false;
+
 	F.initialize();
 	DRF.initialize();
 	ALU1.initialize();
