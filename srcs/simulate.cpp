@@ -6,9 +6,9 @@
 int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	ROB &myrob, IQ &myiq){
 
-	/*COMMITTING PHASE*************************************************************
-	*******************************************************************************
-	******************************************************************************/
+	/*COMMITTING PHASE************************************************************
+	******************************************************************************
+	*****************************************************************************/
 
 	// Check to see if the ROB head matches the contents of either
 	// ALU3, MUL2, LSFU3. If there's a match:
@@ -51,41 +51,58 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****ALU2 STAGE****/
 	if (ALU2.isReady() && ALU3.isEmpty()){
-
+		//TODO: Add advance logic
 	}
 	/****ALU1 STAGE****/
 	if (ALU1.isReady() && ALU2.isEmpty()){
-
+		//TODO: Add advance logic
 	}
 	/****MUL2 STAGE****/
 	// Advanced by ROB COMMITTING
 
 	/****MUL1 STAGE****/
 	if (MUL1.isReady() && MUL2.isEmpty()){
-
+		//TODO: Add advance logic
 	}
 	/****LSFU3 STAGE****/
 	// Advanced by ROB COMMITTING
 
 	/****LSFU2 STAGE****/
 	if (LSFU2.isReady() && LSFU3.isEmpty()){
-
+		//TODO: Add advance logic
 	}
 	/****LSFU1 STAGE****/
 	if (LSFU1.isReady() && LSFU2.isEmpty()){
-
+		//TODO: Add advance logic
 	}
 	/****B STAGE****/
 	// B stage does not "advance", it empties and updates stats counters.
 	// This is because B stage does not have a destination register
 	// and so it doesn't commit.
-	if (B.isReady())
+	if (B.isReady()){
+		//TODO: Add specialized B advance logic
+	}
 	/****IQ****/
+	// Up to 3 wakeup signals can occur per cycle.
+	for (int wakeup = 0; wakeup < 3; wakeup++){
+		//If we can issue, do so, and increment stats
+		if (myiq.issue(*ALU1, *MUL1, *LSFU1, *B)) {
+			issued++;
+		}
+		//If we can't issue, break out of the for-loop
+		else{
+			break;
+		}
 
+		// Now that we've finished wakeups,
+		// Decide if any successful issues occurred this cycle
+		if (wakeup == 0)
+			no_issued++;
+	}
 	/****DRF2 STAGE****/
 	// If HALT is in this stage, do not advance it. Its presence here is part of
-	// the STOPPING logic! There are no instructions behind it
-	// because F stage has stopped fetching. All other opcodes advance into IQ.
+	// the STOPPING logic! There are no instructions behind it because
+	// F stage has stopped fetching. All other opcodes will advance into IQ.
 	if (DRF2.opcode == "HALT"){
 		//Dispatch fails
 		no_dispatch++;
@@ -112,9 +129,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/****F STAGE****/
 
 
-	/*WORKING PHASE****************************************************************
-	*******************************************************************************
-	******************************************************************************/
+	/*WORKING PHASE***************************************************************
+	******************************************************************************
+	*****************************************************************************/
 
 	/****ROB****/
 
@@ -153,9 +170,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		is_halting = true;
 
 
-	/*FORWARDING PHASE*************************************************************
-	*******************************************************************************
-	******************************************************************************/
+	/*FORWARDING PHASE************************************************************
+	******************************************************************************
+	*****************************************************************************/
 
 	/****ROB****/
 
@@ -186,9 +203,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/****F STAGE****/
 
 
-	/*STOPPING PHASE***************************************************************
-	*******************************************************************************
-	******************************************************************************/
+	/*STOPPING PHASE**************************************************************
+	******************************************************************************
+	*****************************************************************************/
 
 	//Stop execution (return code 0) if:
 	// 1. A HALT has been encountered (set with HALT in F, also preventing fetch)
