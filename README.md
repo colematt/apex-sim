@@ -1,7 +1,7 @@
 # apex-sim
 This is a simulator for the Architecture Pipeline EXample (APEX) Instruction Set Architecture (ISA).
 
-In this project, `$(APEX_HOME)` is the path to the directory containing this file, which is the top-level project directory. The project specification and documentation are in `$(APEX_HOME)/docs`. The ISA semantics can be found in `$(APEX_HOME)/docs/semantics.md`.
+The ISA semantics can be found in `$(APEX_HOME)/docs/semantics.md`. The user interface commands can be found in `$(APEX_HOME)/docs/commands.md`.
 
 
 ## Prerequisites
@@ -13,6 +13,8 @@ In this project, `$(APEX_HOME)` is the path to the directory containing this fil
 Note for Binghamton University users: this software is compatible with the `remote.cs.binghamton.edu` system. It is incompatible with the `bingsuns.binghamton.edu` system.
 
 ## Installation
+
+In this project, `$(APEX_HOME)` is the path to the directory containing this file, which is the top-level project directory. The project specification and documentation are in `$(APEX_HOME)/docs`.
 
 In the makefile, set the value of the `CXX` variable to your C++ compiler path. Build the software using the `apex-sim` or `all` target.
 
@@ -33,20 +35,3 @@ $ apex-sim <instruction input file path>
 ```
 
 Sample instruction input files are located in `$(APEX_HOME)/inputs`.
-
-Once execution begins, the following commands can be used:
-
-|Command            | Action |
-|:-----------------:|--------|
-| `i`               | Initialize the simulator state |
-| `s <n>`           | Simulate _n_ number of cycles |
-| `d all`           | Display the full simulator internal state |
-| `d cpu`           | Display CPU stage contents |
-| `d rt`            | Display Front-end and Back-end Register Tables |
-| `d iq`            |Display Issue Queue entries and status |
-| `d rob`           |Display ROB contents |
-| `d mem <a1> <a2>` |Display memory from address _a1_ to _a2_ |
-| `d stats`         |Display Stats |
-| `urf <n>`         |Set URF Size to _n_ physical registers |
-| `q`               |Quit the simulator |
-| `h`               |Display this help message |
