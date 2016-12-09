@@ -12,13 +12,15 @@ Description: Header file for iq.cpp
 #ifndef IQ_H
 #define IQ_H
 
-Class IQ{
+class IQ{
 private:
 	std::deque<Stage> issue_queue;
 
 public:
 	IQ();
 	~IQ();
+
+	bool isEmpty();
 
 	void display();
 	void initialize();

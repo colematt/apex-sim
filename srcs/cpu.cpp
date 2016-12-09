@@ -11,13 +11,11 @@ Description: Contains the CPU class, which simulates operation of a five stage C
 //Constructors for stages explicitly called before constructor body begins
 CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
  F("Fetch"),
- DRF("Decode/RF"),
+ DRF1("Rename"),
  ALU1("ALU First"),
  ALU2("ALU Second"),
- B("Branch"),
- D("Branch Delay"),
- M("Memory"),
- WB("Write Back")
+ ALU2("ALU WB"),
+ B("Branch")
 {
 	this->initialize();
 }

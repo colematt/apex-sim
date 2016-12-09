@@ -5,16 +5,23 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Contains the ROB class, which simulates the operation of a Reorder Buffer.
 */
 
+#include <iostream>
 #include "rob.h"
 
-ROB::ROB();
+ROB::ROB(){
+	this->initialize();
+}
 
 ROB::~ROB();
+
+bool isEmpty(){
+	return reorder_buffer.empty()
+}
 
 //Display the contents of the ROB
 //Each row is cycle#, opcode of the contained stage
 void ROB::display(){
-	std::cout << "Cycle : Opcode"
+	std::cout << "Cycle : Opcode";
 	for (auto e : reorder_buffer){
 		std::cout << e.c << " : " << e.opcode << endl;
 	}
@@ -43,17 +50,19 @@ void ROB::addStage(Stage &stage){
 
 //Given a cycle value gets cycle value of current head
 //and returns if they are equal (==)
-bool ROB::headMatch(int cycle){
+bool ROB::match(Stage& stage){ //TODO update to hand stage being passed was int
 	int size = 0;
+	int passedCycle = 0;
 	int headCycle = 0;
 
 	size = this->reorder_buffer.size();
+	passedCycle = stage.cycle;
 
 	if(size > 0){
 		headCycle = this->reorder_buffer.front().cycle;
 	}
 
-	if(headCycle == cycle){
+	if(headCycle == passedCycle){
 		return true;
 	}
 

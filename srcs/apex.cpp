@@ -9,6 +9,8 @@ Description: Contains helper functions controlling simulator high-level behavior
 #include "cpu.h"
 #include "data.h"
 #include "register.h"
+#include "rob.h"
+#include "iq.h"
 #include "apex.h"
 
 // Initialize simulator state and stats variables with external linkage
@@ -68,7 +70,7 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ
 
 // Display the simulator internal state.
 void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq,
-  std::string mod="all", int a1=0, int a2=3996)
+  std::string mod, int a1, int a2)
 {
   //Sanitize inputs
   if  (mod != "all" ||
@@ -166,9 +168,9 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters, D
 
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)
-    if(!(mycpu.simulate(mycpu, mycode, myregisters, mydata, myrob, myiq))){
+    if(!(mycpu.simulate(mycode, myregisters, mydata, myrob, myiq))){
       std::cout << "Simulator HALT encounted on cycle " << cycle << std::endl;
-      quit(mycpu, mycode, myregisters, mydata, myrob, myiq);
+      quit(mycpu, myregisters, mydata, myrob, myiq);
       return 0;
     }
 
@@ -189,5 +191,5 @@ void quit(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq
 {
   if (VERBOSE >= 1)
     std::cout << "Quitting simulator ..." << std::endl;
-  display(mycpu, myregisters, mydata, myrob, myiq, a1=0, a2=100);
+  display(mycpu, myregisters, mydata, myrob, myiq, 0, 100);
 }

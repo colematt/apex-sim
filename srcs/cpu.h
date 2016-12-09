@@ -10,6 +10,8 @@ Description: Header file for cpu.cpp
 #include "data.h"
 #include "register.h"
 #include "code.h"
+#include "rob.h"
+#include "iq.h"
 
 #ifndef CPU_H
 #define CPU_H
@@ -21,13 +23,17 @@ class CPU {
 		bool is_halting; //See STOPPING phase in CPU::Simulate() for explanation
 
 		Stage F;      	//Fetch stage
-	  Stage DRF;  	//Decode/Reg File stage
-	 	Stage ALU1; 	//ALU 1st stage
-	  Stage ALU2;   	//ALU 2nd stage
-	  Stage B;     	//Branch stage
-	  Stage D;		//(Branch) Delay stage
-	  Stage M;      	//Memory stage
-	  Stage WB;     	//Write Back stage
+		Stage DRF1;  	//Rename stage
+		Stage DRF2;  	//Dispatch stage
+		Stage ALU1; 	//ALU 1st stage
+		Stage ALU2;   	//ALU 2nd stage
+		Stage ALU3;     //ALU WB stage
+		Stage MUL1;		//MUL 4-cycle stage
+		Stage MUL2;		//MUL WB stage
+		Stage B;     	//Branch stage
+		Stage LSFU1;	//LSFU 1st stage
+		Stage LSFU2;	//LSFU 2st stage
+		Stage LSFU3;	//LSFU WB stage
 
 	public:
 	  //Create CPU object which uses Code, Registers, and Data objects

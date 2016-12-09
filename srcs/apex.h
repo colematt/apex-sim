@@ -10,6 +10,8 @@ Description: Header file to hold globally aware variables
 #include "cpu.h"
 #include "data.h"
 #include "register.h"
+#include "rob.h"
+#include "iq.h"
 
 #ifndef APEX_H
 #define APEX_H
@@ -39,7 +41,7 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ
 void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq,
   std::string mod="all", int a1=0, int a2=3996);
 void stats();
-int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq);
+int simulate(int num_cycles, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq);
 void quit(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq);
 
 #endif

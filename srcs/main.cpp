@@ -39,7 +39,7 @@ int main(int argc, char** argv)
   IQ *apexIQ = new IQ();
 
   //Perform first initialization
-  initialize(*apexCPU, *apexRF, *apexData);
+  initialize(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ);
 
   //Set up simulator command interface
   string cmd; //interface switch statement selector
@@ -57,11 +57,11 @@ int main(int argc, char** argv)
 
     //Process the command. If command takes additional parameters, ingest them.
     if (cmd == "i") {
-      initialize(*apexCPU, *apexRF, *apexData);
+      initialize(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ);
     }
     else if (cmd== "s"){
       cin >> n;
-      simulate(n, *apexCode, *apexRF, *apexData);
+      simulate(n, *apexCode, *apexRF, *apexData, *apexROB, *apexIQ);
     }
     else if (cmd == "d"){
       //Ingest modifiers
@@ -70,10 +70,10 @@ int main(int argc, char** argv)
       if (mod == "mem"){
         cin >> a1 >> a2;
         //Display memory
-        display(*apexCPU, *apexRF, *apexData, mod, a1, a2);
+        display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, mod, a1, a2);
       }else {
         //Display memory
-        display(*apexCPU, *apexRF, *apexData, mod);
+        display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, mod);
       }
     }
     else if (cmd == "urf"){
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
       apexRF->setNumReg(n);
     }
     else if (cmd == "q"){
-      quit(*apexCPU, *apexRF, *apexData);
+      quit(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ);
       break;
     }
     else if (cmd == "h"){

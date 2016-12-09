@@ -24,6 +24,8 @@ public:
 	void display();
 	void initialize();
 
+	bool isEmpty();
+
 	//Remove head from ROB and
 	//call registers' commit function,
 	//updating backend table and free list
@@ -34,7 +36,7 @@ public:
 	void addStage(Stage &stage);
 
 	//Check if head matches the cycle value passed
-	bool headMatch(int cycle);
+	bool match(Stage& stage);
 
 	void flush(int cycle); //Traverse from head to end until find a stage with cycle > then passed and remove from that stage down
 };
