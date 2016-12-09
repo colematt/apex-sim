@@ -87,7 +87,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// the STOPPING logic! There are no instructions behind it
 	// because F stage has stopped fetching. All other opcodes advance into IQ.
 	if (DRF2.opcode != "HALT"){
-		//TODO: Advance the contents
+		//TODO: Advance the contents into the IQ
+		myiq->
 	}
 	else {
 
