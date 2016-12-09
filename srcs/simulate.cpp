@@ -107,6 +107,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		//Dispatch fails
 		no_dispatch++;
 	}
+	// NOP instructions do not advance into the IQ. They do not get a ROB entry.
+	else if (DRF2.opcode == "NOP"){
+		// Mark the stage empty so advancement can continue
+		DRF2.empty = true;
+		// Dispatch fails, however
+		no_dispatch++;
+
+	}
 	else {
 		if (DRF2.isReady() && !DRF2.isEmpty()){
 			//Advance the contents of DRF2 into the IQ

@@ -20,7 +20,7 @@ void Stage::initialize(){
 	pc = 0;
 	c = cycle;
 	lcounter = latency;
-	opcode = "NOP";
+	opcode = "";
 	operands.clear();
 	values.clear();
 	values.resize(3, 0);
@@ -51,16 +51,18 @@ void Stage::display(){
 //If advancement is successful, return true
 //If an error occurs, return false
 bool Stage::advance(Stage &dest){
-	//A stage should only advance if it is not empty, is ready,
-	//and the destination is empty
-	if (!this->empty && this->ready && dest.empty){
-		//Copy fields from this stage to destination stage
+	//A source stage should only advance to a dest stage if:
+	// 1. source stage is not empty,
+	// 2. source stage is ready,
+	// 3. dest stage is empty
+	if (!this.isEmpty() && this.isReady() && dest.isEmpty()){
+		//Copy fields from source stage to destination stage
 		dest.pc = this->pc;
 		dest.c = this->pc;
 		dest.opcode = this->opcode;
 		dest.lcounter = dest.latency;
 
-		//Copy register fields
+		//Copy register fields from source stage to dest stage
 		dest.operands.clear();
 		for(auto op : this->operands){
 			dest.operands.push_back(op);
@@ -78,7 +80,7 @@ bool Stage::advance(Stage &dest){
 		dest.empty = false;
 		dest.ready = false;
 
-		//Set this stage's flags
+		//Set source stage's flags
 		//this->isEmpty = true;
 		//this->isReady = false;
 		this->initialize();
@@ -86,6 +88,7 @@ bool Stage::advance(Stage &dest){
 		return true;
 	}
 
+	// Failed to advance!
 	return false;
 }
 
