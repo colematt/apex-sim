@@ -1325,7 +1325,7 @@ int CPU::simulate(CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata
 			F.isEmpty = false;
 			F.isReady = true;
 
-			pc += 4;;
+			pc += 4;
 		}//End F Stage
 
 	return 1; //Return 1 for cycle complete and no Halt processed

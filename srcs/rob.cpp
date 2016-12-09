@@ -50,7 +50,11 @@ void ROB::addStage(Stage &stage){
 
 //Given a cycle value gets cycle value of current head
 //and returns if they are equal (==)
-bool ROB::match(Stage& stage){ //TODO update to hand stage being passed was int
+bool ROB::match(Stage& stage){
+	// If stage is empty, it cannot match the ROB head entry!
+	if stage.isEmpty()
+		return false;
+
 	int size = 0;
 	int passedCycle = 0;
 	int headCycle = 0;

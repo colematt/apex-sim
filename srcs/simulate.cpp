@@ -9,7 +9,36 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/*COMMITTING PHASE*************************************************************
 	*******************************************************************************
 	******************************************************************************/
-
+	// Check to see if the ROB head matches the contents of either
+	// ALU3, MUL2, LSFU3. If there's a match:
+	// 1. Commit ROB's head entry
+	// 2. Increment stats counters
+	// 3. Mark that FU stage empty ("advancing" that stage)
+	if !(myrob.isEmpty()){
+		if (myrob.match(ALU3)){
+			myrob.commit(myregisters);
+			committed++;
+			ALU3.isEmpty = true;
+		}
+		else if (myrob.match(MUL2)){
+			myrob.commit(myregisters);
+			committed++;
+			MUL2.isEmpty = true;
+		}
+		else if (myrob.match(LSFU3)){
+			myrob.commit(myregisters);
+			if (LSFU3.opcode == "LOAD"){
+				committed_load++;
+				committed++;
+			}
+			else {
+				committed_store++;
+				committed++
+			}
+			LSFU3.isEmpty = true;
+		}
+		else{/*no commit this cycle*/}
+	}
 	/*ADVANCEMENT PHASE***********************************************************
 	******************************************************************************
 	*****************************************************************************/
@@ -133,9 +162,13 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	//Continue execution (return code 1) otherwise.
 	if (is_halting &&
 			DRF2.opcode == "HALT" &&
-			myiq.issue_queue.empty() &&
-			myrob.reorder_buffer.empty())
+			myiq.isEmpty() &&
+			myrob.isEmpty()){
+		cycle++
 		return 0;
-	else
+	}
+	else{
+		cycle++;
 		return 1;
+	}
 }
