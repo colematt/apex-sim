@@ -9,23 +9,24 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/*COMMITTING PHASE*************************************************************
 	*******************************************************************************
 	******************************************************************************/
+
 	// Check to see if the ROB head matches the contents of either
 	// ALU3, MUL2, LSFU3. If there's a match:
 	// 1. Commit ROB's head entry
 	// 2. Increment stats counters
-	// 3. Mark that FU stage empty ("advancing" that stage)
+	// 3. Mark that FU stage empty (prepare to "advance" into that stage)
 	if !(myrob.isEmpty()){
-		if (myrob.match(ALU3)){
+		if (ALU3.isReady() && myrob.match(ALU3)){
 			myrob.commit(myregisters);
 			committed++;
-			ALU3.isEmpty = true;
+			ALU3.empty = true;
 		}
-		else if (myrob.match(MUL2)){
+		else if (MUL2.isReady() && myrob.match(MUL2)){
 			myrob.commit(myregisters);
 			committed++;
-			MUL2.isEmpty = true;
+			MUL2.empty = true;
 		}
-		else if (myrob.match(LSFU3)){
+		else if (LSFU3.isReady() && myrob.match(LSFU3)){
 			myrob.commit(myregisters);
 			if (LSFU3.opcode == "LOAD"){
 				committed_load++;
@@ -35,40 +36,61 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				committed_store++;
 				committed++
 			}
-			LSFU3.isEmpty = true;
+			LSFU3.empty = true;
 		}
 		else{/*no commit this cycle*/}
 	}
+
+
 	/*ADVANCEMENT PHASE***********************************************************
 	******************************************************************************
 	*****************************************************************************/
 
 	/****ALU3 STAGE****/
+	// Advanced by ROB COMMITTING
 
 	/****ALU2 STAGE****/
+	if (ALU2.isReady && ALU3.isEmpty){
 
+	}
 	/****ALU1 STAGE****/
+	if (ALU1.isReady && ALU2.isEmpty){
 
+	}
 	/****MUL2 STAGE****/
+	// Advanced by ROB COMMITTING
 
 	/****MUL1 STAGE****/
+	if (MUL1.isReady && (MUL1.lcounter == 0) && MUL2.isEmpty){
 
+	}
 	/****LSFU3 STAGE****/
+	// Advanced by ROB COMMITTING
 
 	/****LSFU2 STAGE****/
+	if (LSFU2.isReady && LSFU3.isEmpty){
 
+	}
 	/****LSFU1 STAGE****/
+	if (LSFU1.isReady && LSFU2.isEmpty){
 
+	}
 	/****B STAGE****/
-
+	// B stage does not "advance", it empties and updates stats counters.
+	// This is because B stage does not have a destination register
+	// and so it doesn't commit.
+	if (B.isReady)
 	/****IQ****/
 
 	/****DRF2 STAGE****/
 	// If HALT is in this stage, do not advance it. Its presence here is part of
 	// the STOPPING logic! There are no instructions behind it
-	// because F stage has stopped fetching
+	// because F stage has stopped fetching. All other opcodes advance into IQ.
 	if (DRF2.opcode != "HALT"){
 		//TODO: Advance the contents
+	}
+	else {
+
 	}
 
 	/****DRF1 STAGE****/

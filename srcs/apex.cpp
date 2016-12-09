@@ -135,7 +135,7 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &m
       std::cout << "-----------\n" << "Statistics\n" << "-----------\n";
     stats();
   }
-} // end simulate()
+} // end display()
 
 //Display simulator stats
 void stats()
@@ -158,7 +158,8 @@ void stats()
 // Simulate the operation of the system for <num_cycles>, or until a HALT
 //instruction is encountered, or until an error occurs in simulation.
 //Return the current cycle number after simulation pauses or halts.
-int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq)
+int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
+  Data &mydata, ROB &myrob, IQ &myiq)
 {
   for (int c = cycle; c < num_cycles; c++)
   {
