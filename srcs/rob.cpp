@@ -17,12 +17,13 @@ ROB::~ROB(){
 }
 
 //Display the contents of the ROB
-//Each row is cycle#, opcode of the contained stage
+//Each entry is a Stage, so we delegate the display call
 void ROB::display(){
-	std::cout << "Cycle : Opcode";
+	std::cout << "Head" << std::endl;
 	for (auto e : reorder_buffer){
-		std::cout << e.c << " : " << e.opcode << std::endl;
+		e.display();
 	}
+	std::cout << "Tail" << std::endl;
 }
 
 //Initialize the ROB to empty state

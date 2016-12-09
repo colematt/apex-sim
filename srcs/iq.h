@@ -20,6 +20,9 @@ public:
 	IQ();
 	~IQ();
 
+	// Return true if the IQ is empty,
+	// Return false otherwise
+	// (Delegates to stl::queue::empty())
 	bool isEmpty();
 
 	void display();

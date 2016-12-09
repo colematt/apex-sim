@@ -33,7 +33,7 @@ void Stage::initialize(){
 //Pretty print a Stage's contents
 void Stage::display(){
 	//Display the contents if the stage is not empty.
-	if (!(empty)){
+	if (!(this.isEmpty())){
 		std::cout << name << ": " << opcode << " ";
 		for(auto o : operands){
 			std::cout << o << " ";

@@ -16,17 +16,21 @@ IQ::~IQ(){
 
 }
 
+// Return true if the IQ is empty,
+// Return false otherwise
+// (Delegates to stl::queue::empty())
 bool IQ::isEmpty(){
 	return issue_queue.empty();
 }
 
 //Display the contents of the IQ
-//Each row is cycle#, opcode of the contained stage
+//Each entry is a Stage, so we delegate the display logic
 void IQ::display(){
-	std::cout << "Cycle : Opcode";
+	std::cout << "Head" << std::endl;
 	for (auto e : issue_queue){
-		std::cout << e.c << " : " << e.opcode << std::endl;
+		e.display();
 	}
+	std::cout << "Tail" << std::endl;
 }
 
 //Initialize the IQ to empty state
@@ -34,7 +38,7 @@ void IQ::initialize(){
 	issue_queue.clear();
 }
 
-//Dispatch an instruction to IQ 
+//Dispatch an instruction to IQ
 void IQ::dispatchInst(Stage &stage){
 	this->issue_queue.push_back(stage);
 }
