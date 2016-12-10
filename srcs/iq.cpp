@@ -103,8 +103,9 @@ void IQ::updateSrc(std::string reg, int val){
 
 //TODO
 bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
+	int numIssued = 0;
 	//for (auto& e : issue_queue){
-	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();)
+	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();){
 		if (i->isReady()){
 			if(i->opcode == "ADD" ||
 				i->opcode == "SUB" ||
@@ -113,19 +114,24 @@ bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
 				i->opcode == "EX-OR" ||
 				i->opcode == "MOV"){
 
-				i->advance(ALU);
-				return true;
+				i->advance(ALU1);
+				this->issue_queue.erase(i);
+				numIssued++;
 			}
 
 			if(i->opcode == "MUL"){
 				
-				return true;
+				i->advance(MUL1);
+				this->issue_queue.erase(i);
+				numIssued++;
 			}
 
 			if(i->opcode == "LOAD" ||
 				i->opcode == "STORE"){
 
-				return true;
+				i->advance(LSFU1);
+				this->issue_queue.erase(i);
+				numIssued++;
 			}
 
 			if(i->opcode == "BAL" ||
@@ -133,13 +139,17 @@ bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
 				i->opcode == "BZ" ||
 				i->opcode == "BNZ"){
 
-				return true;
+				i->advance(B);
+				this->issue_queue.erase(i);
+				numIssued++;
 			}
+		}
 		else{
 			++i;
 		}
-
-		}
+		if (numIssued > 2){
+			return true;
+		}	
 	}
 	//Failed to issue instruction
 	return false;
