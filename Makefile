@@ -10,11 +10,11 @@ CLASS_FILES = \
 	$(APEX_SRC)/code.cpp \
 	$(APEX_SRC)/cpu.cpp \
 	$(APEX_SRC)/data.cpp \
+	$(APEX_SRC)/iq.cpp \
 	$(APEX_SRC)/register.cpp \
-	$(APEX_SRC)/simulate.cpp \
-	$(APEX_SRC)/stage.cpp \
 	$(APEX_SRC)/rob.cpp \
-	$(APEX_SRC)/iq.cpp
+	$(APEX_SRC)/simulate.cpp \
+	$(APEX_SRC)/stage.cpp 
 
 all: apex-sim
 

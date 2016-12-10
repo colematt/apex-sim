@@ -19,7 +19,7 @@ CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
  MUL1("MUL 1st"),
  MUL2("MUL WB"),
  B1("Branch 1st"),
- B2("Branch WB")
+ B2("Branch WB"),
  LSFU1("LSFU 1st"),
  LSFU2("LSFU 2nd"),
  LSFU3("LSFU WB")
