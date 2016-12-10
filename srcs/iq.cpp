@@ -102,56 +102,52 @@ void IQ::updateSrc(std::string reg, int val){
 
 bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 	int numIssued = 0;
-	//for (auto& e : issue_queue){
 	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();){
 		if (i->isReady()){
+			//Arithmetic opcodes
 			if(i->opcode == "ADD" ||
 				i->opcode == "SUB" ||
 				i->opcode == "AND" ||
 				i->opcode == "OR" ||
 				i->opcode == "EX-OR" ||
 				i->opcode == "MOV"){
-
-				i->advance(ALU);
-				this->issue_queue.erase(i);
-				numIssued++;
+					i->advance(ALU);
+					this->issue_queue.erase(i);
+					numIssued++;
 			}
-
+			//Arithmetic opcodes with latency
 			if(i->opcode == "MUL"){
-
 				i->advance(MUL);
 				this->issue_queue.erase(i);
 				numIssued++;
 			}
-
-			if(i->opcode == "LOAD" ||
-				i->opcode == "STORE"){
-
+			//Memory access opcodes
+			if(i->opcode == "LOAD" || i->opcode == "STORE"){
 				i->advance(LSFU);
 				this->issue_queue.erase(i);
 				numIssued++;
 			}
-
+			//Control flow opcodes
 			if(i->opcode == "BAL" ||
 				i->opcode == "JUMP" ||
 				i->opcode == "BZ" ||
 				i->opcode == "BNZ"){
-
-				i->advance(B);
-				this->issue_queue.erase(i);
-				numIssued++;
+					i->advance(B);
+					this->issue_queue.erase(i);
+					numIssued++;
 			}
 		}
 		else{
 			++i;
-		}
+		} //this entry is not ready
 		if (numIssued > 2){
 			return true;
 		}
-	}
+	} //END for each entry in issue_queue
+
 	//Failed to issue instruction
 	return false;
-}
+} //END issue() function
 
 // Flush all entries in the IQ with whose cycle time stamp
 // is >= specified time stamp (used when branch is taken)
@@ -178,4 +174,17 @@ void IQ::flush(int cycle, Registers &rf){
 			// Advance the iterator
 			++it;
 	}
+}
+
+// Given an opcode string,
+// Return true if an entry in the IQ has that opcode
+// Return false otherwise
+bool hasEntryWithOpcode(std::string oc){
+	for (auto entry : issue_queue){
+		if (entry.opcode == oc){
+			return true;
+		}
+	}
+
+	return false;
 }

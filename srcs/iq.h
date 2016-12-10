@@ -21,25 +21,17 @@ public:
 	IQ();
 	~IQ();
 
-	// Return true if the IQ is empty,
-	// Return false otherwise
-	// (Delegates to stl::queue::empty())
-	bool isEmpty();
-
+	// Interface functions
 	void display();
 	void initialize();
 
-	//Add stage to Issue Queue to be issued on a later cycle
+	// Utility functions
+	bool isEmpty();
 	void dispatchInst(Stage &stage);
-
 	void updateSrc(std::string reg, int val);
-
 	bool issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B);
-
-	//TODO
-	//void checkReady();
-
 	void flush(int cycle, Registers &rf);
+	bool hasEntryWithOpcode(std::string oc);
 };
 
 #endif

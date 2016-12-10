@@ -12,9 +12,7 @@ ROB::ROB(){
 	this->initialize();
 }
 
-ROB::~ROB(){
-
-}
+ROB::~ROB(){}
 
 //Display the contents of the ROB
 //Each entry is a Stage, so we delegate the display call
