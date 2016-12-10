@@ -179,7 +179,7 @@ void IQ::flush(int cycle, Registers &rf){
 // Given an opcode string,
 // Return true if an entry in the IQ has that opcode
 // Return false otherwise
-bool hasEntryWithOpcode(std::string oc){
+bool IQ::hasEntryWithOpcode(std::string oc){
 	for (auto entry : issue_queue){
 		if (entry.opcode == oc){
 			return true;

@@ -52,6 +52,10 @@ int main(int argc, char** argv)
     if (cycle == 0)
       help();
 
+  	//Flush both input containers
+  	cmd = "";
+  	mod = "";
+
     //Get the next command. If command takes the n parameter, ingest it also
     cin >> cmd;
 

@@ -34,11 +34,12 @@ void help()
             << "s <n>           |Simulate <n> number of cycles\n"
             << "d all           |Display the full simulator internal state\n"
             << "d cpu           |Display CPU stage contents\n"
-            << "d rt            |Display Front-end and Back-end Register Tables\n"
             << "d iq            |Display Issue Queue entries and status\n"
-            << "d rob           |Display ROB contents\n"
+            << "d map           |Display Front-end and Back-end Register Tables\n"
             << "d mem <a1> <a2> |Display memory from address <a1> to <a2>\n"
+            << "d rob           |Display ROB contents\n"
             << "d stats         |Display Stats\n"
+            << "d urf           |Display Unified Register File\n"
             << "urf <n>         |Set URF Size to <n> physical registers\n"
             << "q               |Quit the simulator\n"
             << "h               |Display this help message" << std::endl;
@@ -74,11 +75,12 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &m
   //Sanitize inputs
   if  (mod != "all" ||
         mod != "cpu" ||
-        mod != "rt"  ||
         mod != "iq"  ||
-        mod != "rob" ||
+        mod != "map" ||
         mod != "mem" ||
-        mod != "stats"){
+        mod != "rob" ||
+        mod != "stats" ||
+        mod != "urf"){
             std::cerr << "Display modifier " << mod << " not understood.";
             mod = "none";
   }
@@ -109,30 +111,35 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &m
       std::cout << "-----------\n" << "CPU\n" << "-----------\n";
     mycpu.display();
   }
-  if (mod == "all" || mod == "rt"){
-    if (VERBOSE >= 1)
-      std::cout << "-----------\n" << "Registers\n" << "-----------\n";
-    myregisters.display();
-  }
   if (mod == "all" || mod == "iq"){
     if (VERBOSE >= 1)
       std::cout << "-----------\n" << "Issue Queue\n" << "-----------\n";
     myiq.display();
   }
-  if (mod == "all" || mod == "rob"){
+  if (mod == "all" || mod == "map"){
     if (VERBOSE >= 1)
-      std::cout << "-----------\n" << "Reorder Buffer\n" << "-----------\n";
-    myrob.display();
+      std::cout << "-----------\n" << "Rename Tables\n" << "-----------\n";
+    myregisters.dMap();
   }
   if (mod == "all" || mod == "mem"){
     if (VERBOSE >= 1)
       std::cout << "-----------\n" << "Data Memory\n" << "-----------\n";
     mydata.display(a1, a2);
   }
+  if (mod == "all" || mod == "rob"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "Reorder Buffer\n" << "-----------\n";
+    myrob.display();
+  }
   if (mod == "all" || mod == "stats"){
     if (VERBOSE >= 1)
       std::cout << "-----------\n" << "Statistics\n" << "-----------\n";
     stats();
+  }
+  if (mod == "all" || mod == "urf"){
+    if (VERBOSE >= 1)
+      std::cout << "-----------\n" << "Registers\n" << "-----------\n";
+    myregisters.dUrf();
   }
 } // end display()
 
