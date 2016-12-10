@@ -13,15 +13,16 @@ CPU::CPU(Code &mycode, Registers &myregisters, Data &mydata) :
  F("Fetch"),
  DRF1("DRF Rename"),
  DRF2("DRF Dispatch"),
- ALU1("ALU First"),
- ALU2("ALU Second"),
- ALU3("ALU Third"),
- MUL1("MUL First"),
- MUL2("MUL Second"),
- B("Branch"),
- LSFU1("LSFU First"),
- LSFU2("LSFU Second"),
- LSFU3("LSFU Third")
+ ALU1("ALU 1st"),
+ ALU2("ALU 2nd"),
+ ALU3("ALU WB"),
+ MUL1("MUL 1st"),
+ MUL2("MUL WB"),
+ B1("Branch 1st"),
+ B2("Branch WB")
+ LSFU1("LSFU 1st"),
+ LSFU2("LSFU 2nd"),
+ LSFU3("LSFU WB")
 {
 	this->initialize();
 }

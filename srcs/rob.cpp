@@ -78,10 +78,9 @@ bool ROB::match(Stage& stage){
 
 // Flush all entries in the ROB with whose cycle time stamp
 // is >= specified time stamp (used when branch is taken)
+// ASSUMPTION: the entries in the IQ and ROB are
+// sorted at all times by their timestamp of creation (c)
 void ROB::flush(int cycle){
-		// ASSUMPTION: the entries in the IQ and ROB are
-		// sorted at all times by their timestamp of creation (c)
-
 		// Point an iterator at the start of the IQ
 		std::deque<Stage>::iterator it = this->reorder_buffer.begin();
 

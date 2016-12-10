@@ -11,7 +11,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	*****************************************************************************/
 
 	// Check to see if the ROB head matches the contents of either
-	// ALU3, MUL2, LSFU3. If there's a match:
+	// ALU3, MUL2, LSFU3, B2. If there's a match:
 	// 1. Commit ROB's head entry
 	// 2. Increment stats counters
 	// 3. Mark that FU stage empty (prepare to "advance" into that stage)
@@ -38,9 +38,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			}
 			LSFU3.empty = true;
 		}
-		else{/*no commit this cycle*/}
+		else if (B2.isReady() && myrob.match(B2)){
+			myrob.commit(myregisters);
+			committed++;
+			B2.empty = true;
+		}
+		else{no_commit++;} // there were ROB contents, but they didn't match
 	}
-
+	else{no_commit++;} // there were no ROB contents
 
 	/*ADVANCEMENT PHASE***********************************************************
 	******************************************************************************
@@ -48,39 +53,35 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****ALU3 STAGE****/
 	// Advanced by ROB COMMITTING
-
 	/****ALU2 STAGE****/
 	if (ALU2.isReady() && ALU3.isEmpty()){
-		//TODO: Add advance logic
+		ALU2.advance(ALU3);
 	}
 	/****ALU1 STAGE****/
 	if (ALU1.isReady() && ALU2.isEmpty()){
-		//TODO: Add advance logic
+		ALU1.advance(ALU2);
 	}
 	/****MUL2 STAGE****/
 	// Advanced by ROB COMMITTING
-
 	/****MUL1 STAGE****/
 	if (MUL1.isReady() && MUL2.isEmpty()){
-		//TODO: Add advance logic
+		MUL1.advance(MUL2);
 	}
 	/****LSFU3 STAGE****/
 	// Advanced by ROB COMMITTING
-
 	/****LSFU2 STAGE****/
 	if (LSFU2.isReady() && LSFU3.isEmpty()){
-		//TODO: Add advance logic
+		LSFU2.advance(LSFU3);
 	}
 	/****LSFU1 STAGE****/
 	if (LSFU1.isReady() && LSFU2.isEmpty()){
-		//TODO: Add advance logic
+		LSFU1.advance(LSFU2);
 	}
-	/****B STAGE****/
-	// B stage does not "advance", it empties and updates stats counters.
-	// This is because B stage does not have a destination register
-	// and so it doesn't commit.
-	if (B.isReady()){
-		//TODO: Add specialized B advance logic
+	/****B2 STAGE****/
+	// Advanced by ROB COMMITTING
+	/****B1 STAGE****/
+	if (B1.isReady() && B2.isEmpty()){
+		B1.advance(B2);
 	}
 	/****IQ****/
 	// Up to 3 wakeup signals can occur per cycle.
@@ -93,11 +94,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		else{
 			break;
 		}
-		// Now that we've finished wakeups,
-		// Decide if any successful issues occurred this cycle
-		if (wakeup == 0)
-			no_issued++;
 	}
+	// Now that we've finished wakeups,
+	// Decide if any successful issues occurred this cycle
+	if (wakeup == 0)
+		no_issued++;
 	/****DRF2 STAGE****/
 	// If HALT is in this stage, do not advance it. Its presence here is part of
 	// the STOPPING logic! There are no instructions behind it because
@@ -130,11 +131,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			no_dispatch++;
 		}
 	}
-
 	/****DRF1 STAGE****/
-
+	if (DRF1.isReady() && DRF2.isEmpty()){
+		DRF1.advance(DRF2);
+	}
 	/****F STAGE****/
-
+	if (F.isReady() && DRF1.isEmpty()){
+		F.advance(DRF1);
+	}
 
 	/*WORKING PHASE***************************************************************
 	******************************************************************************
@@ -158,14 +162,13 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****LSFU1 STAGE****/
 
-	/****B STAGE****/
+	/****B2 STAGE****/
+
+	/****B1 STAGE****/
 	// If a branch is taken, the following actions must occur:
 	//   1. Flush the ROB using flush()
 	//   2. Flush the IQ using flush()
 	//   3. Flush instructions waiting in any stage if issued after B stage
-	//   4. TODO: Do we need to flush FU contents if they were dispatched
-	//            after the instruction in B stage?
-	//   5. TODO: Do we need to reset precise states?
 
 	/****IQ****/
 
@@ -206,7 +209,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****LSFU1 STAGE****/
 
-	/****B STAGE****/
+	/****B2 STAGE****/
+
+	/****B1 STAGE****/
 
 	/****IQ****/
 

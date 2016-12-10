@@ -28,11 +28,10 @@ extern int dispatched; //STAT: number of instructions dispatched to IQ
 extern int no_dispatch; //STAT: number of cycles with no instruction dispatched to IQ
 extern int issued; //STAT: number of instructions issued to ANY FU plus HALT instructions issued directly to ROB
 extern int no_issued; //STAT: number of cycles no instructions were issued
-extern int resolved; //STAT: number of instructions resolved from Branch FU
 extern int committed; //STAT: number of instructions committed from ROB
 extern int committed_load; //STAT: number of LOAD instructions committed
 extern int committed_store; //STAT: number of STORE instructions committed
-
+extern int no_commit; //STAT: number of cycles no instructions were committed
 
 
 // Helper functions

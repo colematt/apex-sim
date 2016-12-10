@@ -20,10 +20,10 @@ int dispatched = 0;
 int no_dispatch = 0;
 int issued = 0;
 int no_issued = 0;
-int resolved = 0;
 int committed = 0;
 int committed_load = 0;
 int committed_store = 0;
+int no_commit= 0;
 
 //Display an interface help message
 void help()
@@ -145,7 +145,6 @@ void stats()
   std::cout << "Instructions through:\n"
             << " Dispatch=" << dispatched
             << " Issue=" << issued
-            << " Resolution=" << resolved
             << " Commit=" << committed << std::endl;
 
   std::cout << "IPC: " << ((double) committed + (double) resolved) / (double) cycle << std::endl;
@@ -153,6 +152,7 @@ void stats()
   std::cout << "# cycles with no issue: " << no_issued << std::endl;
   std::cout << "# LOAD instructions committed: " << committed_load << std::endl;
   std::cout << "# STORE instructions committed: " << committed_store << std::endl;
+  std::cout << "# cycles with no commit: " << no_commit << std::endl;
 }
 
 // Simulate the operation of the system for <num_cycles>, or until a HALT

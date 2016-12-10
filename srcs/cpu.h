@@ -22,15 +22,16 @@ class CPU {
 	private:
 		bool is_halting; //See STOPPING phase in CPU::Simulate() for explanation
 
-		Stage F;      	//Fetch stage
+		Stage F;      //Fetch stage
 		Stage DRF1;  	//Rename stage
 		Stage DRF2;  	//Dispatch stage
 		Stage ALU1; 	//ALU 1st stage
-		Stage ALU2;   	//ALU 2nd stage
-		Stage ALU3;     //ALU WB stage
+		Stage ALU2;  	//ALU 2nd stage
+		Stage ALU3;   //ALU WB stage
 		Stage MUL1;		//MUL 4-cycle stage
 		Stage MUL2;		//MUL WB stage
-		Stage B;     	//Branch stage
+		Stage B1;     //Branch stage
+		Stage B2;     //Branch WB stage
 		Stage LSFU1;	//LSFU 1st stage
 		Stage LSFU2;	//LSFU 2st stage
 		Stage LSFU3;	//LSFU WB stage
