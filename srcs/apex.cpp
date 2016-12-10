@@ -57,7 +57,6 @@ void initialize(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ
   no_dispatch = 0;
   issued = 0;
   no_issued = 0;
-  resolved = 0;
   committed = 0;
   committed_load = 0;
   committed_store = 0;
@@ -147,7 +146,7 @@ void stats()
             << " Issue=" << issued
             << " Commit=" << committed << std::endl;
 
-  std::cout << "IPC: " << ((double) committed + (double) resolved) / (double) cycle << std::endl;
+  std::cout << "IPC: " << ((double) committed) / (double) cycle << std::endl;
   std::cout << "# cycles dispatch stalled: " << no_dispatch << std::endl;
   std::cout << "# cycles with no issue: " << no_issued << std::endl;
   std::cout << "# LOAD instructions committed: " << committed_load << std::endl;

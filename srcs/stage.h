@@ -7,6 +7,7 @@ Description: Header file for stage.cpp
 
 #include <string>
 #include <vector>
+#include "register.h"
 
 #ifndef STAGE_H
 #define STAGE_H

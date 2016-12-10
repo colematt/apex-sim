@@ -7,7 +7,7 @@ Description: Header file for iq.cpp
 
 #include <string>
 #include <deque>
-#include "registers.h"
+#include "register.h"
 #include "stage.h"
 
 #ifndef IQ_H
@@ -34,7 +34,7 @@ public:
 
 	void updateSrc(std::string reg, int val);
 
-	bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B);
+	bool issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B);
 
 	//TODO
 	//void checkReady();

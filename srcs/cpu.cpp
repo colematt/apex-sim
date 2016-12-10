@@ -42,7 +42,8 @@ void CPU::initialize(){
 	ALU3.initialize();
 	MUL1.initialize();
 	MUL2.initialize();
-	B.initialize();
+	B1.initialize();
+	B2.initialize();
 	LSFU1.initialize();
 	LSFU2.initialize();
 	LSFU3.initialize();
@@ -57,7 +58,8 @@ void CPU::display(){
 	ALU3.display();
 	MUL1.display();
 	MUL2.display();
-	B.display();
+	B1.display();
+	B2.display();
 	LSFU1.display();
 	LSFU2.display();
 	LSFU3.display();

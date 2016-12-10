@@ -7,6 +7,7 @@ Description: Contains the IQ class, which simulates the operation of a Instructi
 
 #include <iostream>
 #include "iq.h"
+#include "cpu.h"
 
 IQ::IQ(){
 	this->initialize();
@@ -99,7 +100,7 @@ void IQ::updateSrc(std::string reg, int val){
 	}
 }
 
-bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
+bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 	int numIssued = 0;
 	//for (auto& e : issue_queue){
 	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();){
@@ -111,14 +112,14 @@ bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
 				i->opcode == "EX-OR" ||
 				i->opcode == "MOV"){
 
-				i->advance(ALU1);
+				i->advance(ALU);
 				this->issue_queue.erase(i);
 				numIssued++;
 			}
 
 			if(i->opcode == "MUL"){
 
-				i->advance(MUL1);
+				i->advance(MUL);
 				this->issue_queue.erase(i);
 				numIssued++;
 			}
@@ -126,7 +127,7 @@ bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
 			if(i->opcode == "LOAD" ||
 				i->opcode == "STORE"){
 
-				i->advance(LSFU1);
+				i->advance(LSFU);
 				this->issue_queue.erase(i);
 				numIssued++;
 			}
@@ -169,7 +170,7 @@ void IQ::flush(int cycle, Registers &rf){
 	// Flush the elements from the current iterator to end:
 	while (it != issue_queue.end()){
 			// Deallocate physical registers by delegation
-			it.flush(cycle, rf);
+			it->flush(cycle, rf);
 
 			// Erase this entry in the IQ
 			issue_queue.erase(it);

@@ -12,6 +12,7 @@ Description: header file for register.cpp
 #include <exception>
 #include <stdexcept>
 #include <queue>
+#include <vector>
 
 #ifndef REGISTER_H
 #define REGISTER_H
@@ -19,6 +20,18 @@ Description: header file for register.cpp
 class Registers
 {
 private:
+  struct CompareString {
+    bool operator()(std::string const &s1, std::string const &s2){
+      std::string s1m = s1, s2m = s2;
+
+      s1m.erase(0,1); s2m.erase(0,1);
+
+      int i1 = std::stoi (s1m), i2 = std::stoi (s2m);
+
+      return i1 < i2;
+    }
+  };
+
   //register := {string name:(int value, bool valid)}
   std::map<std::string, std::tuple<int,bool>> reg_file;
 
@@ -29,7 +42,7 @@ private:
   std::map<std::string, std::string> back_end;
 
   //holds list of physical registers that are ready to to be used
-  std::queue<std::string> free_list;
+  std::priority_queue<std::string, std::vector<std::string>, CompareString> free_list;
 
   //Number of physical registers, default=32
   int num_reg = 32;
@@ -46,10 +59,11 @@ public:
   //create instance of R reg
   std::string getRenamed(std::string);
 
-  //TODO create function that updates back_end list
+  //Updates back_end list
+  //Releases physical registers
   void commit(std::string pReg);
-  //TODO create function to release physical registers
-  //TODO
+
+  bool deallocate(std::string reg); //Return true on action, false on no action
 
   //methods for interacting with the register file map
   void write(std::string reg, int value, bool valid); //sets reg_file[register] = (value,valid)
@@ -62,6 +76,7 @@ public:
 
   //method to set the number of physical registers in processor
   void setNumReg(int num); //sets phy_reg = num (default = 32)
+
 };
 
 #endif

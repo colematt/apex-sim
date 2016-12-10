@@ -55,6 +55,8 @@ std::string Registers::getRenamed(std::string rReg){
   std::string regHolder;
   int valueCarry = 0;
 
+  physReg = this->free_list.top();
+
   this->free_list.pop();
 
   //Update or insert pReg value with physReg as key and archReg as value
@@ -94,9 +96,25 @@ void Registers::commit(std::string pReg){
   }
   
   this->back_end[rReg] = pReg; //Set new P reg value
+  this->front_end.erase(pReg); //Remove rename entry from front end table
+  this->free_list.push(pReg);  //Push P reg back into free list
 
-  this->free_list.push(pReg); //Push P reg back into free list
+}
 
+bool Registers::deallocate(std::string reg){
+  if (reg[0] != 'P'){
+    return false;
+  } else {
+    auto it = this->front_end.find(reg);
+    if (it != this->front_end.end()){
+      this->front_end.erase(it); //Remove rename entry from front end table
+      this->free_list.push(reg); //Push P reg back into free list
+      return true;
+
+    } else {
+      return false;
+    }
+  }
 }
 
 //Set reg_file[register] = (value,valid)

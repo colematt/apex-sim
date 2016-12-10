@@ -8,7 +8,6 @@ Description: Contains the Stage class, which defines a cpu stage.
 #include <iostream>
 #include "apex.h"
 #include "stage.h"
-#include "register.h"
 #include "string.h"
 
 Stage::Stage(std::string n, int l){
@@ -35,7 +34,7 @@ void Stage::initialize(){
 //Pretty print a Stage's contents
 void Stage::display(){
 	//Display the contents if the stage is not empty.
-	if (!(this.isEmpty())){
+	if (!(this->isEmpty())){
 		std::cout << name << ": " << opcode << " ";
 		for(auto o : operands){
 			std::cout << o << " ";
@@ -57,7 +56,7 @@ bool Stage::advance(Stage &dest){
 	// 1. source stage is not empty,
 	// 2. source stage is ready,
 	// 3. dest stage is empty
-	if (!this.isEmpty() && this.isReady() && dest.isEmpty()){
+	if (!this->isEmpty() && this->isReady() && dest.isEmpty()){
 		//Copy fields from source stage to destination stage
 		dest.pc = this->pc;
 		dest.c = this->pc;
@@ -96,7 +95,7 @@ bool Stage::advance(Stage &dest){
 
 //Flush the stage if its timestamp is later than <cycle> argument.
 //Return true if a flush actually occurs, return false otherwise.
-bool flush(int cycle, Registers &rf){
+bool Stage::flush(int cycle, Registers &rf){
 	//Check this stage's timestamp
 	if (c > cycle){
 		// This stage must be flushed.
@@ -109,10 +108,10 @@ bool flush(int cycle, Registers &rf){
 				opcode == "OR" ||
 				opcode == "EX-OR" ||
 				opcode == "LOAD"){
-						rf->deallocate(operands.at(0));
+						rf.deallocate(operands.at(0));
 				}
 		// Initialize() it, which also marks it empty.
-		this.initialize();
+		this->initialize();
 
 		return true;
 	}
