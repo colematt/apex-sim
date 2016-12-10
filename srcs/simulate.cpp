@@ -108,14 +108,41 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		//Dispatch fails
 		no_dispatch++;
 	}
-	// NOP instructions do not advance into the IQ. They do not get a ROB entry.
 	else if (DRF2.opcode == "NOP"){
-		// Mark the stage empty so advancement can continue
+		// NOP instructions do not advance into the IQ.
+		// NOP instructions do not get a ROB entry.
+		// Mark the stage empty so advancement can continue, dispatch failed
 		DRF2.empty = true;
-		// Dispatch fails, however
 		no_dispatch++;
-
 	}
+	else if (DRF2.opcode == "BZ" ||
+					DRF2.opcode == "BNZ" ||
+				 	DRF2.opcode == "BAL" ||
+					DRF2.opcode == "JUMP"){
+		// Specification 2, Detail 2 states that no control flow instructions
+		// can be dispatched until any control flow instruction in the IQ has
+		// been issued.
+		if (myiq.hasEntryWithOpcode("BZ") ||
+				myiq.hasEntryWithOpcode("BNZ") ||
+				myiq.hasEntryWithOpcode("BAL") ||
+				myiq.hasEntryWithOpcode("JUMP")){
+			//Dispatch stalls
+			no_dispatch++;
+		}
+		else {
+			if (DRF2.isReady() && !DRF2.isEmpty()){
+				//Advance the contents of DRF2 into the IQ
+				myiq.dispatchInst(DRF2);
+
+				//Empty DRF2
+				DRF2.empty = true;
+
+				//Increment stats counters
+				dispatched++;
+			}
+			else {no_dispatch++;}
+		}
+	} // DRF2 control flow instruction handling
 	else {
 		if (DRF2.isReady() && !DRF2.isEmpty()){
 			//Advance the contents of DRF2 into the IQ
@@ -127,10 +154,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			//Increment stats counters
 			dispatched++;
 		}
-		else {
-			//Dispatch fails
-			no_dispatch++;
-		}
+		else {no_dispatch++;}
 	}
 	/****DRF1 STAGE****/
 	if (DRF1.isReady() && DRF2.isEmpty()){
