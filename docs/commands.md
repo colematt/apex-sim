@@ -8,12 +8,12 @@ Once execution begins, a command prompt is offered, and the following commands c
 | `s <n>`           | Simulate _n_ number of cycles |
 | `d all`           | Display the full simulator internal state |
 | `d cpu`           | Display CPU stage contents |
+| `d iq`            | Display IQ entries and status |
 | `d map`           | Display Front rename table and back-end register alias table |
-| `d rt`            | Display Front-end and Back-end Register Tables |
-| `d iq`            | Display Issue Queue entries and status |
-| `d rob`           | Display ROB contents |
 | `d mem <a1> <a2>` | Display memory from address _a1_ to _a2_ |
+| `d rob`           | Display ROB contents |
 | `d stats`         | Display Stats |
+| `d urf`           | Display URF contents |
 | `urf <n>`         | Set URF Size to _n_ physical registers |
 | `q`               | Quit the simulator |
 | `h`               | Display this help message |
