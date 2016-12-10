@@ -33,21 +33,22 @@ public:
   int pc; //program counter value that issued this
   int c; //simulator cycle "timestamp"
   std::string opcode; //(e.g. ADD) representing this instruction
-  std::vector<std::string> operands;
-  std::vector<int> values;
-  std::vector<bool> valids;
+  std::vector<std::string> operands; //contains the tags of source/destination
+  std::vector<int> values; // contains the actual values
+  std::vector<bool> valids; // contains whether those values are valid
 
   //Constructors/Destructors/Operators
   Stage(std::string n, int l=1);
 
   //Interface functions
-  void initialize(); //Initialize the contents of this stage to empty with NOP
-  void display(); //Display the contents of this stage: name, opcode, operands
-  bool advance(Stage &dest); //Advance a stage into destination stage
+  void initialize();
+  void display();
 
   //Utility functions
-  int littoi(std::string literal); //Convert a #literal to its int value
-  bool isAllValid(); //For this instr are all sources valid or no sources
+  int littoi(std::string literal);
+  bool isAllValid();
+  bool advance(Stage &dest);
+  bool flush(int cycle, Registers &rf);
 
 }; //class Stage
 #endif

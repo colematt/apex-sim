@@ -12,9 +12,7 @@ IQ::IQ(){
 	this->initialize();
 }
 
-IQ::~IQ(){
-
-}
+IQ::~IQ(){}
 
 // Return true if the IQ is empty,
 // Return false otherwise
@@ -101,7 +99,6 @@ void IQ::updateSrc(std::string reg, int val){
 	}
 }
 
-//TODO
 bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
 	int numIssued = 0;
 	//for (auto& e : issue_queue){
@@ -120,7 +117,7 @@ bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
 			}
 
 			if(i->opcode == "MUL"){
-				
+
 				i->advance(MUL1);
 				this->issue_queue.erase(i);
 				numIssued++;
@@ -149,21 +146,17 @@ bool issue(Stage* ALU, Stage* MUL, Stage* LSFU, Stage* B){
 		}
 		if (numIssued > 2){
 			return true;
-		}	
+		}
 	}
 	//Failed to issue instruction
 	return false;
 }
 
-//TODO
-//void checkReady(){}
-
 // Flush all entries in the IQ with whose cycle time stamp
 // is >= specified time stamp (used when branch is taken)
-void IQ::flush(int cycle){
-	// ASSUMPTION: the entries in the IQ and ROB are
-	// sorted at all times by their timestamp of creation (c)
-
+// ASSUMPTION: the entries in the IQ and ROB are
+// 						sorted at all times by their timestamp of creation (c)
+void IQ::flush(int cycle, Registers &rf){
 	// Point an iterator at the start of the IQ
 	std::deque<Stage>::iterator it = issue_queue.begin();
 
@@ -173,6 +166,15 @@ void IQ::flush(int cycle){
 		++it;
 	}
 
-	// flush the elements from the current iterator to end:
-	issue_queue.erase(it, issue_queue.end());
+	// Flush the elements from the current iterator to end:
+	while (it != issue_queue.end()){
+			// Deallocate physical registers by delegation
+			it.flush(cycle, rf);
+
+			// Erase this entry in the IQ
+			issue_queue.erase(it);
+
+			// Advance the iterator
+			++it;
+	}
 }

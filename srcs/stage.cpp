@@ -8,6 +8,8 @@ Description: Contains the Stage class, which defines a cpu stage.
 #include <iostream>
 #include "apex.h"
 #include "stage.h"
+#include "register.h"
+#include "string.h"
 
 Stage::Stage(std::string n, int l){
 	latency = l;
@@ -92,15 +94,45 @@ bool Stage::advance(Stage &dest){
 	return false;
 }
 
+//Flush the stage if its timestamp is later than <cycle> argument.
+//Return true if a flush actually occurs, return false otherwise.
+bool flush(int cycle, Registers &rf){
+	//Check this stage's timestamp
+	if (c > cycle){
+		// This stage must be flushed.
+		// Deallocate its physical register in the dest set
+		if (opcode == "ADD" ||
+				opcode == "SUB" ||
+				opcode == "MOVC" ||
+				opcode == "MUL" ||
+				opcode == "AND" ||
+				opcode == "OR" ||
+				opcode == "EX-OR" ||
+				opcode == "LOAD"){
+						rf->deallocate(operands.at(0));
+				}
+		// Initialize() it, which also marks it empty.
+		this.initialize();
+
+		return true;
+	}
+
+	// A flush did not occur
+	return false;
+}
+
+// Return whether this stage is occupied by an inflight instruction
 bool Stage::isEmpty(){
 	return empty;
 }
 
+// Return whether this stage is ready to be advanced because:
+// 1. its work is complete (this.ready)
+// 2. its latency is complete (ie MUL instructions)
 bool Stage::isReady(){
-
 	if (ready && (latency == 0))
 		return true;
-
+	else
 	return false;
 }
 

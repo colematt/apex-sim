@@ -160,9 +160,9 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****B STAGE****/
 	// If a branch is taken, the following actions must occur:
-	//   1. Flush the ROB
-	//   2. Flush the IQ
-	//   3. Flush instructions waiting in F. DRF1 and DRF2
+	//   1. Flush the ROB using flush()
+	//   2. Flush the IQ using flush()
+	//   3. Flush instructions waiting in any stage if issued after B stage
 	//   4. TODO: Do we need to flush FU contents if they were dispatched
 	//            after the instruction in B stage?
 	//   5. TODO: Do we need to reset precise states?

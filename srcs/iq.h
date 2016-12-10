@@ -5,9 +5,10 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
 Description: Header file for iq.cpp
 */
 
-#include "stage.h"
 #include <string>
 #include <deque>
+#include "registers.h"
+#include "stage.h"
 
 #ifndef IQ_H
 #define IQ_H
@@ -38,7 +39,7 @@ public:
 	//TODO
 	//void checkReady();
 
-	void flush(int cycle);
+	void flush(int cycle, Registers &rf);
 };
 
 #endif
