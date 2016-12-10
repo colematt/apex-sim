@@ -84,10 +84,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		B1.advance(B2);
 	}
 	/****IQ****/
+	int wakeup = -1;
 	// Up to 3 wakeup signals can occur per cycle.
-	for (int wakeup = 0; wakeup < 3; wakeup++){
+	for (wakeup = 0; wakeup < 3; wakeup++){
 		//If we can issue, do so, and increment stats
-		if (myiq.issue(ALU1, MUL1, LSFU1, B)) {
+		if (myiq.issue(ALU1, MUL1, LSFU1, B1)) {
 			issued++;
 		}
 		//If we can't issue, break out of the for-loop
