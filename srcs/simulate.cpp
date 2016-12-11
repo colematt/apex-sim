@@ -388,11 +388,11 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			else {}
 
 			//Set B1 as ready
-			B1.isReady = true;
+			B1.ready = true;
 		}
 		//Branch conditional is false
 		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
-			B1.isReady = true;
+			B1.ready = true;
 		}
 		//Opcode is not one of BZ, BNZ, BAL, JUMP
 		else{
