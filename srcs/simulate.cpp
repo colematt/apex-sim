@@ -98,7 +98,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 	// Now that we've finished wakeups,
 	// Decide if any successful issues occurred this cycle
-	if (wakeup == 0)???
+	if (wakeup == 0)
 		no_issued++;
 	/****DRF2 STAGE****/
 	// If HALT is in this stage, do not advance it. Its presence here is part of
@@ -185,7 +185,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				ALU2.valids.at(0) = true;
 				if (ALU2.c >= Zcycle){
 					Z = ALU2.values.at(0);
-					Zcycle = ALU2.c
+					Zcycle = ALU2.c;
 				}
 			}
 		}
@@ -195,7 +195,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				ALU2.valids.at(0) = true;
 				if (ALU2.c >= Zcycle){
 					Z = ALU2.values.at(0);
-					Zcycle = ALU2.c
+					Zcycle = ALU2.c;
 				}
 			}
 		}
@@ -209,7 +209,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				ALU2.valids.at(0) = true;
 				if (ALU2.c >= Zcycle){
 					Z = ALU2.values.at(0);
-					Zcycle = ALU2.c
+					Zcycle = ALU2.c;
 				}
 			}
 		}
@@ -219,7 +219,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				ALU2.valids.at(0) = true;
 				if (ALU2.c >= Zcycle){
 					Z = ALU2.values.at(0);
-					Zcycle = ALU2.c
+					Zcycle = ALU2.c;
 				}
 			}
 		}
@@ -229,7 +229,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				ALU2.valids.at(0) = true;
 				if (ALU2.c >= Zcycle){
 					Z = ALU2.values.at(0);
-					Zcycle = ALU2.c
+					Zcycle = ALU2.c;
 				}
 			}
 		}
@@ -262,7 +262,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				ALU2.valids.at(0) = true;
 				if (ALU2.c >= Zcycle){
 					Z = ALU2.values.at(0);
-					Zcycle = ALU2.c
+					Zcycle = ALU2.c;
 				}
 			}
 		}

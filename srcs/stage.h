@@ -15,11 +15,12 @@ Description: Header file for stage.cpp
 //Represents the instruction occupying an APEX pipeline stage, its operands, any values accumulated by the register file/forwarding/computation and any validity bools accumulated.
 class Stage {
 private:
-    std::string name;
-    int latency;
-    int lcounter;
 
 public:
+  std::string name;
+  int latency;
+  int lcounter;
+
   //the stage is occupied by an inflight instruction
   //(it will always have an instruction loaded, but that instruction may have
   // advanced to a follow-on stage; it should not be "simulated" again)
