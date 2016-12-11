@@ -25,6 +25,10 @@ int committed_load = 0;
 int committed_store = 0;
 int no_commit= 0;
 
+// Initialize simulator flags
+int Z = 0;
+int Zcycle = 0;
+
 //Display an interface help message
 void help()
 {

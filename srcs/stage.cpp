@@ -18,7 +18,7 @@ Stage::Stage(std::string n, int l){
 
 //Reset the stage state
 void Stage::initialize(){
-	pc = 0;
+	this.pc = pc;
 	c = cycle;
 	lcounter = latency;
 	opcode = "";

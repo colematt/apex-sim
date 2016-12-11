@@ -17,19 +17,15 @@ private:
 
 public:
 	Data(); //initialize the memory with all positions set to zero
-
 	~Data(); //Deconstructor
 
+	//Interface functions
 	void initialize();
+	void display(int a1, int a2);
 
-  	//Read one byte-address from memory at <addr>
-  	int readMem(int addr);
-
-  	//Write one byte to memory at <addr>
-  	void writeMem(int addr, int value);
-
-  	//Display addressable contents of memory from a1 to a2 inclusive
-  	void display(int a1, int a2);
+	//Accessors and Mutators
+	int readMem(int addr);
+	void writeMem(int addr, int value);
 
 };
 #endif

@@ -22,6 +22,7 @@ Description: Header file to hold globally aware variables
 //VERBOSE 3 : All diagnostic output. Currently equal to VERBOSE 2.
 #define VERBOSE 1
 
+//Global variables
 extern int pc;    //STATE: program counter current value
 extern int cycle; //STAT: simulator cycle current value
 extern int dispatched; //STAT: number of instructions dispatched to IQ
@@ -33,6 +34,9 @@ extern int committed_load; //STAT: number of LOAD instructions committed
 extern int committed_store; //STAT: number of STORE instructions committed
 extern int no_commit; //STAT: number of cycles no instructions were committed
 
+//Global Flags
+extern int Z; // Value of the Z flag
+extern int Zcycle; // instruction cycle timestamp that the Z flag was last set
 
 // Helper functions
 void help();
