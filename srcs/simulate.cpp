@@ -359,7 +359,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				(B1.opcode == "BNZ" && Z != 0) ||
 				(B1.opcode == "BAL") ||
 				(B1.opcode == "JUMP")){
-			// Flush the ROB, IQ using flush()
+			// Flush the ROB, IQ
 			myrob.flush(B1.c);
 			myiq.flush(B1.c, myregisters);
 
@@ -378,18 +378,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF1.flush(B1.c, myregisters);
 			F.flush(B1.c, myregisters);
 
-			//Set program counter based on B1.opcode
-			if(B1.opcode == "BZ"){
-
+			//Set global pc based on B1.opcode (and local B1.pc)
+			if(B1.opcode == "BZ" || B1.opcode == "BNZ"){
+				pc = B1.pc + B1.values.at(0);
 			}
-			else if (B1.opcode == "BNZ"){
-
-			}
-			else if (B1.opcode == "BAL"){
-
-			}
-			else if (B1.opcode == "JUMP"){
-
+			else if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+				pc = B1.values.at(0) + B1.values.at(1);
 			}
 			else {}
 
