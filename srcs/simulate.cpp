@@ -354,24 +354,57 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/****B1 STAGE****/
 	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
 		//Perform branching logic
-		//Branch conditional is true or unconditional
+		//Branch conditional is true or unconditionally taken
 		if ((B1.opcode == "BZ" && Z == 0) ||
 				(B1.opcode == "BNZ" && Z != 0) ||
 				(B1.opcode == "BAL") ||
 				(B1.opcode == "JUMP")){
-			// Flush the ROB using flush()
-			// Flush the IQ using flush()
-			// Flush instructions waiting in any stage if issued after B stage
+			// Flush the ROB, IQ using flush()
+			myrob.flush(B1.c);
+			myiq.flush(B1.c, myregisters);
+
+			// For each non-branch stage,
+			// flush instructions if its timestamp
+			// is after B1 stage's timestamp
+			ALU3.flush(B1.c, myregisters);
+			ALU2.flush(B1.c, myregisters);
+			ALU1.flush(B1.c, myregisters);
+			MUL2.flush(B1.c, myregisters);
+			MUL1.flush(B1.c, myregisters);
+			LSFU3.flush(B1.c, myregisters);
+			LSFU2.flush(B1.c, myregisters);
+			LSFU1.flush(B1.c, myregisters);
+			DRF2.flush(B1.c, myregisters);
+			DRF1.flush(B1.c, myregisters);
+			F.flush(B1.c, myregisters);
+
+			//Set program counter based on B1.opcode
+			if(B1.opcode == "BZ"){
+
+			}
+			else if (B1.opcode == "BNZ"){
+
+			}
+			else if (B1.opcode == "BAL"){
+
+			}
+			else if (B1.opcode == "JUMP"){
+
+			}
+			else {}
+
+			//Set B1 as ready
+			B1.isReady = true;
 		}
 		//Branch conditional is false
-		else if (B1.opcode == "BZ" || (B1.opcode == "BNZ" && Z != 0)){
-
+		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
+			B1.isReady = true;
 		}
-		//Opcode is unrecognized
+		//Opcode is not one of BZ, BNZ, BAL, JUMP
 		else{
 			std::cerr << "Unrecognized opcode " << B1.opcode << " at B1 WORKING phase" << std::endl;
+			B1.ready = false;
 		}
-		B1.ready = true;
 	}
 
 	/****DRF2 STAGE****/
