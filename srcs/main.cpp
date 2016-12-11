@@ -85,7 +85,7 @@ int main(int argc, char** argv)
       simulate(n, *apexCPU, *apexCode, *apexRF, *apexData, *apexROB, *apexIQ);
     }
     else if (cmd == "dall"){
-      a1 = 0; a2 = 3996;
+      a1 = 0; a2 = 100;
       display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "all", a1, a2);
     }
     else if (cmd == "dcpu"){
