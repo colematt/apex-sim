@@ -285,7 +285,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 		else if (LSFU3.opcode == "STORE") {
 			//Perform memory access
-			mydata.writeMem(LSFU3.values.at(1), LSFU3.values.at());
+			mydata.writeMem(LSFU3.values.at(1), LSFU3.values.at(0));
 
 			//No writeback (no destination registers)
 		}
@@ -354,111 +354,99 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/****DRF2 STAGE****/
 	if (--(DRF2.lcounter) <= 0) {
 		// Readout available operands
-		if (DRF.opcode == "ADD" ||
-			DRF.opcode == "SUB" ||
-			DRF.opcode == "MUL" ||
-			DRF.opcode == "AND" ||
-			DRF.opcode == "OR" ||
-			DRF.opcode == "EX-OR"){
+		if (DRF2.opcode == "ADD" ||
+			DRF2.opcode == "SUB" ||
+			DRF2.opcode == "MUL" ||
+			DRF2.opcode == "AND" ||
+			DRF2.opcode == "OR" ||
+			DRF2.opcode == "EX-OR"){
 
-			DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
-			DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
+			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
 
-			if (!DRF.valids.at(1)){
-				DRF.values.at(1) = myregisters.read(DRF.operands.at(1));
-				DRF.valids.at(1) = myregisters.isValid(DRF.operands.at(1));
+			if (!DRF2.valids.at(1)){
+				DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
+				DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
 			}
 
-			if (!DRF.valids.at(2)){
-				DRF.values.at(2) = myregisters.read(DRF.operands.at(2));
-				DRF.valids.at(2) = myregisters.isValid(DRF.operands.at(2));
+			if (!DRF2.valids.at(2)){
+				DRF2.values.at(2) = myregisters.read(DRF2.operands.at(2));
+				DRF2.valids.at(2) = myregisters.isValid(DRF2.operands.at(2));
 			}
 
-			DRF.isEmpty = false;
-
-			if (DRF.valids.at(1) && DRF.valids.at(2)){
-				myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
-				DRF.isReady = true;
+			if (DRF2.valids.at(1) && DRF2.valids.at(2)){
+				myregisters.write(DRF2.operands.at(0), DRF2.values.at(0), false);
+				DRF2.ready = true;
 			}
 		}
-		else if (DRF.opcode == "MOVC"){
+		else if (DRF2.opcode == "MOVC"){
 
-			DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
-			DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
+			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
 
-			DRF.values.at(1) = DRF.littoi(DRF.operands.at(1));
-			DRF.valids.at(1) = true;
+			DRF2.values.at(1) = DRF2.littoi(DRF2.operands.at(1));
+			DRF2.valids.at(1) = true;
 
-			myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
+			myregisters.write(DRF2.operands.at(0), DRF2.values.at(0), false);
 
-			DRF.isEmpty = false;
-
-			DRF.isReady = true;
+			DRF2.ready = true;
 		}
-		else if (DRF.opcode == "STORE"){
+		else if (DRF2.opcode == "STORE"){
 
-			if (!DRF.valids.at(0)){
-				DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
-				DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
+			if (!DRF2.valids.at(0)){
+				DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
+				DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
 			}
 
-			DRF.values.at(1) = myregisters.read(DRF.operands.at(1));
-			DRF.valids.at(1) = myregisters.isValid(DRF.operands.at(1));
+			DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
+			DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
 
-			DRF.values.at(2) = DRF.littoi(DRF.operands.at(2));
-			DRF.valids.at(2) = true;
+			DRF2.values.at(2) = DRF2.littoi(DRF2.operands.at(2));
+			DRF2.valids.at(2) = true;
 
-			DRF.isEmpty = false;
-
-			if (DRF.valids.at(1))
-				DRF.isReady = true;
+			if (DRF2.valids.at(1))
+				DRF2.ready = true;
 		}
 
-		else if (DRF.opcode == "LOAD"){
+		else if (DRF2.opcode == "LOAD"){
 
-			DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
-			DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
+			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
 
-			if (!DRF.valids.at(1)){
-				DRF.values.at(1) = myregisters.read(DRF.operands.at(1));
-				DRF.valids.at(1) = myregisters.isValid(DRF.operands.at(1));
+			if (!DRF2.valids.at(1)){
+				DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
+				DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
 			}
 
-			DRF.values.at(2) = DRF.littoi(DRF.operands.at(2));
-			DRF.valids.at(2) = true;
+			DRF2.values.at(2) = DRF2.littoi(DRF2.operands.at(2));
+			DRF2.valids.at(2) = true;
 
-			DRF.isEmpty = false;
-
-			if (DRF.valids.at(1)){
-				myregisters.write(DRF.operands.at(0), DRF.values.at(0), false);
-				DRF.isReady = true;
+			if (DRF2.valids.at(1)){
+				myregisters.write(DRF2.operands.at(0), DRF2.values.at(0), false);
+				DRF2.ready = true;
 			}
 		}
 
-		else if (DRF.opcode == "BZ" ||
-			DRF.opcode == "BNZ"){
+		else if (DRF2.opcode == "BZ" ||
+			DRF2.opcode == "BNZ"){
 
-			DRF.values.at(0) = DRF.littoi(DRF.operands.at(0));
-			DRF.valids.at(0) = true;
-
-			DRF.isEmpty = false;
-			DRF.isReady = true;
+			DRF2.values.at(0) = DRF2.littoi(DRF2.operands.at(0));
+			DRF2.valids.at(0) = true;
+			DRF2.ready = true;
 		}
-		else if (DRF.opcode == "BAL" ||
-			DRF.opcode == "JUMP"){
+		else if (DRF2.opcode == "BAL" ||
+			DRF2.opcode == "JUMP"){
 
-			DRF.values.at(0) = myregisters.read(DRF.operands.at(0));
-			DRF.valids.at(0) = myregisters.isValid(DRF.operands.at(0));
+			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
 
-			DRF.values.at(1) = DRF.littoi(DRF.operands.at(1));
-			DRF.valids.at(1) = true;
+			DRF2.values.at(1) = DRF2.littoi(DRF2.operands.at(1));
+			DRF2.valids.at(1) = true;
 
-			DRF.isEmpty = false;
-
-			if (DRF.valids.at(0))
-				DRF.isReady = true;
+			if (DRF2.valids.at(0))
+				DRF2.ready = true;
 		}else{
-			std::cerr << "Unresolvable opcode in DRF: " << DRF.opcode << std::endl;
+			std::cerr << "Unresolvable opcode in DRF: " << DRF2.opcode << std::endl;
 			exit(1);
 		}//End DRF Stage
 
@@ -468,7 +456,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/****DRF1 STAGE****/
 	if (--(DRF1.lcounter) <= 0) {
 		// Perform renaming
-		DRF1.operands.at(0) = myregisters.getRename(DRF1.operands.at(0));
+		DRF1.operands.at(0) = myregisters.getRenamed(DRF1.operands.at(0));
 		DRF1.ready = true;
 	}
 
