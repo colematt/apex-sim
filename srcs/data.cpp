@@ -43,6 +43,6 @@ Description: Contains the DATA class, which simulates reading and writing main m
 
     //Display contents at address
     for (int addr = a1; addr <= a2; addr += 4){
-        std::cout << addr << ": " << memory.at(addr);
+        std::cout << addr << ": " << memory.at(addr) << std::endl;
     }
   } //end display()

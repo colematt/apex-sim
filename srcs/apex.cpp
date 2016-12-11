@@ -171,7 +171,10 @@ void stats()
 int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
   Data &mydata, ROB &myrob, IQ &myiq)
 {
-  for (int c = cycle; c < num_cycles; c++)
+  int start = ::cycle;
+  int stop = ::cycle + num_cycles;
+  
+  for (int c = start; c < stop; c++)
   {
     //Perform one cycle of simulation
     if (VERBOSE >= 1)
@@ -199,5 +202,5 @@ void quit(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &myiq
 {
   if (VERBOSE >= 1)
     std::cout << "Quitting simulator ..." << std::endl;
-  display(mycpu, myregisters, mydata, myrob, myiq, 0, 100);
+  display(mycpu, myregisters, mydata, myrob, myiq, "all", 0, 100);
 }

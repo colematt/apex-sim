@@ -113,7 +113,8 @@ int main(int argc, char** argv)
         cin >> a1 >> a2;
         //Display memory
         display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, mod, a1, a2);
-      }else {
+      }
+      else {
         //Display memory
         display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, mod);
       }
