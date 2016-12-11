@@ -47,11 +47,11 @@ int main(int argc, char** argv)
   string mod; //the "d" command takes a modifier
   int n, a1, a2; // number of cycles modifier
 
+  //On first execution of the interface, display the help message
+  help();
+
   //Run user interface
   while (true) {
-    //On first execution of the interface, display the help message
-    if (cycle == 0)
-      help();
 
   	//Flush both input containers
   	cmd = "";
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     	mod = "stats";
     }
     #endif
-    
+
     //Process the command. If command takes additional parameters, ingest them.
     if (cmd == "i") {
       initialize(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ);
@@ -104,8 +104,7 @@ int main(int argc, char** argv)
     }
     else if (cmd == "d"){
       //Ingest modifiers
-      if (mod == "")
-      	cin >> mod;
+      cin >> mod;
 
       std::transform(mod.begin(), mod.end(), mod.begin(), ::tolower);
 
