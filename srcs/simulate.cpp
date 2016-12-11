@@ -180,19 +180,23 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	if (--(ALU2.lcounter) == 0 && !ALU2.isEmpty()) {
 		//Perform arithmetic, set valid bit, set Z flag
 		if (ALU2.opcode == "ADD"){
-			ALU2.values.at(0) = ALU2.values.at(1) + ALU2.values.at(2);
-			ALU2.valids.at(0) = true;
-			if (ALU2.c >= Zcycle){
-				Z = ALU2.values.at(0);
-				Zcycle = ALU2.c
+			if (!ALU2.valids.at(0)){
+				ALU2.values.at(0) = ALU2.values.at(1) + ALU2.values.at(2);
+				ALU2.valids.at(0) = true;
+				if (ALU2.c >= Zcycle){
+					Z = ALU2.values.at(0);
+					Zcycle = ALU2.c
+				}
 			}
 		}
 		else if (ALU2.opcode == "SUB"){
-			ALU2.values.at(0) = ALU2.values.at(1) - ALU2.values.at(2);
-			ALU2.valids.at(0) = true;
-			if (ALU2.c >= Zcycle){
-				Z = ALU2.values.at(0);
-				Zcycle = ALU2.c
+			if (!ALU2.valids.at(0)){
+				ALU2.values.at(0) = ALU2.values.at(1) - ALU2.values.at(2);
+				ALU2.valids.at(0) = true;
+				if (ALU2.c >= Zcycle){
+					Z = ALU2.values.at(0);
+					Zcycle = ALU2.c
+				}
 			}
 		}
 		else if (ALU2.opcode == "MOVC"){
@@ -200,27 +204,33 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			ALU2.valids.at(0) = true;
 		}
 		else if (ALU2.opcode == "AND"){
-			ALU2.values.at(0) = ALU2.values.at(1) & ALU2.values.at(2);
-			ALU2.valids.at(0) = true;
-			if (ALU2.c >= Zcycle){
-				Z = ALU2.values.at(0);
-				Zcycle = ALU2.c
+			if (!ALU2.valids.at(0)){
+				ALU2.values.at(0) = ALU2.values.at(1) & ALU2.values.at(2);
+				ALU2.valids.at(0) = true;
+				if (ALU2.c >= Zcycle){
+					Z = ALU2.values.at(0);
+					Zcycle = ALU2.c
+				}
 			}
 		}
 		else if (ALU2.opcode == "OR"){
-			ALU2.values.at(0) = ALU2.values.at(1) | ALU2.values.at(2);
-			ALU2.valids.at(0) = true;
-			if (ALU2.c >= Zcycle){
-				Z = ALU2.values.at(0);
-				Zcycle = ALU2.c
+			if (!ALU2.valids.at(0)){
+				ALU2.values.at(0) = ALU2.values.at(1) | ALU2.values.at(2);
+				ALU2.valids.at(0) = true;
+				if (ALU2.c >= Zcycle){
+					Z = ALU2.values.at(0);
+					Zcycle = ALU2.c
+				}
 			}
 		}
 		else if (ALU2.opcode == "EX-OR"){
-			ALU2.values.at(0) = ALU2.values.at(1) ^ ALU2.values.at(2);
-			ALU2.valids.at(0) = true;
-			if (ALU2.c >= Zcycle){
-				Z = ALU2.values.at(0);
-				Zcycle = ALU2.c
+			if (!ALU2.valids.at(0)){
+				ALU2.values.at(0) = ALU2.values.at(1) ^ ALU2.values.at(2);
+				ALU2.valids.at(0) = true;
+				if (ALU2.c >= Zcycle){
+					Z = ALU2.values.at(0);
+					Zcycle = ALU2.c
+				}
 			}
 		}
 		else {
@@ -231,12 +241,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****ALU1 STAGE****/
-	if (--(ALU1.lcounter) == 0) {
+	if (--(ALU1.lcounter) <= 0) {
 		ALU1.ready = true;
 	}
 
 	/****MUL2 STAGE****/
-	if (--(MUL2.lcounter) == 0) {
+	if (--(MUL2.lcounter) <= 0) {
 		//Writeback
 		myregisters.write(MUL2.operands.at(0), MUL2.values.at(0), MUL2.valids.at(0));
 
@@ -244,14 +254,16 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****MUL1 STAGE****/
-	if (--(MUL1.lcounter) == 0) {
+	if (--(MUL1.lcounter) <= 0) {
 		//Perform arithmetic, set valid bit, set Z flag
 		if (MUL1.opcode == "MUL") {
-			MUL1.values.at(0) = MUL1.values.at(1) * MUL1.values.at(2);
-			MUL1.valids.at(0) = true;
-			if (MUL1.c >= Zcycle){
-				Z = MUL1.values.at(0);
-				Zcycle = MUL1.c
+			if (!ALU2.valids.at(0)){
+				ALU2.values.at(0) = ALU2.values.at(1) * ALU2.values.at(2);
+				ALU2.valids.at(0) = true;
+				if (ALU2.c >= Zcycle){
+					Z = ALU2.values.at(0);
+					Zcycle = ALU2.c
+				}
 			}
 		}
 		else {
@@ -262,7 +274,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****LSFU3 STAGE****/
-	if (--(LSFU3.lcounter) == 0) {
+	if (--(LSFU3.lcounter) <= 0) {
 		if (LSFU3.opcode == "LOAD") {
 			//Perform memory access
 			LSFU3.values.at(0) = mydata.readMem(LSFU3.values.at(1));
@@ -285,14 +297,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****LSFU2 STAGE****/
-	if (--(LSFU2.lcounter) == 0) {
+	if (--(LSFU2.lcounter) <= 0) {
 		/*This phase reserved for TLB lookup (not implemented)*/
 
 		LSFU2.ready = true;
 	}
 
 	/****LSFU1 STAGE****/
-	if (--(LSFU1.lcounter) == 0) {
+	if (--(LSFU1.lcounter) <= 0) {
 		//Compute address, store in src1 (LOAD) or src2 (STORE)
 		if (LSFU1.opcode == "LOAD") {
 			LSFU1.values.at(1) = LSFU1.values.at(1) + LSFU1.values.at(2);
@@ -308,7 +320,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****B2 STAGE****/
-	if (--(B2.lcounter) == 0) {
+	if (--(B2.lcounter) <= 0) {
 		//Writeback X register
 		if (B2.opcode == "BAL") {
 			myregisters.write("X", (B2.pc)+4, true);
@@ -317,7 +329,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****B1 STAGE****/
-	if (--(B1.lcounter) == 0) {
+	if (--(B1.lcounter) <= 0) {
 		//Perform branching logic
 		//Branch conditional is true or unconditional
 		if ((B1.opcode == "BZ" && Z == 0) ||
@@ -340,14 +352,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****DRF2 STAGE****/
-	if (--(DRF2.lcounter) == 0) {
+	if (--(DRF2.lcounter) <= 0) {
 		// Readout available operands
 
 		DRF2.ready = true;
 	}
 
 	/****DRF1 STAGE****/
-	if (--(DRF1.lcounter) == 0) {
+	if (--(DRF1.lcounter) <= 0) {
 		// Perform renaming
 
 		DRF1.ready = true;
@@ -358,19 +370,29 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// If a HALT is fetched, set is_halting = true.
 	// These conditions are needed in the STOPPING PHASE.
 	if (!is_halting){
-		if (--(F.lcounter) == 0) {
+		if (--(F.lcounter) <= 0) {
 			// Fetch the instruction at PC
+			if (F.isEmpty() == true){
+				F.initialize();
+				std::vector<std::string> instr = mycode.getInstr(pc);
 
-			// Increment the PC
+				F.pc = pc;
+				F.opcode = instr.at(0);
+				for (int i=1;i<instr.size();i++){
+					if (instr.at(i) != " ")
+						F.operands.push_back(instr.at(i));
+				}
+				F.empty = false;
+				F.ready = true;
 
+				// Increment the PC
+				pc += 4;
+			}
 			// Check whether the is_halting flag should be set
 			if (F.opcode == "HALT")
 				is_halting = true;
-
-			F.ready = true;
 		}
 	}
-	else {F.empty = true;}
 
 
 	/*FORWARDING PHASE************************************************************
