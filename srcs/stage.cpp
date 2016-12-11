@@ -129,7 +129,7 @@ bool Stage::isEmpty(){
 // 1. its work is complete (this.ready)
 // 2. its latency is complete (ie MUL instructions)
 bool Stage::isReady(){
-	if (ready && (latency == 0))
+	if (ready && (lcounter <= 0))
 		return true;
 	else
 	return false;

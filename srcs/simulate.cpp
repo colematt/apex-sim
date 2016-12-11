@@ -519,6 +519,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			// Fetch the instruction at PC
 			if (F.isEmpty() == true){
 				F.initialize();
+				F.lcounter = 0;
 				std::vector<std::string> instr = mycode.getInstr(pc);
 
 				F.pc = pc;
