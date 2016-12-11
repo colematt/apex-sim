@@ -32,21 +32,21 @@ int Zcycle = 0;
 //Display an interface help message
 void help()
 {
-  std::cout << "Command         | Action\n"
-            << "----------------|---------------------------------------------\n"
-            << "i               |Initialize the simulator state\n"
-            << "s <n>           |Simulate <n> number of cycles\n"
-            << "d all           |Display the full simulator internal state\n"
-            << "d cpu           |Display CPU stage contents\n"
-            << "d iq            |Display Issue Queue entries and status\n"
-            << "d map           |Display Front-end and Back-end Register Tables\n"
-            << "d mem <a1> <a2> |Display memory from address <a1> to <a2>\n"
-            << "d rob           |Display ROB contents\n"
-            << "d stats         |Display Stats\n"
-            << "d urf           |Display Unified Register File\n"
-            << "urf <n>         |Set URF Size to <n> physical registers\n"
-            << "q               |Quit the simulator\n"
-            << "h               |Display this help message" << std::endl;
+  std::cout << "| Command        | Action\n"
+            << "|----------------|---------------------------------------------\n"
+            << "| i              |Initialize the simulator state\n"
+            << "| s <n>          |Simulate <n> number of cycles\n"
+            << "| dall           |Display the full simulator internal state\n"
+            << "| dcpu           |Display CPU stage contents\n"
+            << "| diq            |Display Issue Queue entries and status\n"
+            << "| dmap           |Display Front-end, Back-end Register Tables\n"
+            << "| dmem <a1> <a2> |Display memory from address <a1> to <a2>\n"
+            << "| drob           |Display ROB contents\n"
+            << "| dstats         |Display Stats\n"
+            << "| durf           |Display Unified Register File\n"
+            << "| urf <n>        |Set URF Size to <n> physical registers\n"
+            << "| q              |Quit the simulator\n"
+            << "| h              |Display this help message" << std::endl;
 }
 
 // Initialize the simulator to a known state.
@@ -173,7 +173,7 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
 {
   int start = ::cycle;
   int stop = ::cycle + num_cycles;
-  
+
   for (int c = start; c < stop; c++)
   {
     //Perform one cycle of simulation
@@ -182,7 +182,7 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
 
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)
-    if(!(mycpu.simulate(mycode, myregisters, mydata, myrob, myiq))){
+    if(mycpu.simulate(mycode, myregisters, mydata, myrob, myiq) == 0){
       std::cout << "Simulator HALT encounted on cycle " << cycle << std::endl;
       quit(mycpu, myregisters, mydata, myrob, myiq);
       return 0;
@@ -194,7 +194,7 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
 	  }
   }
 
-  return cycle;
+  return 1;
 }
 
 //Quit the simulator

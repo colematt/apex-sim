@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     instFile = (const char*) argv[1];
   }
 
-  //Instantiate Simulator classes
+  // Instantiate Simulator classes
   Code *apexCode = new Code(instFile);
   Registers *apexRF = new Registers();
   Data *apexData = new Data();
@@ -39,61 +39,42 @@ int main(int argc, char** argv)
   ROB *apexROB = new ROB();
   IQ *apexIQ = new IQ();
 
-  //Perform first initialization
+  // Perform first initialization
   initialize(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ);
 
-  //Set up simulator command interface
-  string cmd; //interface switch statement selector
-  string mod; //the "d" command takes a modifier
-  int n, a1, a2; // number of cycles modifier
+/**** User Interface ***********************************************************
+********************************************************************************
+*******************************************************************************/
+  // User interface variables
+  string cmd;
+  int n, a1, a2;
+  n = a1 = a2 = 0;
 
-  //On first execution of the interface, display the help message
+  //On first pass through the interface, display help
   help();
 
-  //Run user interface
+  //Iterate until the user calls quit option
   while (true) {
+    //Reset parameter variables
+    n = a1 = a2 = 0;
 
-  	//Flush both input containers
-  	//cmd = ".";
-  	//mod = ".";
-
-    //Get the next command. If command takes the n parameter, ingest it also
+    // Get the next command.
     cout << "apex-sim $ ";
     cin >> cmd;
 
-    //lowercase the command string
+    //lowercase input strings
     //std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
-    #if 0
-    //Handle long form command inputs from terminal
-    if (cmd == "set_urf_size"){
-    	cmd = "urf";
+    // Validate the input
+    if (cmd != "i" && cmd != "s" &&
+        cmd != "dall" && cmd != "dcpu" && cmd != "diq" && cmd != "dmap" &&
+        cmd != "dmem" && cmd != "drob" && cmd != "dstats" && cmd != "durf" &&
+        cmd != "urf" && cmd != "q" && cmd != "h"){
+          //user has failed to provide a valid input, try again
+          cerr << "Did not understand command " << cmd << endl;
+          help();
+          continue;
     }
-    if (cmd == "print_map_tables"){
-    	cmd = "d";
-    	mod = "map";
-    }
-    if (cmd == "print_iq"){
-    	cmd = "d";
-    	mod = "iq";
-    }
-    if (cmd == "print_rob"){
-    	cmd = "d";
-    	mod = "rob";
-    }
-    if (cmd == "print_urf"){
-    	cmd = "d";
-    	mod = "urf";
-    }
-    if (cmd == "print_memory"){
-    	cmd = "d";
-    	mod = "mem";
-    }
-    if (cmd == "print_stats"){
-    	cmd = "d";
-    	mod = "stats";
-    }
-    #endif
 
     //Process the command. If command takes additional parameters, ingest them.
     if (cmd == "i") {
@@ -103,26 +84,34 @@ int main(int argc, char** argv)
       cin >> n;
       simulate(n, *apexCPU, *apexCode, *apexRF, *apexData, *apexROB, *apexIQ);
     }
-    else if (cmd == "d"){
-      //Ingest modifiers
-      cin >> mod;
-
-      //std::transform(mod.begin(), mod.end(), mod.begin(), ::tolower);
-
-      if (mod == "mem"){
-        cin >> a1 >> a2;
-        //Display memory
-        display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, mod, a1, a2);
-      }
-      else {
-        //Display memory
-        display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, mod);
-      }
+    else if (cmd == "dall"){
+      a1 = 0; a2 = 3996;
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "all", a1, a2);
+    }
+    else if (cmd == "dcpu"){
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "cpu");
+    }
+    else if (cmd == "diq"){
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "iq");
+    }
+    else if (cmd == "dmap"){
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "map");
+    }
+    else if (cmd == "dmem"){
+      cin >> a1 >> a2;
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "mem", a1, a2);
+    }
+    else if (cmd == "drob"){
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "rob");
+    }
+    else if (cmd == "dstats"){
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "stats");
+    }
+    else if (cmd == "durf"){
+      display(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ, "urf");
     }
     else if (cmd == "urf"){
-      //Ingest modifier
       cin >> n;
-      //Set URF size
       if (VERBOSE >= 1)
         std::cout << "Setting URF Size to " << n << " registers ... " << std::endl;
       apexRF->setNumReg(n);
@@ -134,10 +123,7 @@ int main(int argc, char** argv)
     else if (cmd == "h"){
       help();
     }
-    else{
-      std::cerr << "Did not understand " << cmd << " !" << std::endl;
-      cmd = "h";
-    }
+    else{}
   } // End User Interface while-loop
 
   return 0;
