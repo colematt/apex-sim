@@ -54,14 +54,15 @@ int main(int argc, char** argv)
   while (true) {
 
   	//Flush both input containers
-  	cmd = "";
-  	mod = "";
+  	//cmd = ".";
+  	//mod = ".";
 
     //Get the next command. If command takes the n parameter, ingest it also
+    cout << "apex-sim $ ";
     cin >> cmd;
 
     //lowercase the command string
-    std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+    //std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
     #if 0
     //Handle long form command inputs from terminal
@@ -106,7 +107,7 @@ int main(int argc, char** argv)
       //Ingest modifiers
       cin >> mod;
 
-      std::transform(mod.begin(), mod.end(), mod.begin(), ::tolower);
+      //std::transform(mod.begin(), mod.end(), mod.begin(), ::tolower);
 
       if (mod == "mem"){
         cin >> a1 >> a2;
@@ -134,7 +135,7 @@ int main(int argc, char** argv)
     }
     else{
       std::cerr << "Did not understand " << cmd << " !" << std::endl;
-      help();
+      cmd = "h";
     }
   } // End User Interface while-loop
 
