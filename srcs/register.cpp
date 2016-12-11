@@ -32,10 +32,9 @@ void Registers::initialize(){
 
   //Set flag and special register values and valids
   this->reg_file["X"] = std::make_tuple(0, true);
-  this->reg_file["Z"] = std::make_tuple(0, true);
 }
 
-void dUrf(){
+void Registers::dUrf(){
   std::string myname = "";
   int myvalue = 0;
   bool myvalid = true;
@@ -65,11 +64,11 @@ void dUrf(){
     }
   }
 
-  std::count << holder << std::endl;
+  std::cout << holder << std::endl;
   holder = "";
 }
 
-void dMap(){
+void Registers::dMap(){
   std::string reg1 = "";
   std::string reg2 = "";
 
