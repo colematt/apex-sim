@@ -51,6 +51,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	******************************************************************************
 	*****************************************************************************/
 
+	/****B2 STAGE****/
+	// Advanced by ROB COMMITTING
+
+	/****B1 STAGE****/
+	if (B1.isReady() && B2.isEmpty()){
+		B1.advance(B2);
+	}
+
 	/****ALU3 STAGE****/
 	// Advanced by ROB COMMITTING
 
@@ -58,10 +66,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	if (ALU2.isReady() && ALU3.isEmpty()){
 		ALU2.advance(ALU3);
 	}
+
 	/****ALU1 STAGE****/
 	if (ALU1.isReady() && ALU2.isEmpty()){
 		ALU1.advance(ALU2);
 	}
+
 	/****MUL2 STAGE****/
 	// Advanced by ROB COMMITTING
 
@@ -76,16 +86,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	if (LSFU2.isReady() && LSFU3.isEmpty()){
 		LSFU2.advance(LSFU3);
 	}
+
 	/****LSFU1 STAGE****/
 	if (LSFU1.isReady() && LSFU2.isEmpty()){
 		LSFU1.advance(LSFU2);
-	}
-	/****B2 STAGE****/
-	// Advanced by ROB COMMITTING
-
-	/****B1 STAGE****/
-	if (B1.isReady() && B2.isEmpty()){
-		B1.advance(B2);
 	}
 
 	/****IQ****/
@@ -102,7 +106,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 	}
 	// Now that we've finished wakeups,
-	// Decide if any successful issues occurred this cycle
+	// Determine if no successful issues occurred this cycle
 	if (wakeup == 0)
 		no_issued++;
 
@@ -176,6 +180,69 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/*WORKING PHASE***************************************************************
 	******************************************************************************
 	*****************************************************************************/
+
+	/****B2 STAGE****/
+	if (--(B2.lcounter) <= 0 && !B2.isEmpty()) {
+		//Writeback X register
+		if (B2.opcode == "BAL") {
+			myregisters.write("X", (B2.pc)+4, true);
+		}
+		B2.ready = true;
+	}
+
+	/****B1 STAGE****/
+	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
+		//Opcode is good,
+		//Branch conditional is true or unconditionally taken
+		if ((B1.opcode == "BZ" && Z == 0) ||
+				(B1.opcode == "BNZ" && Z != 0) ||
+				(B1.opcode == "BAL") ||
+				(B1.opcode == "JUMP")){
+			// Flush the ROB, IQ
+			myrob.flush(B1.c);
+			myiq.flush(B1.c, myregisters);
+
+			// For each non-branch stage,
+			// flush instructions if its timestamp
+			// is after B1 stage's timestamp
+			ALU3.flush(B1.c, myregisters);
+			ALU2.flush(B1.c, myregisters);
+			ALU1.flush(B1.c, myregisters);
+			MUL2.flush(B1.c, myregisters);
+			MUL1.flush(B1.c, myregisters);
+			LSFU3.flush(B1.c, myregisters);
+			LSFU2.flush(B1.c, myregisters);
+			LSFU1.flush(B1.c, myregisters);
+			DRF2.flush(B1.c, myregisters);
+			DRF1.flush(B1.c, myregisters);
+			F.flush(B1.c, myregisters);
+
+			//Set global pc based on B1.opcode (and local B1.pc)
+			if(B1.opcode == "BZ" || B1.opcode == "BNZ"){
+				pc = B1.pc + B1.values.at(0);
+			}
+			else if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+				pc = B1.values.at(0) + B1.values.at(1);
+			}
+			else {}
+
+			// Reset the halting flag
+			is_halting = false;
+
+			// Set B1 as ready
+			B1.isReady = true;
+		}
+		// Opcode is good, but branch conditional is false
+		// Set the stage as ready
+		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
+			B1.isReady = true;
+		}
+		//Opcode isn't good: it isn't one of BZ, BNZ, BAL, JUMP
+		else{
+			std::cerr << "Unrecognized opcode " << B1.opcode << " at B1 WORKING phase" << std::endl;
+			B1.ready = false;
+		}
+	}
 
 	/****ALU3 STAGE****/
 	if (--(ALU3.lcounter) <= 0 && !ALU3.isEmpty()) {
@@ -342,65 +409,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		LSFU1.ready = true;
 	}
 
-	/****B2 STAGE****/
-	if (--(B2.lcounter) <= 0 && !B2.isEmpty()) {
-		//Writeback X register
-		if (B2.opcode == "BAL") {
-			myregisters.write("X", (B2.pc)+4, true);
-		}
-		B2.ready = true;
-	}
-
-	/****B1 STAGE****/
-	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
-		//Perform branching logic
-		//Branch conditional is true or unconditionally taken
-		if ((B1.opcode == "BZ" && Z == 0) ||
-				(B1.opcode == "BNZ" && Z != 0) ||
-				(B1.opcode == "BAL") ||
-				(B1.opcode == "JUMP")){
-			// Flush the ROB, IQ
-			myrob.flush(B1.c);
-			myiq.flush(B1.c, myregisters);
-
-			// For each non-branch stage,
-			// flush instructions if its timestamp
-			// is after B1 stage's timestamp
-			ALU3.flush(B1.c, myregisters);
-			ALU2.flush(B1.c, myregisters);
-			ALU1.flush(B1.c, myregisters);
-			MUL2.flush(B1.c, myregisters);
-			MUL1.flush(B1.c, myregisters);
-			LSFU3.flush(B1.c, myregisters);
-			LSFU2.flush(B1.c, myregisters);
-			LSFU1.flush(B1.c, myregisters);
-			DRF2.flush(B1.c, myregisters);
-			DRF1.flush(B1.c, myregisters);
-			F.flush(B1.c, myregisters);
-
-			//Set global pc based on B1.opcode (and local B1.pc)
-			if(B1.opcode == "BZ" || B1.opcode == "BNZ"){
-				pc = B1.pc + B1.values.at(0);
-			}
-			else if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
-				pc = B1.values.at(0) + B1.values.at(1);
-			}
-			else {}
-
-			//Set B1 as ready
-			B1.isReady = true;
-		}
-		//Branch conditional is false
-		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
-			B1.isReady = true;
-		}
-		//Opcode is not one of BZ, BNZ, BAL, JUMP
-		else{
-			std::cerr << "Unrecognized opcode " << B1.opcode << " at B1 WORKING phase" << std::endl;
-			B1.ready = false;
-		}
-	}
-
 	/****DRF2 STAGE****/
 	if (--(DRF2.lcounter) <= 0 && !DRF2.isEmpty()) {
 		// Readout available operands
@@ -540,41 +548,40 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 	}
 
-
 	/*FORWARDING PHASE************************************************************
 	******************************************************************************
 	*****************************************************************************/
 
-	/****From ROB -->****/
+	/****ROB --> ****/
 
-	/****From ALU3 -->****/
-
-	/****From ALU2 -->****/
-
-	/****From ALU1 -->****/
-
-	/****From MUL2 -->****/
-
-	/****From MUL1 -->****/
-
-	/****From LSFU3 -->****/
-
-	/****From LSFU2 -->****/
-
-	/****From LSFU1 -->****/
-
-	/****From B2 -->****/
+	/****B2 --> ****/
 	//--> B1
 
-	/****From B1 -->****/
+	/****B1 --> ****/
 
-	/****From IQ -->****/
+	/****ALU3 --> ****/
 
-	/****From DRF2 -->****/
+	/****ALU2 --> ****/
 
-	/****From DRF1 -->****/
+	/****ALU1 --> ****/
 
-	/****From F -->****/
+	/****MUL2 --> ****/
+
+	/****MUL1 --> ****/
+
+	/****LSFU3 --> ****/
+
+	/****LSFU2 --> ****/
+
+	/****LSFU1 --> ****/
+
+	/****IQ --> ****/
+
+	/****DRF2 --> ****/
+
+	/****DRF1 --> ****/
+
+	/****F --> ****/
 
 
 	/*STOPPING PHASE**************************************************************
@@ -582,8 +589,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	*****************************************************************************/
 
 	//Stop execution (return code 0) if:
-	// 1. A HALT has been encountered (set with HALT in F, also preventing fetch)
-	// 2. HALT reaches DRF2 (ensures no instructions need to enter IQ)
+	// 1. A HALT has been encountered (set with HALT in F, preventing fetch)
+	// 2. HALT reaches DRF2 (ensures no instructions need to be dispatched)
 	// 3. The IQ is empty (ensures no instructions need to be issued)
 	// 4. The ROB is empty (ensures no instructions need to be committed)
 	//Continue execution (return code 1) otherwise.

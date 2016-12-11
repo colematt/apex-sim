@@ -60,8 +60,10 @@ int main(int argc, char** argv)
     //Get the next command. If command takes the n parameter, ingest it also
     cin >> cmd;
 
+    //lowercase the command string
     std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
+    #if 0
     //Handle long form command inputs from terminal
     if (cmd == "set_urf_size"){
     	cmd = "urf";
@@ -78,7 +80,7 @@ int main(int argc, char** argv)
     	cmd = "d";
     	mod = "rob";
     }
-    if (cmd == "print urf"){
+    if (cmd == "print_urf"){
     	cmd = "d";
     	mod = "urf";
     }
@@ -90,7 +92,8 @@ int main(int argc, char** argv)
     	cmd = "d";
     	mod = "stats";
     }
-
+    #endif
+    
     //Process the command. If command takes additional parameters, ingest them.
     if (cmd == "i") {
       initialize(*apexCPU, *apexRF, *apexData, *apexROB, *apexIQ);
