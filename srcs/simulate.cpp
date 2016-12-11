@@ -479,8 +479,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF2.opcode == "OR" ||
 			DRF2.opcode == "EX-OR"){
 
-			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
-			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
+			DRF2.values.at(0) = myregisters.physRead(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.physIsValid(DRF2.operands.at(0));
 
 			if (!DRF2.valids.at(1)){
 				DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
@@ -499,8 +499,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 		else if (DRF2.opcode == "MOVC"){
 
-			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
-			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
+			DRF2.values.at(0) = myregisters.physRead(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.physIsValid(DRF2.operands.at(0));
 
 			DRF2.values.at(1) = DRF2.littoi(DRF2.operands.at(1));
 			DRF2.valids.at(1) = true;
@@ -528,8 +528,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 		else if (DRF2.opcode == "LOAD"){
 
-			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
-			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
+			DRF2.values.at(0) = myregisters.physRead(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.physIsValid(DRF2.operands.at(0));
 
 			if (!DRF2.valids.at(1)){
 				DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
@@ -573,9 +573,17 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****DRF1 STAGE****/
 	if (--(DRF1.lcounter) <= 0 && !DRF1.isEmpty()) {
+		if (DRF1.opcode == "ADD" ||
+			DRF1.opcode == "SUB" ||
+			DRF1.opcode == "MUL" ||
+			DRF1.opcode == "AND" ||
+			DRF1.opcode == "OR" ||
+			DRF1.opcode == "EX-OR" ||
+			DRF1.opcode == "MOVC"){
 		// Perform renaming
 		DRF1.operands.at(0) = myregisters.getRenamed(DRF1.operands.at(0));
 		DRF1.ready = true;
+		}
 	}
 
 	/****F STAGE****/
