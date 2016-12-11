@@ -178,7 +178,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	*****************************************************************************/
 
 	/****ALU3 STAGE****/
-	if (--(ALU3.lcounter) == 0 && !ALU3.isEmpty()) {
+	if (--(ALU3.lcounter) <= 0 && !ALU3.isEmpty()) {
 		//Writeback
 		myregisters.write(ALU3.operands.at(0), ALU3.values.at(0), ALU3.valids.at(0));
 
@@ -186,7 +186,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****ALU2 STAGE****/
-	if (--(ALU2.lcounter) == 0 && !ALU2.isEmpty()) {
+	if (--(ALU2.lcounter) <= 0 && !ALU2.isEmpty()) {
 		//Perform arithmetic, set valid bit, set Z flag
 		if (ALU2.opcode == "ADD"){
 			if (!ALU2.valids.at(0)){
@@ -255,7 +255,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****MUL2 STAGE****/
-	if (--(MUL2.lcounter) <= 0) {
+	if (--(MUL2.lcounter) <= 0 && !MUL2.isEmpty()) {
 		//Writeback
 		myregisters.write(MUL2.operands.at(0), MUL2.values.at(0), MUL2.valids.at(0));
 
@@ -263,7 +263,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****MUL1 STAGE****/
-	if (--(MUL1.lcounter) <= 0) {
+	if (--(MUL1.lcounter) <= 0 && !MUL1.isEmpty()) {
 		//Perform arithmetic, set valid bit, set Z flag
 		if (MUL1.opcode == "MUL") {
 			if (!ALU2.valids.at(0)){
@@ -283,7 +283,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****LSFU3 STAGE****/
-	if (--(LSFU3.lcounter) <= 0) {
+	if (--(LSFU3.lcounter) <= 0 && !LSFU3.isEmpty()) {
 		if (LSFU3.opcode == "LOAD") {
 			//Perform memory access
 			LSFU3.values.at(0) = mydata.readMem(LSFU3.values.at(1));
@@ -306,7 +306,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****LSFU2 STAGE****/
-	if (--(LSFU2.lcounter) <= 0) {
+	if (--(LSFU2.lcounter) <= 0 && !LSFU2.isEmpty()) {
 		/*This phase reserved for TLB lookup (not implemented)*/
 
 		if (LSFU2.opcode == "LOAD"){
@@ -327,7 +327,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****LSFU1 STAGE****/
-	if (--(LSFU1.lcounter) <= 0) {
+	if (--(LSFU1.lcounter) <= 0 && !LSFU1.isEmpty()) {
 		//Compute address, store in src1 (LOAD) or src2 (STORE)
 		if (LSFU1.opcode == "LOAD") {
 			LSFU1.values.at(1) = LSFU1.values.at(1) + LSFU1.values.at(2);
@@ -343,7 +343,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****B2 STAGE****/
-	if (--(B2.lcounter) <= 0) {
+	if (--(B2.lcounter) <= 0 && !B2.isEmpty()) {
 		//Writeback X register
 		if (B2.opcode == "BAL") {
 			myregisters.write("X", (B2.pc)+4, true);
@@ -352,7 +352,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****B1 STAGE****/
-	if (--(B1.lcounter) <= 0) {
+	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
 		//Perform branching logic
 		//Branch conditional is true or unconditional
 		if ((B1.opcode == "BZ" && Z == 0) ||
@@ -375,7 +375,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****DRF2 STAGE****/
-	if (--(DRF2.lcounter) <= 0) {
+	if (--(DRF2.lcounter) <= 0 && !DRF2.isEmpty()) {
 		// Readout available operands
 		if (DRF2.opcode == "ADD" ||
 			DRF2.opcode == "SUB" ||
@@ -477,7 +477,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 
 	/****DRF1 STAGE****/
-	if (--(DRF1.lcounter) <= 0) {
+	if (--(DRF1.lcounter) <= 0 && !DRF1.isEmpty()) {
 		// Perform renaming
 		DRF1.operands.at(0) = myregisters.getRenamed(DRF1.operands.at(0));
 		DRF1.ready = true;
