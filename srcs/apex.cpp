@@ -77,16 +77,16 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &m
   std::string mod, int a1, int a2)
 {
   //Sanitize inputs
-  if  (mod != "all" ||
-        mod != "cpu" ||
-        mod != "iq"  ||
-        mod != "map" ||
-        mod != "mem" ||
-        mod != "rob" ||
-        mod != "stats" ||
+  if  (mod != "all" &&
+        mod != "cpu" &&
+        mod != "iq"  &&
+        mod != "map" &&
+        mod != "mem" &&
+        mod != "rob" &&
+        mod != "stats" &&
         mod != "urf"){
             std::cerr << "Display modifier " << mod << " not understood.";
-            mod = "none";
+            mod = "";
   }
   if ((mod == "all" || mod == "mem") && a1 < 0){
     std::cerr << "Memory range start is out of bounds. Setting to 0." << std::endl;
@@ -188,10 +188,7 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
     if(VERBOSE >= 2){
 	    mycpu.display();
 	    myregisters.display();
-	}
-
-    //Cycle complete, increment the global cycle counter
-    cycle++;
+	  }
   }
 
   return cycle;

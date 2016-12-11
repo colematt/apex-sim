@@ -24,7 +24,7 @@ void Registers::initialize(){
   this->reg_file.clear();
 
   //Set general purpose register values and valids
-  for (int r=0; r< (num_reg - 1); r++){
+  for (int r=0; r< (num_reg); r++){
     reg_name = "P" + std::to_string(r);
     this->reg_file[reg_name] = std::make_tuple(0, true);
     this->free_list.push(reg_name); //Populate free list
@@ -42,29 +42,30 @@ void Registers::dUrf(){
   
   for (auto it = this->reg_file.begin(); it != this->reg_file.end(); ++it) {
     myname = it->first;
-    std::tie(myvalue, myvalid) = it->second;
-    std::cout << myname << ": " << myvalue << "," << myvalid << ";";
+    if (myname != "X"){
+      std::tie(myvalue, myvalid) = it->second;
+      std::cout << myname << ": " << myvalue << "," << myvalid << ";";
 
-    for (auto itt = this->back_end.begin(); itt != this->back_end.end(); ++itt) {
-      if (itt->second == myname){
-        holder = "Committed";
-      }
-    }
-
-    if (holder == ""){
-      for (auto itt = this->front_end.begin(); itt != this->front_end.end(); ++itt) {
-        if (itt->first == myname){
-          holder = "Allocated";
+      for (auto itt = this->back_end.begin(); itt != this->back_end.end(); ++itt) {
+        if (itt->second == myname){
+          holder = "Committed";
         }
       }
 
       if (holder == ""){
-        holder = "Free";
+        for (auto itt = this->front_end.begin(); itt != this->front_end.end(); ++itt) {
+          if (itt->first == myname){
+            holder = "Allocated";
+          }
+        }
+
+        if (holder == ""){
+          holder = "Free";
+        }
       }
     }
-  }
-
   std::cout << holder << std::endl;
+  }
   holder = "";
 }
 
