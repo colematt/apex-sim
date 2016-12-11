@@ -53,6 +53,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****ALU3 STAGE****/
 	// Advanced by ROB COMMITTING
+
 	/****ALU2 STAGE****/
 	if (ALU2.isReady() && ALU3.isEmpty()){
 		ALU2.advance(ALU3);
@@ -63,12 +64,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 	/****MUL2 STAGE****/
 	// Advanced by ROB COMMITTING
+
 	/****MUL1 STAGE****/
 	if (MUL1.isReady() && MUL2.isEmpty()){
 		MUL1.advance(MUL2);
 	}
 	/****LSFU3 STAGE****/
 	// Advanced by ROB COMMITTING
+
 	/****LSFU2 STAGE****/
 	if (LSFU2.isReady() && LSFU3.isEmpty()){
 		LSFU2.advance(LSFU3);
@@ -79,10 +82,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 	/****B2 STAGE****/
 	// Advanced by ROB COMMITTING
+
 	/****B1 STAGE****/
 	if (B1.isReady() && B2.isEmpty()){
 		B1.advance(B2);
 	}
+
 	/****IQ****/
 	int wakeup = -1;
 	// Up to 3 wakeup signals can occur per cycle.
@@ -100,6 +105,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// Decide if any successful issues occurred this cycle
 	if (wakeup == 0)
 		no_issued++;
+
 	/****DRF2 STAGE****/
 	// If HALT is in this stage, do not advance it. Its presence here is part of
 	// the STOPPING logic! There are no instructions behind it because
@@ -156,10 +162,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 		else {no_dispatch++;}
 	}
+
 	/****DRF1 STAGE****/
 	if (DRF1.isReady() && DRF2.isEmpty()){
 		DRF1.advance(DRF2);
 	}
+
 	/****F STAGE****/
 	if (F.isReady() && DRF1.isEmpty()){
 		F.advance(DRF1);
@@ -168,6 +176,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/*WORKING PHASE***************************************************************
 	******************************************************************************
 	*****************************************************************************/
+
 	/****ALU3 STAGE****/
 	if (--(ALU3.lcounter) == 0 && !ALU3.isEmpty()) {
 		//Writeback
@@ -300,7 +309,21 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	if (--(LSFU2.lcounter) <= 0) {
 		/*This phase reserved for TLB lookup (not implemented)*/
 
-		LSFU2.ready = true;
+		if (LSFU2.opcode == "LOAD"){
+			///Operand[0] need not be valid; it gets written to in LSFU3
+			LSFU2.ready = true;
+		}
+		else if (LSFU2.opcode == "STORE"){
+			if (LSFU2.valids.at(0))
+				LSFU2.ready = true;
+			else
+				LSFU2.ready = false;
+		}
+		else{
+			std::cerr << "Unrecognized opcode " << LSFU2.opcode << " at LSFU2 WORKING phase" << std::endl;
+			LSFU2.ready = false;
+		}
+
 	}
 
 	/****LSFU1 STAGE****/
