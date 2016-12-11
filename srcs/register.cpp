@@ -24,7 +24,7 @@ void Registers::initialize(){
   this->reg_file.clear();
 
   //Set general purpose register values and valids
-  for (int r=0; r<num_reg; r++){
+  for (int r=0; r< (num_reg - 1); r++){
     reg_name = "P" + std::to_string(r);
     this->reg_file[reg_name] = std::make_tuple(0, true);
     this->free_list.push(reg_name); //Populate free list
@@ -32,7 +32,61 @@ void Registers::initialize(){
 
   //Set flag and special register values and valids
   this->reg_file["X"] = std::make_tuple(0, true);
-  this->reg_file["Z"] = std::make_tuple(0, true);
+}
+
+void Registers::dUrf(){
+  std::string myname = "";
+  int myvalue = 0;
+  bool myvalid = true;
+  std::string holder = "";
+  
+  for (auto it = this->reg_file.begin(); it != this->reg_file.end(); ++it) {
+    myname = it->first;
+    std::tie(myvalue, myvalid) = it->second;
+    std::cout << myname << ": " << myvalue << "," << myvalid << ";";
+
+    for (auto itt = this->back_end.begin(); itt != this->back_end.end(); ++itt) {
+      if (itt->second == myname){
+        holder = "Committed";
+      }
+    }
+
+    if (holder == ""){
+      for (auto itt = this->front_end.begin(); itt != this->front_end.end(); ++itt) {
+        if (itt->first == myname){
+          holder = "Allocated";
+        }
+      }
+
+      if (holder == ""){
+        holder = "Free";
+      }
+    }
+  }
+
+  std::cout << holder << std::endl;
+  holder = "";
+}
+
+void Registers::dMap(){
+  std::string reg1 = "";
+  std::string reg2 = "";
+
+  std::cout << "Front End Rename Table" << std::endl;
+  for (auto it = this->front_end.begin(); it != this->front_end.end(); ++it){
+    reg1 = it->first;
+    reg2 = it->second;
+
+    std::cout << reg1 << " : " << reg2 << std::endl;
+  }
+
+  std::cout << "Back End Rename Table" << std::endl;
+  for (auto it = this->back_end.begin(); it != this->back_end.end(); ++it){
+    reg1 = it->first;
+    reg2 = it->second;
+
+    std::cout << reg1 << " : " << reg2 << std::endl;
+  }
 }
 
 //Display the contents of the registers/flags
@@ -61,6 +115,7 @@ std::string Registers::getRenamed(std::string rReg){
 
   //Update or insert pReg value with physReg as key and archReg as value
   this->front_end[physReg] = archReg;
+  this->reg_file[physReg] = std::make_tuple(0, false);
 
   //Check back end to see if there is commited value for R reg
   //If there is one set mapped P reg valid to false
@@ -102,7 +157,7 @@ void Registers::commit(std::string pReg){
 }
 
 bool Registers::deallocate(std::string reg){
-  if (reg[0] != 'P'){
+  if (reg[0] != 'P' || reg[0] != 'X'){
     return false;
   } else {
     auto it = this->front_end.find(reg);

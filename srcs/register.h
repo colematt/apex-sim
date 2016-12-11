@@ -54,6 +54,9 @@ public:
 
   //methods for simulator's interface control
   void initialize(); //reset the RF with all registers/flags set to zero
+
+  void dUrf();
+  void dMap();
   void display(); //display the contents of the registers/flags
 
   //create instance of R reg

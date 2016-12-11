@@ -102,9 +102,21 @@ void IQ::updateSrc(std::string reg, int val){
 
 bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 	int numIssued = 0;
+	bool hitArith = false;
 	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();){
 		if (i->isReady()){
-			//Arithmetic opcodes
+
+			//Check if no arithmatic instructions prior to conditional branch
+			if(i->opcode == "ADD" ||
+				i->opcode == "SUB" ||
+				i->opcode == "AND" ||
+				i->opcode == "OR" ||
+				i->opcode == "EX-OR" ||
+				i->opcode == "MUL"){
+				hitArith = true;
+			}
+
+			//Arithmetic Opcodes
 			if(i->opcode == "ADD" ||
 				i->opcode == "SUB" ||
 				i->opcode == "AND" ||
@@ -115,23 +127,30 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 					this->issue_queue.erase(i);
 					numIssued++;
 			}
-			//Arithmetic opcodes with latency
+			//Multiplication Opcode
 			if(i->opcode == "MUL"){
 				i->advance(MUL);
 				this->issue_queue.erase(i);
 				numIssued++;
 			}
-			//Memory access opcodes
+			//Memory Access Opcodes
 			if(i->opcode == "LOAD" || i->opcode == "STORE"){
 				i->advance(LSFU);
 				this->issue_queue.erase(i);
 				numIssued++;
 			}
-			//Control flow opcodes
+			//Unconditional Branches Opcodes
 			if(i->opcode == "BAL" ||
-				i->opcode == "JUMP" ||
-				i->opcode == "BZ" ||
-				i->opcode == "BNZ"){
+				i->opcode == "JUMP"){
+					i->advance(B);
+					this->issue_queue.erase(i);
+					numIssued++;
+			}
+
+			//Conditional Branches Opcodes
+			if((i->opcode == "BZ" ||
+				i->opcode == "BNZ") 
+				&& !hitArith){
 					i->advance(B);
 					this->issue_queue.erase(i);
 					numIssued++;
@@ -179,7 +198,7 @@ void IQ::flush(int cycle, Registers &rf){
 // Given an opcode string,
 // Return true if an entry in the IQ has that opcode
 // Return false otherwise
-bool hasEntryWithOpcode(std::string oc){
+bool IQ::hasEntryWithOpcode(std::string oc){
 	for (auto entry : issue_queue){
 		if (entry.opcode == oc){
 			return true;

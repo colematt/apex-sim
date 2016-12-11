@@ -4,6 +4,7 @@ Authors:  Matthew Cole <mcole8@binghamton.edu>
           Brian Gracin <bgracin1@binghamton.edu>
 Description: Driver for apex-sim.
 */
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include "code.h"
@@ -52,8 +53,43 @@ int main(int argc, char** argv)
     if (cycle == 0)
       help();
 
+  	//Flush both input containers
+  	cmd = "";
+  	mod = "";
+
     //Get the next command. If command takes the n parameter, ingest it also
     cin >> cmd;
+
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+
+    //Handle long form command inputs from terminal
+    if (cmd == "set_urf_size"){
+    	cmd = "urf";
+    }
+    if (cmd == "print_map_tables"){
+    	cmd = "d";
+    	mod = "map";
+    }
+    if (cmd == "print_iq"){
+    	cmd = "d";
+    	mod = "iq";
+    }
+    if (cmd == "print_rob"){
+    	cmd = "d";
+    	mod = "rob";
+    }
+    if (cmd == "print urf"){
+    	cmd = "d";
+    	mod = "urf";
+    }
+    if (cmd == "print_memory"){
+    	cmd = "d";
+    	mod = "mem";
+    }
+    if (cmd == "print_stats"){
+    	cmd = "d";
+    	mod = "stats";
+    }
 
     //Process the command. If command takes additional parameters, ingest them.
     if (cmd == "i") {
@@ -65,7 +101,10 @@ int main(int argc, char** argv)
     }
     else if (cmd == "d"){
       //Ingest modifiers
-      cin >> mod;
+      if (mod == "")
+      	cin >> mod;
+
+      std::transform(mod.begin(), mod.end(), mod.begin(), ::tolower);
 
       if (mod == "mem"){
         cin >> a1 >> a2;
