@@ -216,7 +216,6 @@ bool Registers::physIsValid(std::string reg){
 }
 
 //Translate R reg to P reg to get value
-//Throws std::invalid_argument exception if mapping doesn't exist
 int Registers::read(std::string reg){
   int myvalue;
   std::string myReg;
@@ -224,12 +223,10 @@ int Registers::read(std::string reg){
   auto it = this->back_end.find(reg);
   if (it != this->back_end.end()) {
     myReg = (it->second);
+    myvalue = physRead(myReg);
   } else {
-    std::string what_arg = reg + " is not a valid register";
-    throw std::invalid_argument(what_arg);
+    myvalue = 0;
   }
-
-  myvalue = physRead(myReg);
 
   return myvalue;
 }
@@ -243,12 +240,10 @@ bool Registers::isValid(std::string reg){
   auto it = this->back_end.find(reg);
   if (it != this->back_end.end()) {
     myReg = (it->second);
+    myvalid = physIsValid(myReg);
   } else {
-    std::string what_arg = reg + " is not a valid register";
-    throw std::invalid_argument(what_arg);
+    myvalid = false;
   }
-
-  myvalid = physIsValid(myReg);
 
   return myvalid;
 }

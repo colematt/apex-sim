@@ -38,10 +38,45 @@ void IQ::initialize(){
 }
 
 //Dispatch an instruction to IQ
-void IQ::dispatchInst(Stage &stage){
-	stage.empty = false;
-	stage.ready = false;
-	this->issue_queue.push_back(stage);
+bool IQ::dispatchInst(Stage &stage){
+	if (this->issue_queue.size() < this->max_size){
+		stage.empty = false;
+
+		if (stage.opcode == "ADD" ||
+			stage.opcode == "SUB" ||
+			stage.opcode == "MUL" ||
+			stage.opcode == "AND" ||
+			stage.opcode == "OR" ||
+			stage.opcode == "EX-OR"){
+			if (stage.valids.at(1) && stage.valids.at(2)){
+				stage.ready = true;
+			}
+		}
+		else if (stage.opcode == "MOVC" ||
+			stage.opcode == "BZ" ||
+			stage.opcode == "BNZ"){
+			stage.ready = true;
+		}
+		else if (stage.opcode == "STORE"){
+			if (stage.valids.at(1))
+				stage.ready = true;
+		}
+		else if (stage.opcode == "LOAD"){
+			if (stage.valids.at(1)){
+				stage.ready = true;
+			}
+		}
+		else if (stage.opcode == "BAL" ||
+			stage.opcode == "JUMP"){
+			if (stage.valids.at(0))
+				stage.ready = true;
+		}
+
+		this->issue_queue.push_back(stage);
+		return true;
+	}
+
+	return false;
 }
 
 //Forward the value of an R reg that was computed from an FU
@@ -103,6 +138,7 @@ void IQ::updateSrc(std::string reg, int val){
 bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 	int numIssued = 0;
 	bool hitArith = false;
+	bool advSuccess = false;
 	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();){
 		if (i->isReady()){
 
@@ -122,38 +158,53 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 				i->opcode == "AND" ||
 				i->opcode == "OR" ||
 				i->opcode == "EX-OR" ||
-				i->opcode == "MOV"){
-					i->advance(ALU);
+				i->opcode == "MOVC"){
+				advSuccess = i->advance(ALU);
+
+				if ( advSuccess ){
 					this->issue_queue.erase(i);
 					numIssued++;
+				}
 			}
 			//Multiplication Opcode
 			if(i->opcode == "MUL"){
-				i->advance(MUL);
-				this->issue_queue.erase(i);
-				numIssued++;
+				advSuccess = i->advance(MUL);
+
+				if ( advSuccess ){
+					this->issue_queue.erase(i);
+					numIssued++;
+				}
 			}
 			//Memory Access Opcodes
 			if(i->opcode == "LOAD" || i->opcode == "STORE"){
-				i->advance(LSFU);
-				this->issue_queue.erase(i);
-				numIssued++;
+				advSuccess = i->advance(LSFU);
+
+				if ( advSuccess ){
+					this->issue_queue.erase(i);
+					numIssued++;
+				}
 			}
 			//Unconditional Branches Opcodes
 			if(i->opcode == "BAL" ||
 				i->opcode == "JUMP"){
-					i->advance(B);
+				advSuccess = i->advance(B);
+
+				if ( advSuccess ){
 					this->issue_queue.erase(i);
 					numIssued++;
+				}
 			}
 
 			//Conditional Branches Opcodes
 			if((i->opcode == "BZ" ||
 				i->opcode == "BNZ") 
 				&& !hitArith){
-					i->advance(B);
+				advSuccess = i->advance(B);
+
+				if ( advSuccess ){
 					this->issue_queue.erase(i);
 					numIssued++;
+				}
 			}
 		}
 		else{
@@ -162,6 +213,8 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 		if (numIssued > 2){
 			return true;
 		}
+
+		advSuccess = false;
 	} //END for each entry in issue_queue
 
 	//Failed to issue instruction

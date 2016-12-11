@@ -132,6 +132,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		// Specification 2, Detail 2 states that no control flow instructions
 		// can be dispatched until any control flow instruction in the IQ has
 		// been issued.
+		bool inIQ = false;
+		bool inROB = false;
 		if (myiq.hasEntryWithOpcode("BZ") ||
 				myiq.hasEntryWithOpcode("BNZ") ||
 				myiq.hasEntryWithOpcode("BAL") ||
@@ -142,13 +144,25 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		else {
 			if (DRF2.isReady() && !DRF2.isEmpty()){
 				//Advance the contents of DRF2 into the IQ
-				myiq.dispatchInst(DRF2);
+				if( inIQ == false){
+					inIQ = myiq.dispatchInst(DRF2);
+				}
 
-				//Empty DRF2
-				DRF2.empty = true;
+				//Advance the contents of DRF2 into the ROB
+				if( inROB == false){
+					inROB = myrob.addStage(DRF2);
+				}
 
-				//Increment stats counters
-				dispatched++;
+				if( inIQ && inROB){
+					//Empty DRF2
+					DRF2.empty = true;
+
+					//Increment stats counters
+					dispatched++;
+
+					inIQ = false;
+					inROB = false;
+				}
 			}
 			else {no_dispatch++;}
 		}
@@ -482,20 +496,13 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF2.values.at(0) = myregisters.physRead(DRF2.operands.at(0));
 			DRF2.valids.at(0) = myregisters.physIsValid(DRF2.operands.at(0));
 
-			if (!DRF2.valids.at(1)){
-				DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
-				DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
-			}
+			DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
+			DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
 
-			if (!DRF2.valids.at(2)){
-				DRF2.values.at(2) = myregisters.read(DRF2.operands.at(2));
-				DRF2.valids.at(2) = myregisters.isValid(DRF2.operands.at(2));
-			}
+			DRF2.values.at(2) = myregisters.read(DRF2.operands.at(2));
+			DRF2.valids.at(2) = myregisters.isValid(DRF2.operands.at(2));
 
-			if (DRF2.valids.at(1) && DRF2.valids.at(2)){
-				myregisters.write(DRF2.operands.at(0), DRF2.values.at(0), false);
-				DRF2.ready = true;
-			}
+			DRF2.ready = true;
 		}
 		else if (DRF2.opcode == "MOVC"){
 
@@ -511,10 +518,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 		else if (DRF2.opcode == "STORE"){
 
-			if (!DRF2.valids.at(0)){
-				DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
-				DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
-			}
+			DRF2.values.at(0) = myregisters.read(DRF2.operands.at(0));
+			DRF2.valids.at(0) = myregisters.isValid(DRF2.operands.at(0));
 
 			DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
 			DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
@@ -531,18 +536,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF2.values.at(0) = myregisters.physRead(DRF2.operands.at(0));
 			DRF2.valids.at(0) = myregisters.physIsValid(DRF2.operands.at(0));
 
-			if (!DRF2.valids.at(1)){
-				DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
-				DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
-			}
+			DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
+			DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
+			
 
 			DRF2.values.at(2) = DRF2.littoi(DRF2.operands.at(2));
 			DRF2.valids.at(2) = true;
 
-			if (DRF2.valids.at(1)){
-				myregisters.write(DRF2.operands.at(0), DRF2.values.at(0), false);
-				DRF2.ready = true;
-			}
+			DRF2.ready = true;
 		}
 
 		else if (DRF2.opcode == "BZ" ||
@@ -561,8 +562,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF2.values.at(1) = DRF2.littoi(DRF2.operands.at(1));
 			DRF2.valids.at(1) = true;
 
-			if (DRF2.valids.at(0))
-				DRF2.ready = true;
+			DRF2.ready = true;
 		}else{
 			std::cerr << "Unresolvable opcode in DRF: " << DRF2.opcode << std::endl;
 			exit(1);
