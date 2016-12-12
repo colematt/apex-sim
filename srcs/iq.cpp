@@ -109,8 +109,6 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 				i->opcode == "EX-OR" ||
 				i->opcode == "MOVC"){
 
-				std::cout << i->valids.at(1) << " " << i->valids.at(2) << " " << i->opcode << std::endl;
-
 				if (i->valids.at(1) && i->valids.at(2)){
 					advSuccess = i->advance(ALU);
 				}
