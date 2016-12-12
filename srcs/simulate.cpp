@@ -868,8 +868,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				LSFU1.valids.at(1) = MUL1.valids.at(0);
 			}
 		}
-
-		/****MUL1 --> ****/
 		// --> IQ (MUL1.op[0] == IQ.entry.{srcs})
 		for (auto &entry: myiq.issue_queue){
 			std::string forwardReg = myregisters.translateReg(MUL1.operands.at(0));
@@ -925,6 +923,24 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			LSFU2.values.at(0) = LSFU3.values.at(0);
 			LSFU2.valids.at(0) = LSFU3.valids.at(0);
 		}
+		// --> LSFU2 (LSFU2.opcode == STORE, LSFU2.src[0] == LSFU3.dst)
+		if (LSFU2.opcode == "LOAD" &&
+			LSFU2.operands.at(0) == forwardReg){
+				LSFU2.values.at(0) = LSFU3.values.at(0);
+				LSFU2.valids.at(0) = LSFU3.valids.at(0);
+		}
+		// --> LSFU1 (LSFU2.opcode == STORE, LSFU3.dst = LSFU2.srcs[0])
+		if (LSFU1.opcode == "STORE" &&
+			(LSFU1.operands.at(0) == forwardReg)){
+			LSFU1.values.at(0) = LSFU3.values.at(0);
+			LSFU1.valids.at(0) = LSFU3.valids.at(0);
+		}
+		// --> LSFU1 (LSFU1.opcode == STORE, LSFU1.src[0] == LSFU3.dst  )
+		if (LSFU1.opcode == "LOAD" &&
+			LSFU1.operands.at(0) == forwardReg){
+				LSFU1.values.at(0) = LSFU3.values.at(0);
+				LSFU1.valids.at(0) = LSFU3.valids.at(0);
+		}
 		// --> ALU1 (LSFU3.dst == ALU1.srcs)
 		// MOVC instructions have no source set
 		if (ALU1.opcode != "MOVC"){
@@ -945,18 +961,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		if (MUL1.operands.at(2) == forwardReg){
 			MUL1.values.at(2) = LSFU3.values.at(0);
 			MUL1.valids.at(2) = LSFU3.valids.at(0);
-		}
-		// --> LSFU2 (LSFU2.opcode == STORE, LSFU2.src[0] == LSFU3.dst)
-		if (LSFU2.opcode == "LOAD" &&
-			LSFU2.operands.at(0) == forwardReg){
-				LSFU2.values.at(0) = LSFU3.values.at(0);
-				LSFU2.valids.at(0) = LSFU3.valids.at(0);
-		}
-		// --> LSFU1 (LSFU1.opcode == STORE, LSFU1.src[0] == LSFU3.dst  )
-		if (LSFU1.opcode == "LOAD" &&
-			LSFU1.operands.at(0) == forwardReg){
-				LSFU1.values.at(0) = LSFU3.values.at(0);
-				LSFU1.valids.at(0) = LSFU3.valids.at(0);
 		}
 		// --> IQ
 		for (auto &entry: myiq.issue_queue){
