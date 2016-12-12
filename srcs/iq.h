@@ -22,6 +22,9 @@ public:
 	IQ();
 	~IQ();
 
+	std::deque<Stage> issue_queue;
+	int max_size = 12;
+
 	// Interface functions
 	void display();
 	void initialize();

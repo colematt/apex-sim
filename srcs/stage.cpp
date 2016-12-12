@@ -19,7 +19,7 @@ Stage::Stage(std::string n, int l){
 //Reset the stage state
 void Stage::initialize(){
 	pc = ::pc;
-	c = cycle;
+	c = ::cycle;
 	lcounter = latency;
 	opcode = "";
 	operands.clear();
@@ -60,7 +60,7 @@ bool Stage::advance(Stage &dest){
 	if (!this->isEmpty() && this->isReady() && dest.isEmpty()){
 		//Copy fields from source stage to destination stage
 		dest.pc = this->pc;
-		dest.c = this->pc;
+		dest.c = this->c;
 		dest.opcode = this->opcode;
 		dest.lcounter = dest.latency;
 

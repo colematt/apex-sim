@@ -152,10 +152,15 @@ void Registers::commit(std::string pReg){
     std::string what_arg = pReg + " is not a valid register";
     throw std::invalid_argument(what_arg);
   }
+
+  auto itt = this->back_end.find(rReg);
+  if (itt != this->back_end.end()){
+    prevReg = itt->second;
+    this->front_end.erase(prevReg); //Remove rename entry from front end table
+    this->free_list.push(prevReg);  //Push P reg back into free list
+  }
   
   this->back_end[rReg] = pReg; //Set new P reg value
-  this->front_end.erase(pReg); //Remove rename entry from front end table
-  this->free_list.push(pReg);  //Push P reg back into free list
 
 }
 

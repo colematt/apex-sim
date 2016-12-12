@@ -13,6 +13,8 @@ Description: Contains helper functions controlling simulator high-level behavior
 #include "iq.h"
 #include "apex.h"
 
+#define DEBUG 1
+
 // Initialize simulator state and stats variables with external linkage
 int cycle = 0;
 int pc = 4000;
@@ -179,6 +181,11 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
     //Perform one cycle of simulation
     if (VERBOSE >= 1)
       std::cout << "Simulating cycle " << cycle << " ..." << std::endl;
+
+    #if (DEBUG)
+      mycpu.display();
+      myregisters.dUrf();
+    #endif
 
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)

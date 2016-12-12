@@ -242,10 +242,8 @@ void IQ::flush(int cycle, Registers &rf){
 			it->flush(cycle, rf);
 
 			// Erase this entry in the IQ
+			// Pointer advanced by erase function
 			issue_queue.erase(it);
-
-			// Advance the iterator
-			++it;
 	}
 }
 
