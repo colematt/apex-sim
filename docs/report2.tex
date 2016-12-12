@@ -115,19 +115,43 @@ In this section, we will discuss key aspects of our simulator's execution: the s
 \subsubsection{Working}
 
 \subsubsection{Forwarding}
-\todo{Add table of forwarding scenarios.}
+Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwarding from later stages to earlier stages in order to reduce bubbles caused by waiting for flow dependencies to resolve. In \codename, this is accomplished in \texttt{simulate.cpp} during the forwarding phase (lines \todo{Add line numbers}).
+
 \begin{table}
   \centering
   \caption{APEX Forwarding Scenarios}
   \label{tab:fwdscenarios}
-  \begin{tabular}{l|l|c}
-    Source Stage & Destination Stage & Description\\
+  \begin{tabular}{l|l|p{5.0in}}
+    From & To & Description\\
     \hline
-    - & - & - \\
+    B2 & B1 & Occurs when B2 has a \texttt{BAL} instruction, and B1 has the X register in its source set. \\
+    B2 & IQ & Occurs when B2 has a \texttt{BAL} instruction, and one or more IQ entries is a \texttt{BAL} or \texttt{JUMP} with the X register in its source set. \\
+    \hline
+    ALU3 & IQ & Occurs when ALU3's destination set has a union with an IQ entry's source set. \\
+    ALU3 & ALU2 & Occurs when ALU3's destination set has a union with ALU2's source set. \\
+    ALU3 & MUL1 & Occurs when ALU3's destination set has a union with MUL1's source set. \\
+    \hline
+    ALU2 & ALU1 & Occurs when ALU2's destination set has a union with ALU1's source set.\\
+    ALU2 & MUL1 & Occurs when ALU2's destination set has a union with MUL1's source set.\\
+    ALU2 & B1 & B1's opcode is \texttt{BAL} or \texttt{JUMP}, ALU2's destination set has a union with B1's source set. \\
+    ALU2 & LSFU2 & LSFU2's opcode is \texttt{LOAD} or \texttt{STORE}, ALU2's destination set has a union with LSFU2's source set. \\
+    ALU2 & LSFU1 & LSFU2's opcode is \texttt{LOAD} or \texttt{STORE}, ALU2's destination set has a union with LSFU1's source set. \\
+    ALU2 & IQ & ALU2's destination set has a union with an IQ entry's source set. \\
+    \hline
+    MUL2 & IQ & MUL2's destination set has a union with an IQ entry's source set. \\
+    \hline
+    MUL1 & ALU1 & MUL1's destination set has a union with ALU1's source set. \\
+    MUL1 & B1 & B1's opcode is \texttt{BAL} or \texttt{JUMP} and MUL1's destination set has a union with B1's source set. \\
+    MUL1 & LSFU2 & MUL1's destination set has a union with LSFU2's source set. \\
+    MUL1 & LSFU1 & MUL1's destination set has a union with LSFU1's source set. \\
+    MUL1 & IQ & MUL1's destination set has a union with an IQ entry's source set. \\
+    \hline
+    LSFU3 & LSFU2 & LSFU3's destination set has a union with LSFU2's source set. \\
+    LSFU3 & LSFU1 & LSFU3's destination set has a union with LSFU1's source set. \\
+    
+    
   \end{tabular}
 \end{table}
-
-\todo{Add discussion of forwarding from writeback stages.}
 
 \begin{table}
   \centering
