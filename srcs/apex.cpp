@@ -13,7 +13,7 @@ Description: Contains helper functions controlling simulator high-level behavior
 #include "iq.h"
 #include "apex.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 // Initialize simulator state and stats variables with external linkage
 int cycle = 0;

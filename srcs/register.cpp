@@ -216,8 +216,6 @@ int Registers::read(std::string reg){
     myvalue = 0;
   }
 
-  std::cout << myvalue << std::endl;
-
   return myvalue;
 }
 
