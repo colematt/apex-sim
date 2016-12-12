@@ -23,6 +23,7 @@ void Stage::initialize(){
 	lcounter = latency;
 	opcode = "";
 	operands.clear();
+	operands.resize(3, "");
 	values.clear();
 	values.resize(3, 0);
 	valids.clear();
