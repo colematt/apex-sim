@@ -3,6 +3,8 @@
 #include "cpu.h"
 #include "apex.h"
 
+// FORWARDING 1 : forwarding occurs
+// FORWARDING 0 : forwarding does not occur
 #define FORWARDING 1
 
 int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
@@ -642,8 +644,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	*****************************************************************************/
 
 	// Defined at the top of this file
-	// FORWARDING 1 : forwarding occurs
-	// FORWARDING 0 : forwarding does not occur
 	#if FORWARDING
 
 	/****B2 --> ****/
@@ -693,6 +693,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****ALU2 --> ****/
 	// --> ALU1 (ALU2.dst == ALU1.srcs)
+	//MOVC has an empty source set
 	if (ALU1.opcode != "MOVC"){
 		if (ALU1.operands.at(1) == ALU2.operands.at(0)){
 			ALU1.values.at(1) = ALU2.values.at(0);
@@ -840,12 +841,65 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 	}
 
-	/****MUL1 (lcounter == 0) --> ****/
-	// --> ALU1 (MUL1.dst == ALU1.srcs)
-	// --> B1 (MUL1.dst = B1.srcs)
-	// --> LSFU2 (MUL1.dst = LSFU2.srcs)
-	// --> LSFU1 (MUL1.dst = LSFU1.srcs)
-
+	/****MUL1 (when MUL1.lcounter == 0) --> ****/
+	if (MUL1.lcounter == 0){
+		// --> ALU1 (MUL1.dst == ALU1.srcs)
+		//MOVC has an empty source set
+		if (ALU1.opcode != "MOVC"){
+			if (ALU1.operands.at(1) == MUL1.operands.at(0)){
+				ALU1.values.at(1) = MUL1.values.at(0);
+				ALU1.valids.at(1) = MUL1.valids.at(0);
+			}
+			if (ALU1.operands.at(2) == MUL1.operands.at(0)){
+				ALU1.values.at(2) = MUL1.values.at(0);
+				ALU1.valids.at(2) = MUL1.valids.at(0);
+			}
+		}
+		// --> B1 (MUL1.dst = B1.srcs)
+		if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+			if (B1.operands.at(0) == MUL1.operands.at(0)){
+				B1.values.at(0) = MUL1.values.at(0);
+				B1.valids.at(0) = MUL1.valids.at(0);
+			}
+		}
+		// --> LSFU2 (MUL1.dst = LSFU2.srcs)
+		if (LSFU2.opcode == "LOAD"){
+			if (LSFU2.operands.at(1) == MUL1.operands.at(0)){
+				LSFU2.values.at(1) = MUL1.values.at(0);
+				LSFU2.valids.at(1) = MUL1.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {STORE}, MUL1.dst == LSFU2.srcs)
+		if (LSFU2.opcode == "STORE"){
+			if (LSFU2.operands.at(0) == MUL1.operands.at(0)){
+				LSFU2.values.at(0) = MUL1.values.at(0);
+				LSFU2.valids.at(0) = MUL1.valids.at(0);
+			}
+			if (LSFU2.operands.at(1) == MUL1.operands.at(0)){
+				LSFU2.values.at(1) = MUL1.values.at(0);
+				LSFU2.valids.at(1) = MUL1.valids.at(0);
+			}
+		}
+		// --> LSFU1 (MUL1.dst = LSFU2.srcs)
+		if (LSFU1.opcode == "LOAD"){
+			if (LSFU1.operands.at(1) == MUL1.operands.at(0)){
+				LSFU1.values.at(1) = MUL1.values.at(0);
+				LSFU1.valids.at(1) = MUL1.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {STORE}, MUL1.dst == LSFU2.srcs)
+		if (LSFU1.opcode == "STORE"){
+			if (LSFU1.operands.at(0) == MUL1.operands.at(0)){
+				LSFU1.values.at(0) = MUL1.values.at(0);
+				LSFU1.valids.at(0) = MUL1.valids.at(0);
+			}
+			if (LSFU1.operands.at(1) == MUL1.operands.at(0)){
+				LSFU1.values.at(1) = MUL1.values.at(0);
+				LSFU1.valids.at(1) = MUL1.valids.at(0);
+			}
+		}
+	}
+	
 	/****LSFU3 --> ****/
 	// --> LSFU2 (LSFU3.opcode == LOAD, LSFU2.opcode == STORE, LSFU3.dst = LSFU2.srcs)
 	// --> ALU1 (LSFU3.opcode == LOAD, LSFU3.dst == ALU1.srcs)
