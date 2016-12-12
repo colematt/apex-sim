@@ -94,19 +94,6 @@ void Registers::dMap(){
   }
 }
 
-//Display the contents of the registers/flags
-void Registers::display(){
-  std::string myname = "";
-  int myvalue = 0;
-  bool myvalid = true;
-  
-  for (auto it = this->reg_file.begin(); it != this->reg_file.end(); ++it) {
-    myname = it->first;
-    std::tie(myvalue, myvalid) = it->second;
-    std::cout << myname << ": " << myvalue << "," << myvalid << std::endl;
-  }
-}
-
 //Create new instance of an R reg
 std::string Registers::getRenamed(std::string rReg){
   std::string physReg;
@@ -156,8 +143,14 @@ void Registers::commit(std::string pReg){
   auto itt = this->back_end.find(rReg);
   if (itt != this->back_end.end()){
     prevReg = itt->second;
-    this->front_end.erase(prevReg); //Remove rename entry from front end table
-    this->free_list.push(prevReg);  //Push P reg back into free list
+
+    auto ittt = this->front_end.find(prevReg);
+    if (ittt != this->front_end.end()){
+      this->front_end.erase(ittt);
+      this->free_list.push(prevReg);
+    }
+    //this->front_end.erase(prevReg); //Remove rename entry from front end table
+    //this->free_list.push(prevReg);  //Push P reg back into free list
   }
   
   this->back_end[rReg] = pReg; //Set new P reg value
@@ -165,7 +158,7 @@ void Registers::commit(std::string pReg){
 }
 
 bool Registers::deallocate(std::string reg){
-  if (reg[0] != 'P' || reg[0] != 'X'){
+  if (reg[0] == 'R' || reg[0] == 'X'){
     return false;
   } else {
     auto it = this->front_end.find(reg);
@@ -258,4 +251,15 @@ bool Registers::isValid(std::string reg){
 void Registers::setNumReg(int num){
   if (num > 0)
     num_reg = 0;
+}
+
+std::string Registers::translateReg(std::string pReg){
+  std::string rReg = "";
+  auto it = this->front_end.find(pReg);
+  if (it != this->front_end.end()) {
+    rReg = (it->second);
+  } else {
+    rReg = "";
+  }
+  return rReg;
 }

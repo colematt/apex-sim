@@ -93,7 +93,7 @@ void ROB::flush(int cycle){
 
 		// Traverse until encountering an entry
 		// whose cycle timestamp indicates it must be flushed
-		while(it->c < cycle){
+		while(it->c <= cycle){
 			++it;
 		}
 

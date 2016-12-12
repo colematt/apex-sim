@@ -55,9 +55,8 @@ public:
   //methods for simulator's interface control
   void initialize(); //reset the RF with all registers/flags set to zero
 
-  void dUrf();
-  void dMap();
-  void display(); //display the contents of the registers/flags
+  void dUrf(); //Display contents of unified registers
+  void dMap(); //Display Front end and Back end rename tables
 
   //create instance of R reg
   std::string getRenamed(std::string);
@@ -79,6 +78,8 @@ public:
 
   //method to set the number of physical registers in processor
   void setNumReg(int num); //sets phy_reg = num (default = 32)
+
+  std::string translateReg(std::string pReg); //Translates P reg to R reg for forwarding compares.
 
 };
 

@@ -79,9 +79,10 @@ bool IQ::dispatchInst(Stage &stage){
 	return false;
 }
 
+//FIX
 bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
-	int numIssued = 0;
 	bool hitArith = false;
+	bool hitStore = false;
 	bool advSuccess = false;
 	for (auto i = this->issue_queue.begin(); i != this->issue_queue.end();){
 		if (i->isReady()){
@@ -96,6 +97,10 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 				hitArith = true;
 			}
 
+			if(i->opcode == "STORE"){
+				hitStore = true;
+			}
+
 			//Arithmetic Opcodes
 			if(i->opcode == "ADD" ||
 				i->opcode == "SUB" ||
@@ -107,7 +112,7 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
-					numIssued++;
+					return true;
 				}
 			}
 			//Multiplication Opcode
@@ -116,16 +121,27 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
-					numIssued++;
+					return true;
 				}
 			}
-			//Memory Access Opcodes
-			if(i->opcode == "LOAD" || i->opcode == "STORE"){
+			//Load Opcode
+			if(i->opcode == "LOAD"){
+				if (hitStore == false){
+					advSuccess = i->advance(LSFU);
+
+					if ( advSuccess ){
+						this->issue_queue.erase(i);
+						return true;
+					}
+				}
+			}
+			//Store Opcode
+			if(i->opcode == "STORE"){
 				advSuccess = i->advance(LSFU);
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
-					numIssued++;
+					return true;
 				}
 			}
 			//Unconditional Branches Opcodes
@@ -135,7 +151,7 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
-					numIssued++;
+					return true;
 				}
 			}
 
@@ -147,19 +163,13 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
-					numIssued++;
+					return true;
 				}
 			}
 		}
-		if (numIssued > 2){
-			return true;
-		}
-
 		if (advSuccess == false){
 			++i;
 		}
-
-		advSuccess = false;
 	} //END for each entry in issue_queue
 
 	//Failed to issue instruction

@@ -184,7 +184,8 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
 
     #if (DEBUG)
       mycpu.display();
-      myregisters.dUrf();
+      //myregisters.dUrf();
+      //mydata.display(0, 100);
     #endif
 
     //cpu::simulate() returns 0 if execution should not continue
@@ -197,7 +198,7 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
 
     if(VERBOSE >= 2){
 	    mycpu.display();
-	    myregisters.display();
+	    myregisters.dUrf();
 	  }
   }
 
