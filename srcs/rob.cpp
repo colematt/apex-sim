@@ -17,6 +17,10 @@ ROB::~ROB(){}
 //Display the contents of the ROB
 //Each entry is a Stage, so we delegate the display call
 void ROB::display(){
+	if (VERBOSE >= 1){
+		std::cout << "Name: Opcode Operands" << std::endl;
+	}
+	
 	std::cout << "Head" << std::endl;
 	for (auto e : reorder_buffer){
 		e.display();

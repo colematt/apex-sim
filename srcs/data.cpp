@@ -41,6 +41,9 @@ Description: Contains the DATA class, which simulates reading and writing main m
     a1 = a1 - (a1 % 4);
     a2 = a2 - (a2 % 4);
 
+    if (VERBOSE >= 1)
+      std::cout << "Address: Value" << std::endl;
+
     //Display contents at address
     for (int addr = a1; addr <= a2; addr += 4){
         std::cout << addr << ": " << memory.at(addr) << std::endl;

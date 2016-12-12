@@ -25,7 +25,12 @@ bool IQ::isEmpty(){
 //Display the contents of the IQ
 //Each entry is a Stage, so we delegate the display logic
 void IQ::display(){
+	if (VERBOSE >= 1){
+		std::cout << "Name: Opcode Operands" << std::endl;
+	}
+	
 	std::cout << "Head" << std::endl;
+
 	for (auto e : issue_queue){
 		e.display();
 	}
@@ -175,7 +180,7 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 
 			//Conditional Branches Opcodes
 			if((i->opcode == "BZ" ||
-				i->opcode == "BNZ") 
+				i->opcode == "BNZ")
 				&& !hitArith){
 				advSuccess = i->advance(B);
 

@@ -19,8 +19,8 @@ Description: Header file to hold globally aware variables
 //VERBOSE 0 : No diagnostic output. Only output required by specification.
 //VERBOSE 1 : Some diagnostic output. Notify on each major action.
 //VERBOSE 2 : More diagnostic output. VERBOSE 1 + mini report after a cycle.
-//VERBOSE 3 : All diagnostic output. Currently equal to VERBOSE 2.
-#define VERBOSE 0
+//VERBOSE 3 : All diagnostic output.
+#define VERBOSE 1
 
 //Global variables
 extern int pc;    //STATE: program counter current value

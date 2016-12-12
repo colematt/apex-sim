@@ -181,13 +181,6 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
     if (VERBOSE >= 1)
       std::cout << "Simulating cycle " << cycle << " ..." << std::endl;
 
-    #if (DEBUG)
-      mycpu.display();
-      //myregisters.dMap();
-      //myregisters.dUrf();
-      mydata.display(0, 100);
-    #endif
-
     //cpu::simulate() returns 0 if execution should not continue
     //(EOF, HALT or exception encountered)
     if(mycpu.simulate(mycode, myregisters, mydata, myrob, myiq) == 0){
@@ -196,10 +189,15 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
       return 0;
     }
 
+    //Mini reports
     if(VERBOSE >= 2){
 	    mycpu.display();
 	    myregisters.dUrf();
 	  }
+    //Bigger mini report
+    if(VERBOSE >= 3){
+      mydata.display(0, 100);
+    }
   }
 
   return 1;
