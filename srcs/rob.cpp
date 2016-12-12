@@ -36,9 +36,16 @@ bool ROB::isEmpty(){
 //Remove head from ROB and call registers' commit function,
 //updating backend table and free list
 void ROB::commit(Registers &reg){
-	std::string pReg;
-	pReg = this->reorder_buffer.front().operands.at(0);
-	reg.commit(pReg);
+	std::string curOpcode = this->reorder_buffer.front().opcode;
+	if (curOpcode != "STORE" &&
+		curOpcode != "BZ" &&
+		curOpcode != "BNZ" &&
+		curOpcode != "BAL" &&
+		curOpcode != "JUMP"){
+		std::string pReg;
+		pReg = this->reorder_buffer.front().operands.at(0);
+		reg.commit(pReg);
+	}
 	this->reorder_buffer.pop_front();
 }
 

@@ -625,7 +625,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				F.opcode = instr.at(0);
 				for (int i=1;i<instr.size();i++){
 					if (instr.at(i) != " ")
-						F.operands.push_back(instr.at(i));
+						F.operands.at(i - 1) = instr.at(i);
 				}
 				F.empty = false;
 				F.ready = true;
