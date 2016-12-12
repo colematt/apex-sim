@@ -700,7 +700,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	}
 	// --> MUL1 (ALU2.dst == MUL1.srcs)
 	if (MUL1.opcode == "MUL"){
-		if (MUL.operands.at(1) == ALU2.operands.at(0)){
+		if (MUL1.operands.at(1) == ALU2.operands.at(0)){
 			MUL1.values.at(1) = ALU2.values.at(0);
 			MUL1.valids.at(1) = ALU2.valids.at(0);
 		}
