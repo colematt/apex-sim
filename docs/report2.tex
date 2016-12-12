@@ -142,7 +142,7 @@ This function is broken up into four phases, each providing one general task of 
 \subsubsection{Forwarding}
 Stages attempt to forward. 
 Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwarding from later stages to earlier stages in order to reduce bubbles caused by waiting for flow dependencies to resolve. 
-In \codename this is accomplished in \texttt{simulate.cpp} during the forwarding phase (lines \todo{Add forwarding code's line numbers}). 
+In \codename this is accomplished in \texttt{simulate.cpp} during the forwarding phase (\texttt{simulate.cpp:13-717}).
 The instructions' source sets and destination sets are enumerated in table \ref{tab:instsets}.
 
 \begin{table}
@@ -202,7 +202,7 @@ The instructions' source sets and destination sets are enumerated in table \ref{
 \subsubsection{Committing}
 In this phase, the stages' contents of each of the four WB stages are compared to the ROB's head. If the stage is ready, not empty, and the opcode and timestamp match between stage and ROB head, the instruction is committed.
 Committing allows register values to writeback, allows memory access for the LSFU, deallocates registers back into the free list, pops the ROB head, and empties the WB stage.
-This phase occurs in lines \todo{add committing source code line numbers}, and takes advantage of the ROB class' \texttt{commit()} function to perform each of the tasks listed above.
+This phase occurs in \texttt{simulate.cpp:719-763}, and takes advantage of the ROB class' \texttt{commit()} function to perform each of the tasks listed above.
 
 \subsubsection{Advancing}
 Next, stages other than those which commit are allowed to advance.
@@ -213,12 +213,12 @@ Advancing occurs only if the following conditions are all met:
   \item The receiving stage is empty (i.e. it advanced its contents in this cycle or a previous cycle).
 \end{itemize}
 Advancing takes advantage of the Stage class' \texttt{advance()} function to perform this logic and to copy contents.
-This phase occurs in lines \todo{add advancing phase source code lines}.
+This phase occurs in \texttt{simulate.cpp:765-916}.
 
 \subsubsection{Working}
 Then, stages perform their work as one might expect. 
 For example, the ALU performs either arithmetic, logical operations or a constant move into a register.
-Other stages have their own working phase tasks, and they can be seen in lines \todo{add working phase source code lines}.
+Other stages have their own working phase tasks, and they can be seen in \texttt{simualte.cpp:918-1296}.
 
 
 \subsection{Register Renaming and Allocation}
