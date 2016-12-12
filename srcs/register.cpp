@@ -6,6 +6,7 @@ Description: Contains the Registers class, which simulates operation of a regist
 */
 
 #include "register.h"
+#include "apex.h"
 
 Registers::Registers(){
   this->initialize();
@@ -24,14 +25,14 @@ void Registers::initialize(){
   this->reg_file.clear();
 
   //Flush free list
-  std::priority_queue<std::string, std::vector<std::string>, CompareString> flush_list;
+  std::deque<std::string> flush_list;
   free_list = flush_list;
 
   //Set general purpose register values and valids
   for (int r=0; r< (num_reg); r++){
     reg_name = "P" + std::to_string(r);
     this->reg_file[reg_name] = std::make_tuple(0, true);
-    this->free_list.push(reg_name); //Populate free list
+    this->free_list.push_back(reg_name); //Populate free list
   }
 
   //Set flag and special register values and valids
@@ -40,9 +41,14 @@ void Registers::initialize(){
 
 void Registers::dUrf(){
   std::string myname = "";
+  std::string myRname = "";
   int myvalue = 0;
   bool myvalid = true;
   std::string holder = "";
+
+  if (VERBOSE >= 1){
+    std::cout << "Register : Value,Valid;Status" << std::endl;
+  }
   
   for (auto it = this->reg_file.begin(); it != this->reg_file.end(); ++it) {
     myname = it->first;
@@ -62,13 +68,17 @@ void Registers::dUrf(){
             holder = "Allocated";
           }
         }
+      }
 
-        if (holder == ""){
+        
+      for (auto fl = free_list.begin(); fl != this->free_list.end(); ++fl){
+        if (*fl == myname){
           holder = "Free";
         }
       }
       std::cout << holder << std::endl;
     }
+    holder = "";
   }
   holder = "";
 }
@@ -77,12 +87,20 @@ void Registers::dMap(){
   std::string reg1 = "";
   std::string reg2 = "";
 
+  if (VERBOSE >= 1){
+    std::cout << "Physical : Architectural" << std::endl;
+  }
+
   std::cout << "Front End Rename Table" << std::endl;
   for (auto it = this->front_end.begin(); it != this->front_end.end(); ++it){
     reg1 = it->first;
     reg2 = it->second;
 
     std::cout << reg1 << " : " << reg2 << std::endl;
+  }
+
+  if (VERBOSE >= 1){
+    std::cout << "Architectural : Physical" << std::endl;
   }
 
   std::cout << "Back End Rename Table" << std::endl;
@@ -99,8 +117,8 @@ std::string Registers::getRenamed(std::string rReg){
   std::string physReg;
   std::string regHolder;
 
-  physReg = this->free_list.top();
-  this->free_list.pop();
+  physReg = this->free_list.front();
+  this->free_list.pop_front();
 
   //Update or insert pReg value with physReg as key and archReg as value
   this->front_end[physReg] = rReg;
@@ -137,7 +155,8 @@ void Registers::commit(std::string pReg){
     auto ittt = this->front_end.find(prevReg);
     if (ittt != this->front_end.end()){
       this->front_end.erase(ittt);
-      this->free_list.push(prevReg);
+      this->free_list.push_back(prevReg);
+      std::sort(free_list.begin(), free_list.end(), compareString);
     }
   }
   
@@ -152,7 +171,8 @@ bool Registers::deallocate(std::string reg){
     auto it = this->front_end.find(reg);
     if (it != this->front_end.end()){
       this->front_end.erase(it); //Remove rename entry from front end table
-      this->free_list.push(reg); //Push P reg back into free list
+      this->free_list.push_back(reg);
+      std::sort(free_list.begin(), free_list.end(), compareString);
       return true;
 
     } else {

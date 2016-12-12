@@ -11,8 +11,9 @@ Description: header file for register.cpp
 #include <tuple>
 #include <exception>
 #include <stdexcept>
-#include <queue>
+#include <deque>
 #include <vector>
+#include <algorithm>
 
 #ifndef REGISTER_H
 #define REGISTER_H
@@ -30,7 +31,7 @@ private:
 
       return i1 > i2;
     }
-  };
+  }compareString;
 
   //register := {string name:(int value, bool valid)}
   std::map<std::string, std::tuple<int,bool>> reg_file;
@@ -42,7 +43,7 @@ private:
   std::map<std::string, std::string> back_end;
 
   //holds list of physical registers that are ready to to be used
-  std::priority_queue<std::string, std::vector<std::string>, CompareString> free_list;
+  std::deque<std::string> free_list;
 
   //Number of physical registers, default=32
   int num_reg = 32;
