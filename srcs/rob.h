@@ -28,7 +28,7 @@ public:
 	//Utility functions
 	bool isEmpty();
 	void commit(Registers &reg);
-	void addStage(Stage &stage);
+	bool addStage(Stage &stage);
 	bool match(Stage& stage);
 	void flush(int cycle);
 };

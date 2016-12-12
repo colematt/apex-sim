@@ -16,6 +16,7 @@ Description: Header file for iq.cpp
 class IQ{
 private:
 	std::deque<Stage> issue_queue;
+	int max_size = 12;
 
 public:
 	IQ();
@@ -27,7 +28,7 @@ public:
 
 	// Utility functions
 	bool isEmpty();
-	void dispatchInst(Stage &stage);
+	bool dispatchInst(Stage &stage);
 	void updateSrc(std::string reg, int val);
 	bool issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B);
 	void flush(int cycle, Registers &rf);

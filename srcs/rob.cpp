@@ -43,10 +43,12 @@ void ROB::commit(Registers &reg){
 }
 
 //Add a Stage instance to ROB
-void ROB::addStage(Stage &stage){
+bool ROB::addStage(Stage &stage){
 	if (this->reorder_buffer.size() < this->max_size){
 		this->reorder_buffer.push_back(stage);
+		return true;
 	}
+	return false;
 }
 
 //Given a cycle value gets cycle value of current head
