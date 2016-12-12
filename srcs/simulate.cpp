@@ -630,7 +630,12 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/*FORWARDING PHASE************************************************************
 	******************************************************************************
 	*****************************************************************************/
+
+	// Defined at the top of this file
+	// FORWARDING 1 : forwarding occurs
+	// FORWARDING 0 : forwarding does not occur
 	#if FORWARDING
+
 	/****B2 --> ****/
 	//--> B1 handled by immediately committing X register
 
@@ -785,6 +790,45 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****MUL2 --> ****/
 	// --> IQ (MUL2.op[0] == IQ.entry.{srcs})
+	for (auto &entry: myiq.issue_queue){
+		if (entry.opcode == "ADD" ||
+				entry.opcode == "SUB" ||
+				entry.opcode == "MUL" ||
+				entry.opcode == "AND" ||
+				entry.opcode == "OR" ||
+				entry.opcode == "EX-OR"){
+			if (entry.operands.at(1) == MUL2.operands.at(0)){
+				entry.values.at(1) = MUL2.values.at(0);
+				entry.valids.at(1) = MUL2.valids.at(0);
+			}
+			if (entry.operands.at(2) == MUL2.operands.at(0)){
+				entry.values.at(2) = MUL2.values.at(0);
+				entry.valids.at(2) = MUL2.valids.at(0);
+			}
+		}
+		if (entry.opcode == "LOAD"){
+			if (entry.operands.at(1) == MUL2.operands.at(0)){
+				entry.values.at(1) = MUL2.values.at(0);
+				entry.valids.at(1) = MUL2.valids.at(0);
+			}
+		}
+		if (entry.opcode == "STORE"){
+			if (entry.operands.at(1) == MUL2.operands.at(0)){
+				entry.values.at(1) = MUL2.values.at(0);
+				entry.valids.at(1) = MUL2.valids.at(0);
+			}
+			if (entry.operands.at(2) == MUL2.operands.at(0)){
+				entry.values.at(2) = MUL2.values.at(0);
+				entry.valids.at(2) = MUL2.valids.at(0);
+			}
+		}
+		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+			if (entry.operands.at(0) == MUL2.operands.at(0)){
+				entry.values.at(0) = MUL2.values.at(0);
+				entry.valids.at(0) = MUL2.valids.at(0);
+			}
+		}
+	}
 
 	/****MUL1 (lcounter == 0) --> ****/
 	// --> ALU1 (MUL1.dst == ALU1.srcs)
