@@ -79,62 +79,6 @@ bool IQ::dispatchInst(Stage &stage){
 	return false;
 }
 
-//Forward the value of an R reg that was computed from an FU
-//If an instruction is found to have an R reg that is being forwarded
-//Set value and valid bit for associated operand fields
-void IQ::updateSrc(std::string reg, int val){
-	if (issue_queue.size() > 0){
-		for (auto& e : issue_queue){
-
-			//Handle forward to arithmatic instructions in IQ
-			if(e.opcode == "ADD" ||
-				e.opcode == "SUB" ||
-				e.opcode == "MUL" ||
-				e.opcode == "AND" ||
-				e.opcode == "OR" ||
-				e.opcode == "EX-OR"){
-				if(e.operands.at(1) == reg){
-					e.values.at(1) = val;
-					e.valids.at(1) = true;
-				}
-				if(e.operands.at(2) == reg){
-					e.values.at(2) = val;
-					e.valids.at(2) = true;
-				}
-			}
-
-			//Handle forward to LOAD instruction in IQ
-			if(e.opcode == "LOAD"){
-				if(e.operands.at(1) == reg){
-					e.values.at(1) = val;
-					e.valids.at(1) = true;
-				}
-			}
-
-			//Handle forward to branch instructions in IQ
-			if(e.opcode == "BAL" ||
-				e.opcode == "JUMP"){
-				if(e.operands.at(0) == reg){
-					e.values.at(0) = val;
-					e.valids.at(0) = true;
-				}
-			}
-
-			//Handle forward to STORE instructions in IQ
-			if(e.opcode == "STORE"){
-				if(e.operands.at(0) == reg){
-					e.values.at(0) = val;
-					e.valids.at(0) = true;
-				}
-				if(e.operands.at(1) == reg){
-					e.values.at(1) = val;
-					e.valids.at(1) = true;
-				}
-			}
-		}
-	}
-}
-
 bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 	int numIssued = 0;
 	bool hitArith = false;
