@@ -23,6 +23,10 @@ void Registers::initialize(){
   //Purge reg_file
   this->reg_file.clear();
 
+  //Flush free list
+  std::priority_queue<std::string, std::vector<std::string>, CompareString> flush_list;
+  free_list = flush_list;
+
   //Set general purpose register values and valids
   for (int r=0; r< (num_reg); r++){
     reg_name = "P" + std::to_string(r);
@@ -110,7 +114,6 @@ std::string Registers::getRenamed(std::string rReg){
   int valueCarry = 0;
 
   physReg = this->free_list.top();
-
   this->free_list.pop();
 
   //Update or insert pReg value with physReg as key and archReg as value

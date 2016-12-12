@@ -424,7 +424,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		if (LSFU1.opcode == "LOAD") {
 			LSFU1.values.at(1) = LSFU1.values.at(1) + LSFU1.values.at(2);
 			LSFU1.valids.at(1) = true;
-		} else if (LSFU2.opcode == "STORE") {
+		} else if (LSFU1.opcode == "STORE") {
 			LSFU1.values.at(1) = LSFU1.values.at(1) + LSFU1.values.at(2);
 			LSFU1.valids.at(1) = true;
 		} else {
@@ -595,6 +595,16 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		DRF1.operands.at(0) = myregisters.getRenamed(DRF1.operands.at(0));
 		DRF1.ready = true;
 		}
+
+		if (DRF1.opcode == "STORE" ||
+			DRF1.opcode == "BZ" ||
+			DRF1.opcode == "BNZ" ||
+			DRF1.opcode == "BAL" ||
+			DRF1.opcode == "JUMP" ||
+			DRF1.opcode == "HALT"){
+			DRF1.ready = true;
+		}
+
 	}
 
 	/****F STAGE****/

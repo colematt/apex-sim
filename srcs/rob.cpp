@@ -38,8 +38,8 @@ bool ROB::isEmpty(){
 void ROB::commit(Registers &reg){
 	std::string pReg;
 	pReg = this->reorder_buffer.front().operands.at(0);
-	this->reorder_buffer.pop_front();
 	reg.commit(pReg);
+	this->reorder_buffer.pop_front();
 }
 
 //Add a Stage instance to ROB
