@@ -224,7 +224,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****B1 STAGE****/
 	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
-		//Opcode is good,
+		//Perform branching logic
 		//Branch conditional is true or unconditionally taken
 		if ((B1.opcode == "BZ" && Z == 0) ||
 				(B1.opcode == "BNZ" && Z != 0) ||
@@ -258,18 +258,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			}
 			else {}
 
-			// Reset the halting flag
-			is_halting = false;
-
-			// Set B1 as ready
+			//Set B1 as ready
 			B1.ready = true;
 		}
-		// Opcode is good, but branch conditional is false
-		// Set the stage as ready
+		//Branch conditional is false
 		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
 			B1.ready = true;
 		}
-		//Opcode isn't good: it isn't one of BZ, BNZ, BAL, JUMP
+		//Opcode is not one of BZ, BNZ, BAL, JUMP
 		else{
 			std::cerr << "Unrecognized opcode " << B1.opcode << " at B1 WORKING phase" << std::endl;
 			B1.ready = false;
@@ -439,66 +435,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 
 		LSFU1.ready = true;
-	}
-
-
-	/****B2 STAGE****/
-	if (--(B2.lcounter) <= 0 && !B2.isEmpty()) {
-		//Writeback X register
-		if (B2.opcode == "BAL") {
-			myregisters.write("X", (B2.pc)+4, true);
-		}
-		B2.ready = true;
-	}
-
-	/****B1 STAGE****/
-	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
-		//Perform branching logic
-		//Branch conditional is true or unconditionally taken
-		if ((B1.opcode == "BZ" && Z == 0) ||
-				(B1.opcode == "BNZ" && Z != 0) ||
-				(B1.opcode == "BAL") ||
-				(B1.opcode == "JUMP")){
-			// Flush the ROB, IQ
-			myrob.flush(B1.c);
-			myiq.flush(B1.c, myregisters);
-
-			// For each non-branch stage,
-			// flush instructions if its timestamp
-			// is after B1 stage's timestamp
-			ALU3.flush(B1.c, myregisters);
-			ALU2.flush(B1.c, myregisters);
-			ALU1.flush(B1.c, myregisters);
-			MUL2.flush(B1.c, myregisters);
-			MUL1.flush(B1.c, myregisters);
-			LSFU3.flush(B1.c, myregisters);
-			LSFU2.flush(B1.c, myregisters);
-			LSFU1.flush(B1.c, myregisters);
-			DRF2.flush(B1.c, myregisters);
-			DRF1.flush(B1.c, myregisters);
-			F.flush(B1.c, myregisters);
-
-			//Set global pc based on B1.opcode (and local B1.pc)
-			if(B1.opcode == "BZ" || B1.opcode == "BNZ"){
-				pc = B1.pc + B1.values.at(0);
-			}
-			else if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
-				pc = B1.values.at(0) + B1.values.at(1);
-			}
-			else {}
-
-			//Set B1 as ready
-			B1.ready = true;
-		}
-		//Branch conditional is false
-		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
-			B1.ready = true;
-		}
-		//Opcode is not one of BZ, BNZ, BAL, JUMP
-		else{
-			std::cerr << "Unrecognized opcode " << B1.opcode << " at B1 WORKING phase" << std::endl;
-			B1.ready = false;
-		}
 	}
 
 	/****DRF2 STAGE****/
