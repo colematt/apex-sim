@@ -3,6 +3,8 @@
 #include "cpu.h"
 #include "apex.h"
 
+#define FORWARDING 1
+
 int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	ROB &myrob, IQ &myiq){
 
@@ -619,39 +621,81 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	/*FORWARDING PHASE************************************************************
 	******************************************************************************
 	*****************************************************************************/
-
-	/****ROB --> ****/
-
+	#if FORWARDING
 	/****B2 --> ****/
-	//--> B1
-
-	/****B1 --> ****/
+	//--> B1 handled by immediately committing X register
 
 	/****ALU3 --> ****/
+	// --> IQ (ALU3.dst = IQ.entry.src)
+	for (auto &entry: myiq.issue_queue){
+		if (entry.opcode == "ADD" ||
+				entry.opcode == "SUB" ||
+				entry.opcode == "MUL" ||
+				entry.opcode == "AND" ||
+				entry.opcode == "OR" ||
+				entry.opcode == "EX-OR"){
+			if ALU3.operands.at(0) == entry.operands.at(1){
+				entry.values.at(1) = ALU3.values.at(0);
+				entry.valids.at(1) = ALU3.valids.at(0);
+			}
+			if ALU3.operands.at(0) == entry.operands.at(2){
+				entry.values.at(2) = ALU3.values.at(0);
+				entry.valids.at(2) = ALU3.valids.at(0);
+			}
+		}
+		if (entry.opcode == "LOAD"){
+			if ALU3.operands.at(0) == entry.operands.at(1){
+				entry.values.at(1) = ALU3.values.at(0);
+				entry.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		if (entry.opcode == "STORE"){
+			if ALU3.operands.at(0) == entry.operands.at(1){
+				entry.values.at(1) = ALU3.values.at(0);
+				entry.valids.at(1) = ALU3.valids.at(0);
+			}
+			if ALU3.operands.at(0) == entry.operands.at(2){
+				entry.values.at(2) = ALU3.values.at(0);
+				entry.valids.at(2) = ALU3.valids.at(0);
+			}
+		}
+		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+			if ALU3.operands.at(0) == entry.operands.at(0){
+				entry.values.at(0) = ALU3.values.at(0);
+				entry.valids.at(0) = ALU3.valids.at(0);
+			}
+		}
+	}
 
 	/****ALU2 --> ****/
-
-	/****ALU1 --> ****/
+	// --> ALU1 (ALU2.dst == ALU1.srcs)
+	// --> MUL1 (ALU2.dst == MUL1.srcs)
+	// --> B1   (B1.opcode == {BAL,JUMP}, ALU2.dst == B1.srcs)
+	// --> LSFU2 (LSFU2.opcode == {LOAD}, ALU2.dst == LSFU2.srcs)
+	// --> LSFU2 (LSFU2.opcode == {STORE}, ALU2.dst == LSFU2.srcs)
+	// --> LSFU1 (LSFU1.opcode == {LOAD}, ALU2.dst == LSFU1.srcs)
+	// --> LSFU1 (LSFU1.opcode == {STORE}, ALU2.dst == LSFU1.srcs)
+	// --> IQ (ALU2.op[0] == IQ.entry.{srcs})
 
 	/****MUL2 --> ****/
+	// --> IQ (MUL2.op[0] == IQ.entry.{srcs})
 
-	/****MUL1 --> ****/
+	/****MUL1 (lcounter == 0) --> ****/
+	// --> ALU1 (MUL1.dst == ALU1.srcs)
+	// --> B1 (MUL1.dst = B1.srcs)
+	// --> LSFU2 (MUL1.dst = LSFU2.srcs)
+	// --> LSFU1 (MUL1.dst = LSFU1.srcs)
 
 	/****LSFU3 --> ****/
+	// --> LSFU2 (LSFU3.opcode == LOAD, LSFU2.opcode == STORE, LSFU3.dst = LSFU2.srcs)
+	// --> ALU1 (LSFU3.opcode == LOAD, LSFU3.dst == ALU1.srcs)
+	// --> MUL1 (LSFU3.opcode == LOAD, LSFU3.dst == MUL1.srcs)
+	// --> LSFU1 (LSFU1.opcode == LOAD, )
+	// --> LSFU1 (LSFU1.opcode == STORE, )
+	// --> IQ
 
-	/****LSFU2 --> ****/
-
-	/****LSFU1 --> ****/
-
-	/****IQ --> ****/
-
-	/****DRF2 --> ****/
-
-	/****DRF1 --> ****/
-
-	/****F --> ****/
-
-
+	#endif
+	
 	/*STOPPING PHASE**************************************************************
 	******************************************************************************
 	*****************************************************************************/
