@@ -223,6 +223,13 @@ Other stages have their own working phase tasks, and they can be seen in lines \
 
 \subsection{Register Renaming and Allocation}
 \label{sec:renamealloc}
+We use the free list to determine if a physical register can be allocated as a stand-in for an architectural register. 
+If it can, the register is removed from the free list, and mappings are updated in the front-end and back-end rename tables. 
+After the instruction using that physical register as a source reaches the commit step, the physical register is deallocated by making sure that the mappings are updated, and the register is added to the free list. 
+When the register is added to the free-list, the list is sorted to ensure that lower-numbered physical registers are preferentially used.
+While this is not required to strictly support register renaming, we have done so to support deterministic evaluation.
+These operations are enabled by use of the Registers class' \texttt{getRenamed()}, \texttt{commit()} and \texttt{deallocate()} functions.
+Furthermore, both physical and architectural registers have respective write, read and validity check accessors and mutators for reading and writing to the register file.
 
 \subsection{Dispatch}
 Instructions are dispatched from the DRF2 stage to the IQ using the IQ class' \texttt{dispatchInst(Stage\&)} function when DRF2 is ready and not empty. 
