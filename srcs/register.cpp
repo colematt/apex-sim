@@ -63,8 +63,8 @@ void Registers::dUrf(){
           holder = "Free";
         }
       }
+      std::cout << holder << std::endl;
     }
-  std::cout << holder << std::endl;
   }
   holder = "";
 }
@@ -106,7 +106,6 @@ void Registers::display(){
 //Create new instance of an R reg
 std::string Registers::getRenamed(std::string rReg){
   std::string physReg;
-  std::string archReg;
   std::string regHolder;
   int valueCarry = 0;
 
@@ -115,7 +114,7 @@ std::string Registers::getRenamed(std::string rReg){
   this->free_list.pop();
 
   //Update or insert pReg value with physReg as key and archReg as value
-  this->front_end[physReg] = archReg;
+  this->front_end[physReg] = rReg;
   this->reg_file[physReg] = std::make_tuple(0, false);
 
   //Check back end to see if there is commited value for R reg

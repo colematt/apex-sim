@@ -168,9 +168,18 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 	} // DRF2 control flow instruction handling
 	else {
+		bool inIQ = false;
+		bool inROB = false;
 		if (DRF2.isReady() && !DRF2.isEmpty()){
 			//Advance the contents of DRF2 into the IQ
-			myiq.dispatchInst(DRF2);
+			if( inIQ == false){
+				inIQ = myiq.dispatchInst(DRF2);
+			}
+
+			//Advance the contents of DRF2 into the ROB
+			if( inROB == false){
+				inROB = myrob.addStage(DRF2);
+			}
 
 			//Empty DRF2
 			DRF2.empty = true;

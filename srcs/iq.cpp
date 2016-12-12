@@ -207,11 +207,12 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 				}
 			}
 		}
-		else{
-			++i;
-		} //this entry is not ready
 		if (numIssued > 2){
 			return true;
+		}
+
+		if (advSuccess == false){
+			++i;
 		}
 
 		advSuccess = false;
