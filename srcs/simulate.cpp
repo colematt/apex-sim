@@ -661,11 +661,13 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		}
 	}
 	//--> IQ (X is in IQ.entry.srcs)
-	for (auto &entry : myiq.issue_queue){
-		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-			if (entry.operands.at(0) == "X"){
-				entry.values.at(0) = (B2.pc)+4;
-				entry.valids.at(0) = true;
+	if (B2.opcode == "BAL"){
+		for (auto &entry : myiq.issue_queue){
+			if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+				if (entry.operands.at(0) == "X"){
+					entry.values.at(0) = (B2.pc)+4;
+					entry.valids.at(0) = true;
+				}
 			}
 		}
 	}
