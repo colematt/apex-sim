@@ -90,15 +90,41 @@ The \codename entry point file is \texttt{main.cpp}. Besides maintaining simulat
 \codename models each major component of the APEX system as a standalone class. Unless mentioned below, these classes did not change appreciably from release v1.0 and are not discussed further in this report. Please see the release v1.0 documentation for discussion of these unchanged classes.
 
 \subsubsection{Issue Queue}
+\codename's issue queue (IQ) uses C++11's Standard Template Library (STL) deque container to model a priority queue. 
+Each entry in the deque is a Stage class instance. 
+This allows inflight instructions to seamlessly dispatch from the DRF2 stage into the IQ, and issue out into one of the function units. 
+Entries are inherently sorted by timestamp of fetching, ensuring that removing entries with earlier program-ordered are preferentially removed before later program-ordered instructions if both are ready. 
+Additionally, this mechanism allows us to determine if an later \texttt{LOAD} instruction is attempting to bypass an earlier \texttt{STORE} instruction and prevent its issue. 
+The use of the deque container was precipitated by the queue container not having a standard iterator.
 
 \subsubsection{Reorder Buffer}
-
-\subsubsection{Data}
+The reorder buffer (ROB) likewise uses a deque container for the same design reasons as the IQ, however it is a strict FIFO queue. 
+This allows instructions which may have been issued out-of-program order to be committed in-program order. 
+Whenever an entry is made in the IQ, a parallel entry is made and queued in the ROB. 
+This ensures that the head of the ROB always points to the earliest dispatched instruction. 
+Each of the function units' (FU) writeback (WB) stage contents are compared by opcode and timestamp to the ROB head once they become ready. 
+When a match occurs, this allows that FU to commit its contents to the back-end register file and de-queue the ROB entry. 
+In the case of the LSFU, it also allows memory access to occur.
+This enforces memory in-order execution.
 
 \subsubsection{Registers}
+The Registers class retains its basic structure as a register file, using an STL::map whose key is a register "tag" (a string), and whose value is a two-tuple of value (an integer) and validity (a bool).
+However, in phase two, we added three components.
+First, a front-end rename table mapping physical register tag to architectural register tag (STL::map).
+Second, a back-end rename table mapping architectural register tag to physical register tag (STL::map).
+Third, a free list (STL::vector), listing free physical registers, sorted by their tag's integral value.
+This assures that the lowest numbered physical register is preferentially allocated.
 
 \subsubsection{CPU and Stages}
-
+The functionality and design of the Stage class is largely unchanged from phase 1. 
+However, the CPU's structure changed dramatically from phase 1.
+\begin{itemize}
+  \item DRF stage was split into two stages.
+  \item MUL FU was split from the larger ALU FU.
+  \item MEM stage was replaced by a LSFU.
+  \item WB stage was replaced by a specialized WB stage for each FU
+\end{itemize}
+Figure \ref{fig:overview} shows the interactions between these new classes.
 
 %-----------------------
 \section{Implementation}
@@ -115,7 +141,7 @@ In this section, we will discuss key aspects of our simulator's execution: the s
 \subsubsection{Working}
 
 \subsubsection{Forwarding}
-Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwarding from later stages to earlier stages in order to reduce bubbles caused by waiting for flow dependencies to resolve. In \codename, this is accomplished in \texttt{simulate.cpp} during the forwarding phase (lines \todo{Add line numbers}).
+Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwarding from later stages to earlier stages in order to reduce bubbles caused by waiting for flow dependencies to resolve. In \codename this is accomplished in \texttt{simulate.cpp} during the forwarding phase (lines \todo{Add forwarding code's line numbers}). The instructions' source sets and destination sets are enumerated in table \ref{tab:instsets}.
 
 \begin{table}
   \centering
@@ -148,8 +174,9 @@ Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwar
     \hline
     LSFU3 & LSFU2 & LSFU3's destination set has a union with LSFU2's source set. \\
     LSFU3 & LSFU1 & LSFU3's destination set has a union with LSFU1's source set. \\
-    
-    
+    LSFU3 & ALU1 & LSFU3's destination set has a union with ALU1's source set. \\
+    LSFU3 & MUL1 & LSFU3's destination set has a union with MUL1's source set. \\
+    LSFU3 & LIQ & LSFU3's destination set has a union with an entry in the IQ's source set. \\
   \end{tabular}
 \end{table}
 
