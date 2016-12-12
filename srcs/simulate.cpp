@@ -549,7 +549,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 			DRF2.values.at(1) = myregisters.read(DRF2.operands.at(1));
 			DRF2.valids.at(1) = myregisters.isValid(DRF2.operands.at(1));
-			
+
 
 			DRF2.values.at(2) = DRF2.littoi(DRF2.operands.at(2));
 			DRF2.valids.at(2) = true;
@@ -643,33 +643,33 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				entry.opcode == "AND" ||
 				entry.opcode == "OR" ||
 				entry.opcode == "EX-OR"){
-			if ALU3.operands.at(0) == entry.operands.at(1){
+			if (entry.operands.at(1) == ALU3.operands.at(0)){
 				entry.values.at(1) = ALU3.values.at(0);
 				entry.valids.at(1) = ALU3.valids.at(0);
 			}
-			if ALU3.operands.at(0) == entry.operands.at(2){
+			if (entry.operands.at(2) == ALU3.operands.at(0)){
 				entry.values.at(2) = ALU3.values.at(0);
 				entry.valids.at(2) = ALU3.valids.at(0);
 			}
 		}
 		if (entry.opcode == "LOAD"){
-			if ALU3.operands.at(0) == entry.operands.at(1){
+			if (entry.operands.at(1) == ALU3.operands.at(0)){
 				entry.values.at(1) = ALU3.values.at(0);
 				entry.valids.at(1) = ALU3.valids.at(0);
 			}
 		}
 		if (entry.opcode == "STORE"){
-			if ALU3.operands.at(0) == entry.operands.at(1){
+			if (entry.operands.at(1) == ALU3.operands.at(0)){
 				entry.values.at(1) = ALU3.values.at(0);
 				entry.valids.at(1) = ALU3.valids.at(0);
 			}
-			if ALU3.operands.at(0) == entry.operands.at(2){
+			if (entry.operands.at(2) == ALU3.operands.at(0)){
 				entry.values.at(2) = ALU3.values.at(0);
 				entry.valids.at(2) = ALU3.valids.at(0);
 			}
 		}
 		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-			if ALU3.operands.at(0) == entry.operands.at(0){
+			if (entry.operands.at(0) == ALU3.operands.at(0)){
 				entry.values.at(0) = ALU3.values.at(0);
 				entry.valids.at(0) = ALU3.valids.at(0);
 			}
@@ -678,13 +678,110 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 
 	/****ALU2 --> ****/
 	// --> ALU1 (ALU2.dst == ALU1.srcs)
+	if (ALU1.opcode != "MOVC"){
+		if (ALU1.operands.at(1) == ALU2.operands.at(0)){
+			ALU1.values.at(1) = ALU2.values.at(0);
+			ALU1.valids.at(1) = ALU2.valids.at(0);
+		}
+		if (ALU1.operands.at(2) == ALU2.operands.at(0)){
+			ALU1.values.at(2) = ALU2.values.at(0);
+			ALU1.valids.at(2) = ALU2.valids.at(0);
+		}
+	}
 	// --> MUL1 (ALU2.dst == MUL1.srcs)
+	if (MUL1.opcode == "MUL"){
+		if (MUL.operands.at(1) == ALU2.operands.at(0)){
+			MUL1.values.at(1) = ALU2.values.at(0);
+			MUL1.valids.at(1) = ALU2.valids.at(0);
+		}
+		if (MUL1.operands.at(2) == ALU2.operands.at(0)){
+			MUL1.values.at(2) = ALU2.values.at(0);
+			MUL1.valids.at(2) = ALU2.valids.at(0);
+		}
+	}
 	// --> B1   (B1.opcode == {BAL,JUMP}, ALU2.dst == B1.srcs)
+	if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+		if (B1.operands.at(0) == ALU2.operands.at(0)){
+			B1.values.at(0) = ALU2.values.at(0);
+			B1.valids.at(0) = ALU2.valids.at(0);
+		}
+	}
 	// --> LSFU2 (LSFU2.opcode == {LOAD}, ALU2.dst == LSFU2.srcs)
+	if (LSFU2.opcode == "LOAD"){
+		if (LSFU2.operands.at(1) == ALU2.operands.at(0)){
+			LSFU2.values.at(1) = ALU2.values.at(0);
+			LSFU2.valids.at(1) = ALU2.valids.at(0);
+		}
+	}
 	// --> LSFU2 (LSFU2.opcode == {STORE}, ALU2.dst == LSFU2.srcs)
+	if (LSFU2.opcode == "STORE"){
+		if (LSFU2.operands.at(0) == ALU2.operands.at(0)){
+			LSFU2.values.at(0) = ALU2.values.at(0);
+			LSFU2.valids.at(0) = ALU2.valids.at(0);
+		}
+		if (LSFU2.operands.at(1) == ALU2.operands.at(0)){
+			LSFU2.values.at(1) = ALU2.values.at(0);
+			LSFU2.valids.at(1) = ALU2.valids.at(0);
+		}
+	}
 	// --> LSFU1 (LSFU1.opcode == {LOAD}, ALU2.dst == LSFU1.srcs)
+	if (LSFU1.opcode == "LOAD"){
+		if (LSFU1.operands.at(1) == ALU2.operands.at(0)){
+			LSFU1.values.at(1) = ALU2.values.at(0);
+			LSFU1.valids.at(1) = ALU2.valids.at(0);
+		}
+	}
 	// --> LSFU1 (LSFU1.opcode == {STORE}, ALU2.dst == LSFU1.srcs)
+	if (LSFU1.opcode == "STORE"){
+		if (LSFU1.operands.at(0) == ALU2.operands.at(0)){
+			LSFU1.values.at(0) = ALU2.values.at(0);
+			LSFU1.valids.at(0) = ALU2.valids.at(0);
+		}
+		if (LSFU1.operands.at(1) == ALU2.operands.at(0)){
+			LSFU1.values.at(1) = ALU2.values.at(0);
+			LSFU1.valids.at(1) = ALU2.valids.at(0);
+		}
+	}
 	// --> IQ (ALU2.op[0] == IQ.entry.{srcs})
+	for (auto &entry: myiq.issue_queue){
+		if (entry.opcode == "ADD" ||
+				entry.opcode == "SUB" ||
+				entry.opcode == "MUL" ||
+				entry.opcode == "AND" ||
+				entry.opcode == "OR" ||
+				entry.opcode == "EX-OR"){
+			if (entry.operands.at(1) == ALU2.operands.at(0)){
+				entry.values.at(1) = ALU2.values.at(0);
+				entry.valids.at(1) = ALU2.valids.at(0);
+			}
+			if (entry.operands.at(2) == ALU2.operands.at(0)){
+				entry.values.at(2) = ALU2.values.at(0);
+				entry.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+		if (entry.opcode == "LOAD"){
+			if (entry.operands.at(1) == ALU2.operands.at(0)){
+				entry.values.at(1) = ALU2.values.at(0);
+				entry.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		if (entry.opcode == "STORE"){
+			if (entry.operands.at(1) == ALU2.operands.at(0)){
+				entry.values.at(1) = ALU2.values.at(0);
+				entry.valids.at(1) = ALU2.valids.at(0);
+			}
+			if (entry.operands.at(2) == ALU2.operands.at(0)){
+				entry.values.at(2) = ALU2.values.at(0);
+				entry.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+			if (entry.operands.at(0) == ALU2.operands.at(0)){
+				entry.values.at(0) = ALU2.values.at(0);
+				entry.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+	}
 
 	/****MUL2 --> ****/
 	// --> IQ (MUL2.op[0] == IQ.entry.{srcs})
@@ -704,7 +801,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	// --> IQ
 
 	#endif
-	
+
 	/*STOPPING PHASE**************************************************************
 	******************************************************************************
 	*****************************************************************************/
