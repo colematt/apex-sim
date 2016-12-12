@@ -30,7 +30,10 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			committed++;
 			MUL2.empty = true;
 		}
-		else if (LSFU3.isReady() && myrob.match(LSFU3)){
+		//For LSFU3 only, additionally check that LSFU3.src1 is valid.
+		//It may have issued from the IQ without src1 validity
+		//(in order to reduce bubbles)
+		else if (LSFU3.valids.at(0) == true && LSFU3.isReady() && myrob.match(LSFU3)){
 			myrob.commit(myregisters);
 			if (LSFU3.opcode == "LOAD"){
 				committed_load++;
@@ -649,11 +652,27 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	#if FORWARDING
 
 	/****B2 --> ****/
-	//--> B1 handled by immediately committing X register
+	//--> B1 (B2.opcode is BAL (sets X) and X is in B1.srcs)
+	if (B2.opcode == "BAL"){
+		if ((B1.opcode == "BAL" || B1.opcode == "JUMP")
+				&& B1.operands.at(0) == "X"){
+			B1.values.at(0) = (B2.pc)+4;
+			B1.valids.at(0) = true;
+		}
+	}
+	//--> IQ (X is in IQ.entry.srcs)
+	for (auto &entry : myiq.issue_queue){
+		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+			if (entry.operands.at(0) == "X"){
+				entry.values.at(0) = (B2.pc)+4;
+				entry.valids.at(0) = true;
+			}
+		}
+	}
 
 	/****ALU3 --> ****/
 	// --> IQ (ALU3.dst = IQ.entry.src)
-	for (auto &entry: myiq.issue_queue){
+	for (auto &entry : myiq.issue_queue){
 		std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
 		if (entry.opcode == "ADD" ||
 				entry.opcode == "SUB" ||
