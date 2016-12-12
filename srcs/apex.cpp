@@ -152,7 +152,6 @@ void display(CPU &mycpu, Registers &myregisters, Data &mydata, ROB &myrob, IQ &m
 //Display simulator stats
 void stats()
 {
-  std::cout << "-----------\n" << "Statistics\n" << "-----------\n";
   std::cout << "Cycle: " << cycle << std::endl;
   std::cout << "Instructions through:\n"
             << " Dispatch=" << dispatched
