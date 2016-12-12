@@ -93,10 +93,13 @@ void ROB::flush(int cycle){
 
 		// Traverse until encountering an entry
 		// whose cycle timestamp indicates it must be flushed
-		while(it->c <= cycle){
-			++it;
+		if (it != reorder_buffer.end()){
+			while((it->c <= cycle) && (it != reorder_buffer.end())){
+				++it;
+			}
 		}
 
 		// flush the elements from the current iterator to end:
-		this->reorder_buffer.erase(it, reorder_buffer.end());
+		if (it != reorder_buffer.end())
+			this->reorder_buffer.erase(it, reorder_buffer.end());
 }

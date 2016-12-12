@@ -184,8 +184,9 @@ int simulate(int num_cycles, CPU &mycpu, Code &mycode, Registers &myregisters,
 
     #if (DEBUG)
       mycpu.display();
+      //myregisters.dMap();
       //myregisters.dUrf();
-      //mydata.display(0, 100);
+      mydata.display(0, 100);
     #endif
 
     //cpu::simulate() returns 0 if execution should not continue

@@ -108,16 +108,30 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 				i->opcode == "OR" ||
 				i->opcode == "EX-OR" ||
 				i->opcode == "MOVC"){
-				advSuccess = i->advance(ALU);
+
+				std::cout << i->valids.at(1) << " " << i->valids.at(2) << " " << i->opcode << std::endl;
+
+				if (i->valids.at(1) && i->valids.at(2)){
+					advSuccess = i->advance(ALU);
+				}
+
+				if ( !advSuccess ){
+					if (i->opcode == "MOVC"){
+						advSuccess = i->advance(ALU);
+					}
+				}
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
 					return true;
 				}
 			}
+
 			//Multiplication Opcode
 			if(i->opcode == "MUL"){
-				advSuccess = i->advance(MUL);
+				if (i->valids.at(1) && i->valids.at(2)){
+					advSuccess = i->advance(MUL);
+				}
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
@@ -127,7 +141,9 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 			//Load Opcode
 			if(i->opcode == "LOAD"){
 				if (hitStore == false){
-					advSuccess = i->advance(LSFU);
+					if (i->valids.at(1) && i->valids.at(2)){
+						advSuccess = i->advance(LSFU);
+					}
 
 					if ( advSuccess ){
 						this->issue_queue.erase(i);
@@ -137,7 +153,9 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 			}
 			//Store Opcode
 			if(i->opcode == "STORE"){
-				advSuccess = i->advance(LSFU);
+				if (i->valids.at(1)){
+					advSuccess = i->advance(LSFU);
+				}
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);
@@ -147,7 +165,9 @@ bool IQ::issue(Stage& ALU, Stage& MUL, Stage& LSFU, Stage& B){
 			//Unconditional Branches Opcodes
 			if(i->opcode == "BAL" ||
 				i->opcode == "JUMP"){
-				advSuccess = i->advance(B);
+				if (i->valids.at(0)){
+					advSuccess = i->advance(B);
+				}
 
 				if ( advSuccess ){
 					this->issue_queue.erase(i);

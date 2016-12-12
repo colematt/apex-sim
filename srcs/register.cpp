@@ -98,7 +98,6 @@ void Registers::dMap(){
 std::string Registers::getRenamed(std::string rReg){
   std::string physReg;
   std::string regHolder;
-  int valueCarry = 0;
 
   physReg = this->free_list.top();
   this->free_list.pop();
@@ -112,15 +111,6 @@ std::string Registers::getRenamed(std::string rReg){
   auto it = this->back_end.find(rReg);
   if (it != this->back_end.end()) {
     regHolder = it->second;
-
-    auto itt = this->reg_file.find(regHolder);
-    if (itt != this->reg_file.end()) {
-      valueCarry = std::get<0>(itt->second);
-      this->reg_file[regHolder] = std::make_tuple(valueCarry, false);
-    } else {
-      std::string what_arg = rReg + " is not a valid register";
-      throw std::invalid_argument(what_arg);
-    }
   }
 
   return physReg;
@@ -149,8 +139,6 @@ void Registers::commit(std::string pReg){
       this->front_end.erase(ittt);
       this->free_list.push(prevReg);
     }
-    //this->front_end.erase(prevReg); //Remove rename entry from front end table
-    //this->free_list.push(prevReg);  //Push P reg back into free list
   }
   
   this->back_end[rReg] = pReg; //Set new P reg value
@@ -227,6 +215,8 @@ int Registers::read(std::string reg){
   } else {
     myvalue = 0;
   }
+
+  std::cout << myvalue << std::endl;
 
   return myvalue;
 }

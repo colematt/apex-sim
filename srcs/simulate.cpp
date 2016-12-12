@@ -10,6 +10,712 @@
 int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	ROB &myrob, IQ &myiq){
 
+	/*FORWARDING PHASE************************************************************
+	******************************************************************************
+	*****************************************************************************/
+
+	// Defined at the top of this file
+	#if FORWARDING
+
+	/****B2 --> ****/
+	if (!B2.isEmpty()){
+		//--> B1 (B2.opcode is BAL (sets X) and X is in B1.srcs)
+		if (B2.opcode == "BAL"){
+			if ((B1.opcode == "BAL" || B1.opcode == "JUMP")
+					&& B1.operands.at(0) == "X"){
+				B1.values.at(0) = (B2.pc)+4;
+				B1.valids.at(0) = true;
+			}
+		}
+		//--> IQ (X is in IQ.entry.srcs)
+		if (B2.opcode == "BAL"){
+			for (auto &entry : myiq.issue_queue){
+				if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+					if (entry.operands.at(0) == "X"){
+						entry.values.at(0) = (B2.pc)+4;
+						entry.valids.at(0) = true;
+					}
+				}
+			}
+		}
+	}
+
+	/****ALU3 --> ****/
+	if (!ALU3.isEmpty()){
+		//SPECIAL CASE: due to program structure
+		// --> DRF2 (ALU3.dst == DRF2.srcs)
+		if (DRF2.opcode == "ADD" ||
+					DRF2.opcode == "SUB" ||
+					DRF2.opcode == "MUL" ||
+					DRF2.opcode == "AND" ||
+					DRF2.opcode == "OR" ||
+					DRF2.opcode == "EX-OR"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU3.values.at(0);
+				DRF2.valids.at(1) = ALU3.valids.at(0);
+			}
+			if (DRF2.operands.at(2) == forwardReg){
+				DRF2.values.at(2) = ALU3.values.at(0);
+				DRF2.valids.at(2) = ALU3.valids.at(0);
+			}
+		}
+		// --> DRF2 (ALU3.dst == DRF2.srcs)
+		if (DRF2.opcode == "MUL"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU3.values.at(0);
+				DRF2.valids.at(1) = ALU3.valids.at(0);
+			}
+			if (DRF2.operands.at(2) == forwardReg){
+				DRF2.values.at(2) = ALU3.values.at(0);
+				DRF2.valids.at(2) = ALU3.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {BAL,JUMP}, ALU3.dst == DRF2.srcs)
+		if (DRF2.opcode == "BAL" || DRF2.opcode == "JUMP"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (DRF2.operands.at(0) == forwardReg){
+				DRF2.values.at(0) = ALU3.values.at(0);
+				DRF2.valids.at(0) = ALU3.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {LOAD}, ALU3.dst == DRF2.srcs)
+		if (DRF2.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU3.values.at(0);
+				DRF2.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {STORE}, ALU3.dst == DRF2.srcs)
+		if (DRF2.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (DRF2.operands.at(0) == forwardReg){
+				DRF2.values.at(0) = ALU3.values.at(0);
+				DRF2.valids.at(0) = ALU3.valids.at(0);
+			}
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU3.values.at(0);
+				DRF2.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {LOAD}, ALU3.dst == DRF2.srcs)
+		if (DRF2.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU3.values.at(0);
+				DRF2.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {STORE}, ALU3.dst == DRF2.srcs)
+		if (DRF2.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(0) == forwardReg){
+				DRF2.values.at(0) = ALU3.values.at(0);
+				DRF2.valids.at(0) = ALU3.valids.at(0);
+			}
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU3.values.at(0);
+				DRF2.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		//END SPECIAL CASE
+
+		// --> ALU1 (ALU3.dst == ALU1.srcs)
+		//MOVC has an empty source set
+		if (ALU1.opcode != "MOVC"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (ALU1.operands.at(1) == forwardReg){
+				ALU1.values.at(1) = ALU3.values.at(0);
+				ALU1.valids.at(1) = ALU3.valids.at(0);
+			}
+			if (ALU1.operands.at(2) == forwardReg){
+				ALU1.values.at(2) = ALU3.values.at(0);
+				ALU1.valids.at(2) = ALU3.valids.at(0);
+			}
+		}
+		// --> MUL1 (ALU3.dst == MUL1.srcs)
+		if (MUL1.opcode == "MUL"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (MUL1.operands.at(1) == forwardReg){
+				MUL1.values.at(1) = ALU3.values.at(0);
+				MUL1.valids.at(1) = ALU3.valids.at(0);
+			}
+			if (MUL1.operands.at(2) == forwardReg){
+				MUL1.values.at(2) = ALU3.values.at(0);
+				MUL1.valids.at(2) = ALU3.valids.at(0);
+			}
+		}
+		// --> B1   (B1.opcode == {BAL,JUMP}, ALU3.dst == B1.srcs)
+		if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (B1.operands.at(0) == forwardReg){
+				B1.values.at(0) = ALU3.values.at(0);
+				B1.valids.at(0) = ALU3.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {LOAD}, ALU3.dst == LSFU2.srcs)
+		if (LSFU2.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (LSFU2.operands.at(1) == forwardReg){
+				LSFU2.values.at(1) = ALU3.values.at(0);
+				LSFU2.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {STORE}, ALU3.dst == LSFU2.srcs)
+		if (LSFU2.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (LSFU2.operands.at(0) == forwardReg){
+				LSFU2.values.at(0) = ALU3.values.at(0);
+				LSFU2.valids.at(0) = ALU3.valids.at(0);
+			}
+			if (LSFU2.operands.at(1) == forwardReg){
+				LSFU2.values.at(1) = ALU3.values.at(0);
+				LSFU2.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		// --> LSFU1 (LSFU1.opcode == {LOAD}, ALU3.dst == LSFU1.srcs)
+		if (LSFU1.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (LSFU1.operands.at(1) == forwardReg){
+				LSFU1.values.at(1) = ALU3.values.at(0);
+				LSFU1.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		// --> LSFU1 (LSFU1.opcode == {STORE}, ALU3.dst == LSFU1.srcs)
+		if (LSFU1.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (LSFU1.operands.at(0) == forwardReg){
+				LSFU1.values.at(0) = ALU3.values.at(0);
+				LSFU1.valids.at(0) = ALU3.valids.at(0);
+			}
+			if (LSFU1.operands.at(1) == forwardReg){
+				LSFU1.values.at(1) = ALU3.values.at(0);
+				LSFU1.valids.at(1) = ALU3.valids.at(0);
+			}
+		}
+		// --> IQ (ALU3.dst = IQ.entry.src)
+		for (auto &entry : myiq.issue_queue){
+			std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
+			if (entry.opcode == "ADD" ||
+					entry.opcode == "SUB" ||
+					entry.opcode == "MUL" ||
+					entry.opcode == "AND" ||
+					entry.opcode == "OR" ||
+					entry.opcode == "EX-OR"){
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = ALU3.values.at(0);
+					entry.valids.at(1) = ALU3.valids.at(0);
+				}
+				if (entry.operands.at(2) == forwardReg){
+					entry.values.at(2) = ALU3.values.at(0);
+					entry.valids.at(2) = ALU3.valids.at(0);
+				}
+			}
+			if (entry.opcode == "LOAD"){
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = ALU3.values.at(0);
+					entry.valids.at(1) = ALU3.valids.at(0);
+				}
+			}
+			if (entry.opcode == "STORE"){
+				if (entry.operands.at(0) == forwardReg){
+					entry.values.at(0) = ALU3.values.at(0);
+					entry.valids.at(0) = ALU3.valids.at(0);
+				}
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = ALU3.values.at(0);
+					entry.valids.at(1) = ALU3.valids.at(0);
+				}
+			}
+			if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+				if (entry.operands.at(0) == forwardReg){
+					entry.values.at(0) = ALU3.values.at(0);
+					entry.valids.at(0) = ALU3.valids.at(0);
+				}
+			}
+		}
+	}
+
+	/****ALU2 --> ****/
+	if (!ALU2.isEmpty()){
+		//SPECIAL CASE: due to program structure
+		// --> DRF2 (ALU2.dst == DRF2.srcs)
+		if (DRF2.opcode == "ADD" ||
+					DRF2.opcode == "SUB" ||
+					DRF2.opcode == "MUL" ||
+					DRF2.opcode == "AND" ||
+					DRF2.opcode == "OR" ||
+					DRF2.opcode == "EX-OR"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU2.values.at(0);
+				DRF2.valids.at(1) = ALU2.valids.at(0);
+			}
+			if (DRF2.operands.at(2) == forwardReg){
+				DRF2.values.at(2) = ALU2.values.at(0);
+				DRF2.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+		// --> DRF2 (ALU2.dst == DRF2.srcs)
+		if (DRF2.opcode == "MUL"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU2.values.at(0);
+				DRF2.valids.at(1) = ALU2.valids.at(0);
+			}
+			if (DRF2.operands.at(2) == forwardReg){
+				DRF2.values.at(2) = ALU2.values.at(0);
+				DRF2.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {BAL,JUMP}, ALU2.dst == DRF2.srcs)
+		if (DRF2.opcode == "BAL" || DRF2.opcode == "JUMP"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(0) == forwardReg){
+				DRF2.values.at(0) = ALU2.values.at(0);
+				DRF2.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {LOAD}, ALU2.dst == DRF2.srcs)
+		if (DRF2.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU2.values.at(0);
+				DRF2.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {STORE}, ALU2.dst == DRF2.srcs)
+		if (DRF2.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(0) == forwardReg){
+				DRF2.values.at(0) = ALU2.values.at(0);
+				DRF2.valids.at(0) = ALU2.valids.at(0);
+			}
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU2.values.at(0);
+				DRF2.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {LOAD}, ALU2.dst == DRF2.srcs)
+		if (DRF2.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU2.values.at(0);
+				DRF2.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		// --> DRF2 (DRF2.opcode == {STORE}, ALU2.dst == DRF2.srcs)
+		if (DRF2.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (DRF2.operands.at(0) == forwardReg){
+				DRF2.values.at(0) = ALU2.values.at(0);
+				DRF2.valids.at(0) = ALU2.valids.at(0);
+			}
+			if (DRF2.operands.at(1) == forwardReg){
+				DRF2.values.at(1) = ALU2.values.at(0);
+				DRF2.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		//END SPECIAL CASE
+		
+		// --> ALU1 (ALU2.dst == ALU1.srcs)
+		//MOVC has an empty source set
+		if (ALU1.opcode != "MOVC"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (ALU1.operands.at(1) == forwardReg){
+				ALU1.values.at(1) = ALU2.values.at(0);
+				ALU1.valids.at(1) = ALU2.valids.at(0);
+			}
+			if (ALU1.operands.at(2) == forwardReg){
+				ALU1.values.at(2) = ALU2.values.at(0);
+				ALU1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+		// --> MUL1 (ALU2.dst == MUL1.srcs)
+		if (MUL1.opcode == "MUL"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (MUL1.operands.at(1) == forwardReg){
+				MUL1.values.at(1) = ALU2.values.at(0);
+				MUL1.valids.at(1) = ALU2.valids.at(0);
+			}
+			if (MUL1.operands.at(2) == forwardReg){
+				MUL1.values.at(2) = ALU2.values.at(0);
+				MUL1.valids.at(2) = ALU2.valids.at(0);
+			}
+		}
+		// --> B1   (B1.opcode == {BAL,JUMP}, ALU2.dst == B1.srcs)
+		if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (B1.operands.at(0) == forwardReg){
+				B1.values.at(0) = ALU2.values.at(0);
+				B1.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {LOAD}, ALU2.dst == LSFU2.srcs)
+		if (LSFU2.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (LSFU2.operands.at(1) == forwardReg){
+				LSFU2.values.at(1) = ALU2.values.at(0);
+				LSFU2.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {STORE}, ALU2.dst == LSFU2.srcs)
+		if (LSFU2.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (LSFU2.operands.at(0) == forwardReg){
+				LSFU2.values.at(0) = ALU2.values.at(0);
+				LSFU2.valids.at(0) = ALU2.valids.at(0);
+			}
+		}
+		// --> LSFU1 (LSFU1.opcode == {LOAD}, ALU2.dst == LSFU1.srcs)
+		if (LSFU1.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (LSFU1.operands.at(1) == forwardReg){
+				LSFU1.values.at(1) = ALU2.values.at(0);
+				LSFU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		// --> LSFU1 (LSFU1.opcode == {STORE}, ALU2.dst == LSFU1.srcs)
+		if (LSFU1.opcode == "STORE"){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (LSFU1.operands.at(0) == forwardReg){
+				LSFU1.values.at(0) = ALU2.values.at(0);
+				LSFU1.valids.at(0) = ALU2.valids.at(0);
+			}
+			if (LSFU1.operands.at(1) == forwardReg){
+				LSFU1.values.at(1) = ALU2.values.at(0);
+				LSFU1.valids.at(1) = ALU2.valids.at(0);
+			}
+		}
+		// --> IQ (ALU2.op[0] == IQ.entry.{srcs})
+		for (auto &entry: myiq.issue_queue){
+			std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
+			if (entry.opcode == "ADD" ||
+					entry.opcode == "SUB" ||
+					entry.opcode == "MUL" ||
+					entry.opcode == "AND" ||
+					entry.opcode == "OR" ||
+					entry.opcode == "EX-OR"){
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = ALU2.values.at(0);
+					entry.valids.at(1) = ALU2.valids.at(0);
+				}
+				if (entry.operands.at(2) == forwardReg){
+					entry.values.at(2) = ALU2.values.at(0);
+					entry.valids.at(2) = ALU2.valids.at(0);
+				}
+			}
+			if (entry.opcode == "LOAD"){
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = ALU2.values.at(0);
+					entry.valids.at(1) = ALU2.valids.at(0);
+				}
+			}
+			if (entry.opcode == "STORE"){
+				if (entry.operands.at(0) == forwardReg){
+					entry.values.at(0) = ALU2.values.at(0);
+					entry.valids.at(0) = ALU2.valids.at(0);
+				}
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = ALU2.values.at(0);
+					entry.valids.at(1) = ALU2.valids.at(0);
+				}
+			}
+			if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+				if (entry.operands.at(0) == forwardReg){
+					entry.values.at(0) = ALU2.values.at(0);
+					entry.valids.at(0) = ALU2.valids.at(0);
+				}
+			}
+		}
+	}
+
+	/****MUL2 --> ****/
+	if (!MUL2.isEmpty()){
+		std::string forwardReg = myregisters.translateReg(MUL2.operands.at(0));
+		// --> ALU1 (MUL2.dst == ALU1.srcs)
+		//MOVC has an empty source set
+		if (ALU1.opcode != "MOVC"){
+			if (ALU1.operands.at(1) == forwardReg){
+				ALU1.values.at(1) = MUL2.values.at(0);
+				ALU1.valids.at(1) = MUL2.valids.at(0);
+			}
+			if (ALU1.operands.at(2) == forwardReg){
+				ALU1.values.at(2) = MUL2.values.at(0);
+				ALU1.valids.at(2) = MUL2.valids.at(0);
+			}
+		}
+		// --> B1 (MUL2.dst = B1.srcs)
+		if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+			if (B1.operands.at(0) == forwardReg){
+				B1.values.at(0) = MUL2.values.at(0);
+				B1.valids.at(0) = MUL2.valids.at(0);
+			}
+		}
+		// --> LSFU2 (MUL2.dst = LSFU2.srcs)
+		if (LSFU2.opcode == "LOAD"){
+			if (LSFU2.operands.at(1) == forwardReg){
+				LSFU2.values.at(1) = MUL2.values.at(0);
+				LSFU2.valids.at(1) = MUL2.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {STORE}, MUL2.dst == LSFU2.srcs)
+		if (LSFU2.opcode == "STORE"){
+			if (LSFU2.operands.at(0) == forwardReg){
+				LSFU2.values.at(0) = MUL2.values.at(0);
+				LSFU2.valids.at(0) = MUL2.valids.at(0);
+			}
+		}
+		// --> LSFU1 (MUL2.dst = LSFU2.srcs)
+		if (LSFU1.opcode == "LOAD"){
+			if (LSFU1.operands.at(1) == forwardReg){
+				LSFU1.values.at(1) = MUL2.values.at(0);
+				LSFU1.valids.at(1) = MUL2.valids.at(0);
+			}
+		}
+		// --> LSFU2 (LSFU2.opcode == {STORE}, MUL2.dst == LSFU2.srcs)
+		if (LSFU1.opcode == "STORE"){
+			if (LSFU1.operands.at(0) == forwardReg){
+				LSFU1.values.at(0) = MUL2.values.at(0);
+				LSFU1.valids.at(0) = MUL2.valids.at(0);
+			}
+			if (LSFU1.operands.at(1) == forwardReg){
+				LSFU1.values.at(1) = MUL2.values.at(0);
+				LSFU1.valids.at(1) = MUL2.valids.at(0);
+			}
+		}
+		// --> IQ (MUL2.op[0] == IQ.entry.{srcs})
+		for (auto &entry: myiq.issue_queue){
+			std::string forwardReg = myregisters.translateReg(MUL2.operands.at(0));
+			if (entry.opcode == "ADD" ||
+					entry.opcode == "SUB" ||
+					entry.opcode == "MUL" ||
+					entry.opcode == "AND" ||
+					entry.opcode == "OR" ||
+					entry.opcode == "EX-OR"){
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = MUL2.values.at(0);
+					entry.valids.at(1) = MUL2.valids.at(0);
+				}
+				if (entry.operands.at(2) == forwardReg){
+					entry.values.at(2) = MUL2.values.at(0);
+					entry.valids.at(2) = MUL2.valids.at(0);
+				}
+			}
+			if (entry.opcode == "LOAD"){
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = MUL2.values.at(0);
+					entry.valids.at(1) = MUL2.valids.at(0);
+				}
+			}
+			if (entry.opcode == "STORE"){
+				if (entry.operands.at(0) == forwardReg){
+					entry.values.at(0) = MUL2.values.at(0);
+					entry.valids.at(0) = MUL2.valids.at(0);
+				}
+				if (entry.operands.at(1) == forwardReg){
+					entry.values.at(1) = MUL2.values.at(0);
+					entry.valids.at(1) = MUL2.valids.at(0);
+				}
+			}
+			if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+				if (entry.operands.at(0) == forwardReg){
+					entry.values.at(0) = MUL2.values.at(0);
+					entry.valids.at(0) = MUL2.valids.at(0);
+				}
+			}
+		}
+	}
+
+	/****MUL1 (when MUL1.lcounter == 0) --> ****/
+	if (!MUL1.isEmpty()){
+		if (MUL1.lcounter == 0){
+			std::string forwardReg = myregisters.translateReg(MUL1.operands.at(0));
+			// --> ALU1 (MUL1.dst == ALU1.srcs)
+			//MOVC has an empty source set
+			if (ALU1.opcode != "MOVC"){
+				if (ALU1.operands.at(1) == forwardReg){
+					ALU1.values.at(1) = MUL1.values.at(0);
+					ALU1.valids.at(1) = MUL1.valids.at(0);
+				}
+				if (ALU1.operands.at(2) == forwardReg){
+					ALU1.values.at(2) = MUL1.values.at(0);
+					ALU1.valids.at(2) = MUL1.valids.at(0);
+				}
+			}
+			// --> B1 (MUL1.dst = B1.srcs)
+			if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+				if (B1.operands.at(0) == forwardReg){
+					B1.values.at(0) = MUL1.values.at(0);
+					B1.valids.at(0) = MUL1.valids.at(0);
+				}
+			}
+			// --> LSFU2 (MUL1.dst = LSFU2.srcs)
+			if (LSFU2.opcode == "LOAD"){
+				if (LSFU2.operands.at(1) == forwardReg){
+					LSFU2.values.at(1) = MUL1.values.at(0);
+					LSFU2.valids.at(1) = MUL1.valids.at(0);
+				}
+			}
+			// --> LSFU2 (LSFU2.opcode == {STORE}, MUL1.dst == LSFU2.srcs)
+			if (LSFU2.opcode == "STORE"){
+				if (LSFU2.operands.at(0) == forwardReg){
+					LSFU2.values.at(0) = MUL1.values.at(0);
+					LSFU2.valids.at(0) = MUL1.valids.at(0);
+				}
+			}
+			// --> LSFU1 (MUL1.dst = LSFU2.srcs)
+			if (LSFU1.opcode == "LOAD"){
+				if (LSFU1.operands.at(1) == forwardReg){
+					LSFU1.values.at(1) = MUL1.values.at(0);
+					LSFU1.valids.at(1) = MUL1.valids.at(0);
+				}
+			}
+			// --> LSFU2 (LSFU2.opcode == {STORE}, MUL1.dst == LSFU2.srcs)
+			if (LSFU1.opcode == "STORE"){
+				if (LSFU1.operands.at(0) == forwardReg){
+					LSFU1.values.at(0) = MUL1.values.at(0);
+					LSFU1.valids.at(0) = MUL1.valids.at(0);
+				}
+				if (LSFU1.operands.at(1) == forwardReg){
+					LSFU1.values.at(1) = MUL1.values.at(0);
+					LSFU1.valids.at(1) = MUL1.valids.at(0);
+				}
+			}
+
+			/****MUL1 --> ****/
+			// --> IQ (MUL1.op[0] == IQ.entry.{srcs})
+			for (auto &entry: myiq.issue_queue){
+				std::string forwardReg = myregisters.translateReg(MUL1.operands.at(0));
+				if (entry.opcode == "ADD" ||
+						entry.opcode == "SUB" ||
+						entry.opcode == "MUL" ||
+						entry.opcode == "AND" ||
+						entry.opcode == "OR" ||
+						entry.opcode == "EX-OR"){
+					if (entry.operands.at(1) == forwardReg){
+						entry.values.at(1) = MUL1.values.at(0);
+						entry.valids.at(1) = MUL1.valids.at(0);
+					}
+					if (entry.operands.at(2) == forwardReg){
+						entry.values.at(2) = MUL1.values.at(0);
+						entry.valids.at(2) = MUL1.valids.at(0);
+					}
+				}
+				if (entry.opcode == "LOAD"){
+					if (entry.operands.at(1) == forwardReg){
+						entry.values.at(1) = MUL1.values.at(0);
+						entry.valids.at(1) = MUL1.valids.at(0);
+					}
+				}
+				if (entry.opcode == "STORE"){
+					if (entry.operands.at(0) == forwardReg){
+						entry.values.at(0) = MUL1.values.at(0);
+						entry.valids.at(0) = MUL1.valids.at(0);
+					}
+				}
+				if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+					if (entry.operands.at(0) == forwardReg){
+						entry.values.at(0) = MUL1.values.at(0);
+						entry.valids.at(0) = MUL1.valids.at(0);
+					}
+				}
+			}
+		}
+	}
+
+	/****LSFU3 --> ****/
+	if (!LSFU3.isEmpty()){
+		//Only LOAD instructions in the LSFU have a destination set
+		//That destination set is not computed until LSFU3
+		//(no forwarding from LSFU1, LSFU2)
+		if (LSFU3.opcode == "LOAD"){
+			std::string forwardReg = myregisters.translateReg(LSFU3.operands.at(0));
+			// --> LSFU2 (LSFU2.opcode == STORE, LSFU3.dst = LSFU2.srcs[0])
+			if (LSFU2.opcode == "STORE" &&
+				(LSFU2.operands.at(0) == forwardReg)){
+				LSFU2.values.at(0) = LSFU3.values.at(0);
+				LSFU2.valids.at(0) = LSFU3.valids.at(0);
+			}
+			// --> ALU1 (LSFU3.dst == ALU1.srcs)
+			// MOVC instructions have no source set
+			if (ALU1.opcode != "MOVC"){
+				if (ALU1.operands.at(1) == forwardReg){
+					ALU1.values.at(1) = LSFU3.values.at(0);
+					ALU1.valids.at(1) = LSFU3.valids.at(0);
+				}
+				if (ALU1.operands.at(2) == forwardReg){
+					ALU1.values.at(2) = LSFU3.values.at(0);
+					ALU1.valids.at(2) = LSFU3.valids.at(0);
+				}
+			}
+			// --> MUL1 (LSFU3.dst == MUL1.srcs)
+			if (MUL1.operands.at(1) == forwardReg){
+				MUL1.values.at(1) = LSFU3.values.at(0);
+				MUL1.valids.at(1) = LSFU3.valids.at(0);
+			}
+			if (MUL1.operands.at(2) == forwardReg){
+				MUL1.values.at(2) = LSFU3.values.at(0);
+				MUL1.valids.at(2) = LSFU3.valids.at(0);
+			}
+			// --> LSFU2 (LSFU2.opcode == STORE, LSFU2.src[0] == LSFU3.dst)
+			if (LSFU2.opcode == "LOAD" &&
+				LSFU2.operands.at(0) == forwardReg){
+					LSFU2.values.at(0) = LSFU3.values.at(0);
+					LSFU2.valids.at(0) = LSFU3.valids.at(0);
+			}
+			// --> LSFU1 (LSFU1.opcode == STORE, LSFU1.src[0] == LSFU3.dst  )
+			if (LSFU1.opcode == "LOAD" &&
+				LSFU1.operands.at(0) == forwardReg){
+					LSFU1.values.at(0) = LSFU3.values.at(0);
+					LSFU1.valids.at(0) = LSFU3.valids.at(0);
+			}
+			// --> IQ
+			for (auto &entry: myiq.issue_queue){
+				if (entry.opcode == "ADD" ||
+						entry.opcode == "SUB" ||
+						entry.opcode == "MUL" ||
+						entry.opcode == "AND" ||
+						entry.opcode == "OR" ||
+						entry.opcode == "EX-OR"){
+					if (entry.operands.at(1) == forwardReg){
+						entry.values.at(1) = LSFU3.values.at(0);
+						entry.valids.at(1) = LSFU3.valids.at(0);
+					}
+					if (entry.operands.at(2) == forwardReg){
+						entry.values.at(2) = LSFU3.values.at(0);
+						entry.valids.at(2) = LSFU3.valids.at(0);
+					}
+				}
+				if (entry.opcode == "LOAD"){
+					if (entry.operands.at(1) == forwardReg){
+						entry.values.at(1) = LSFU3.values.at(0);
+						entry.valids.at(1) = LSFU3.valids.at(0);
+					}
+				}
+				if (entry.opcode == "STORE"){
+					if (entry.operands.at(0) == forwardReg){
+						entry.values.at(0) = LSFU3.values.at(0);
+						entry.valids.at(0) = LSFU3.valids.at(0);
+					}
+					if (entry.operands.at(1) == forwardReg){
+						entry.values.at(1) = LSFU3.values.at(0);
+						entry.valids.at(1) = LSFU3.valids.at(0);
+					}
+				}
+				if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
+					if (entry.operands.at(0) == forwardReg){
+						entry.values.at(0) = LSFU3.values.at(0);
+						entry.valids.at(0) = LSFU3.valids.at(0);
+					}
+				}
+			}
+		}
+	}
+	#endif
+
 	/*COMMITTING PHASE************************************************************
 	******************************************************************************
 	*****************************************************************************/
@@ -213,65 +919,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 	******************************************************************************
 	*****************************************************************************/
 
-	/****B2 STAGE****/
-	if (--(B2.lcounter) <= 0 && !B2.isEmpty()) {
-		//Writeback X register
-		if (B2.opcode == "BAL") {
-			myregisters.write("X", (B2.pc)+4, true);
-		}
-		B2.ready = true;
-	}
-
-	/****B1 STAGE****/
-	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
-		//Perform branching logic
-		//Branch conditional is true or unconditionally taken
-		if ((B1.opcode == "BZ" && Z == 0) ||
-				(B1.opcode == "BNZ" && Z != 0) ||
-				(B1.opcode == "BAL") ||
-				(B1.opcode == "JUMP")){
-			// Flush the ROB, IQ
-			myrob.flush(B1.c);
-			myiq.flush(B1.c, myregisters);
-
-			// For each non-branch stage,
-			// flush instructions if its timestamp
-			// is after B1 stage's timestamp
-			ALU3.flush(B1.c, myregisters);
-			ALU2.flush(B1.c, myregisters);
-			ALU1.flush(B1.c, myregisters);
-			MUL2.flush(B1.c, myregisters);
-			MUL1.flush(B1.c, myregisters);
-			LSFU3.flush(B1.c, myregisters);
-			LSFU2.flush(B1.c, myregisters);
-			LSFU1.flush(B1.c, myregisters);
-			DRF2.flush(B1.c, myregisters);
-			DRF1.flush(B1.c, myregisters);
-			F.flush(B1.c, myregisters);
-
-			//Set global pc based on B1.opcode (and local B1.pc)
-			if(B1.opcode == "BZ" || B1.opcode == "BNZ"){
-				pc = B1.pc + B1.values.at(0);
-			}
-			else if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
-				pc = B1.values.at(0) + B1.values.at(1);
-			}
-			else {}
-
-			//Set B1 as ready
-			B1.ready = true;
-		}
-		//Branch conditional is false
-		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
-			B1.ready = true;
-		}
-		//Opcode is not one of BZ, BNZ, BAL, JUMP
-		else{
-			std::cerr << "Unrecognized opcode " << B1.opcode << " at B1 WORKING phase" << std::endl;
-			B1.ready = false;
-		}
-	}
-
 	/****ALU3 STAGE****/
 	if (--(ALU3.lcounter) <= 0 && !ALU3.isEmpty()) {
 		//Writeback
@@ -377,6 +1024,67 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 		MUL1.ready = true;
 	}
 
+	/****B2 STAGE****/
+	if (--(B2.lcounter) <= 0 && !B2.isEmpty()) {
+		//Writeback X register
+		if (B2.opcode == "BAL") {
+			myregisters.write("X", (B2.pc)+4, true);
+		}
+		B2.ready = true;
+	}
+
+	/****B1 STAGE****/
+	if (--(B1.lcounter) <= 0 && !B1.isEmpty()) {
+		//Perform branching logic
+		//Branch conditional is true or unconditionally taken
+		if ((B1.opcode == "BZ" && Z == 0) ||
+				(B1.opcode == "BNZ" && Z != 0) ||
+				(B1.opcode == "BAL") ||
+				(B1.opcode == "JUMP")){
+			// Flush the ROB, IQ
+			myrob.flush(B1.c);
+			myiq.flush(B1.c, myregisters);
+
+			// For each non-branch stage,
+			// flush instructions if its timestamp
+			// is after B1 stage's timestamp
+			ALU3.flush(B1.c, myregisters);
+			ALU2.flush(B1.c, myregisters);
+			ALU1.flush(B1.c, myregisters);
+			MUL2.flush(B1.c, myregisters);
+			MUL1.flush(B1.c, myregisters);
+			LSFU3.flush(B1.c, myregisters);
+			LSFU2.flush(B1.c, myregisters);
+			LSFU1.flush(B1.c, myregisters);
+			DRF2.flush(B1.c, myregisters);
+			DRF1.flush(B1.c, myregisters);
+			F.flush(B1.c, myregisters);
+
+			is_halting = false;
+
+			//Set global pc based on B1.opcode (and local B1.pc)
+			if(B1.opcode == "BZ" || B1.opcode == "BNZ"){
+				pc = B1.pc + B1.values.at(0);
+			}
+			else if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
+				pc = B1.values.at(0) + B1.values.at(1);
+			}
+			else {}
+
+			//Set B1 as ready
+			B1.ready = true;
+		}
+		//Branch conditional is false
+		else if ((B1.opcode == "BZ" && Z != 0) || (B1.opcode == "BNZ" && Z == 0)){
+			B1.ready = true;
+		}
+		//Opcode is not one of BZ, BNZ, BAL, JUMP
+		else{
+			std::cerr << "Unrecognized opcode " << B1.opcode << " at B1 WORKING phase" << std::endl;
+			B1.ready = false;
+		}
+	}
+
 	/****LSFU3 STAGE****/
 	if (--(LSFU3.lcounter) <= 0 && !LSFU3.isEmpty()) {
 		if (LSFU3.opcode == "LOAD") {
@@ -466,7 +1174,7 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF2.values.at(1) = DRF2.littoi(DRF2.operands.at(1));
 			DRF2.valids.at(1) = true;
 
-			myregisters.write(DRF2.operands.at(0), DRF2.values.at(0), false);
+			//myregisters.write(DRF2.operands.at(0), DRF2.values.at(0), true);
 
 			DRF2.ready = true;
 		}
@@ -517,8 +1225,14 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF2.valids.at(1) = true;
 
 			DRF2.ready = true;
-		}else{
-			std::cerr << "Unresolvable opcode in DRF: " << DRF2.opcode << std::endl;
+
+		}
+		else if (DRF2.opcode == "HALT"){
+			DRF2.ready = false;
+			is_halting = true;
+		}
+		else{
+			std::cerr << "Unresolvable opcode in DRF2: " << DRF2.opcode << std::endl;
 			exit(1);
 		}//End DRF Stage
 
@@ -533,7 +1247,8 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 			DRF1.opcode == "AND" ||
 			DRF1.opcode == "OR" ||
 			DRF1.opcode == "EX-OR" ||
-			DRF1.opcode == "MOVC"){
+			DRF1.opcode == "MOVC" ||
+			DRF1.opcode == "LOAD"){
 		// Perform renaming
 		DRF1.operands.at(0) = myregisters.getRenamed(DRF1.operands.at(0));
 		DRF1.ready = true;
@@ -579,427 +1294,6 @@ int CPU::simulate(Code &mycode, Registers &myregisters, Data &mydata,
 				is_halting = true;
 		}
 	}
-
-	/*FORWARDING PHASE************************************************************
-	******************************************************************************
-	*****************************************************************************/
-
-	// Defined at the top of this file
-	#if FORWARDING
-
-	/****B2 --> ****/
-	//--> B1 (B2.opcode is BAL (sets X) and X is in B1.srcs)
-	if (B2.opcode == "BAL"){
-		if ((B1.opcode == "BAL" || B1.opcode == "JUMP")
-				&& B1.operands.at(0) == "X"){
-			B1.values.at(0) = (B2.pc)+4;
-			B1.valids.at(0) = true;
-		}
-	}
-	//--> IQ (X is in IQ.entry.srcs)
-	if (B2.opcode == "BAL"){
-		for (auto &entry : myiq.issue_queue){
-			if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-				if (entry.operands.at(0) == "X"){
-					entry.values.at(0) = (B2.pc)+4;
-					entry.valids.at(0) = true;
-				}
-			}
-		}
-	}
-
-	/****ALU3 --> ****/
-	// --> IQ (ALU3.dst = IQ.entry.src)
-	for (auto &entry : myiq.issue_queue){
-		std::string forwardReg = myregisters.translateReg(ALU3.operands.at(0));
-		if (entry.opcode == "ADD" ||
-				entry.opcode == "SUB" ||
-				entry.opcode == "MUL" ||
-				entry.opcode == "AND" ||
-				entry.opcode == "OR" ||
-				entry.opcode == "EX-OR"){
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = ALU3.values.at(0);
-				entry.valids.at(1) = ALU3.valids.at(0);
-			}
-			if (entry.operands.at(2) == forwardReg){
-				entry.values.at(2) = ALU3.values.at(0);
-				entry.valids.at(2) = ALU3.valids.at(0);
-			}
-		}
-		if (entry.opcode == "LOAD"){
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = ALU3.values.at(0);
-				entry.valids.at(1) = ALU3.valids.at(0);
-			}
-		}
-		if (entry.opcode == "STORE"){
-			if (entry.operands.at(0) == forwardReg){
-				entry.values.at(0) = ALU3.values.at(0);
-				entry.valids.at(0) = ALU3.valids.at(0);
-			}
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = ALU3.values.at(0);
-				entry.valids.at(1) = ALU3.valids.at(0);
-			}
-		}
-		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-			if (entry.operands.at(0) == forwardReg){
-				entry.values.at(0) = ALU3.values.at(0);
-				entry.valids.at(0) = ALU3.valids.at(0);
-			}
-		}
-	}
-
-	/****ALU2 --> ****/
-	// --> ALU1 (ALU2.dst == ALU1.srcs)
-	//MOVC has an empty source set
-	if (ALU1.opcode != "MOVC"){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (ALU1.operands.at(1) == forwardReg){
-			ALU1.values.at(1) = ALU2.values.at(0);
-			ALU1.valids.at(1) = ALU2.valids.at(0);
-		}
-		if (ALU1.operands.at(2) == forwardReg){
-			ALU1.values.at(2) = ALU2.values.at(0);
-			ALU1.valids.at(2) = ALU2.valids.at(0);
-		}
-	}
-	// --> MUL1 (ALU2.dst == MUL1.srcs)
-	if (MUL1.opcode == "MUL"){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (MUL1.operands.at(1) == forwardReg){
-			MUL1.values.at(1) = ALU2.values.at(0);
-			MUL1.valids.at(1) = ALU2.valids.at(0);
-		}
-		if (MUL1.operands.at(2) == forwardReg){
-			MUL1.values.at(2) = ALU2.values.at(0);
-			MUL1.valids.at(2) = ALU2.valids.at(0);
-		}
-	}
-	// --> B1   (B1.opcode == {BAL,JUMP}, ALU2.dst == B1.srcs)
-	if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (B1.operands.at(0) == forwardReg){
-			B1.values.at(0) = ALU2.values.at(0);
-			B1.valids.at(0) = ALU2.valids.at(0);
-		}
-	}
-	// --> LSFU2 (LSFU2.opcode == {LOAD}, ALU2.dst == LSFU2.srcs)
-	if (LSFU2.opcode == "LOAD"){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (LSFU2.operands.at(1) == forwardReg){
-			LSFU2.values.at(1) = ALU2.values.at(0);
-			LSFU2.valids.at(1) = ALU2.valids.at(0);
-		}
-	}
-	// --> LSFU2 (LSFU2.opcode == {STORE}, ALU2.dst == LSFU2.srcs)
-	if (LSFU2.opcode == "STORE"){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (LSFU2.operands.at(0) == forwardReg){
-			LSFU2.values.at(0) = ALU2.values.at(0);
-			LSFU2.valids.at(0) = ALU2.valids.at(0);
-		}
-		if (LSFU2.operands.at(1) == forwardReg){
-			LSFU2.values.at(1) = ALU2.values.at(0);
-			LSFU2.valids.at(1) = ALU2.valids.at(0);
-		}
-	}
-	// --> LSFU1 (LSFU1.opcode == {LOAD}, ALU2.dst == LSFU1.srcs)
-	if (LSFU1.opcode == "LOAD"){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (LSFU1.operands.at(1) == forwardReg){
-			LSFU1.values.at(1) = ALU2.values.at(0);
-			LSFU1.valids.at(1) = ALU2.valids.at(0);
-		}
-	}
-	// --> LSFU1 (LSFU1.opcode == {STORE}, ALU2.dst == LSFU1.srcs)
-	if (LSFU1.opcode == "STORE"){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (LSFU1.operands.at(0) == forwardReg){
-			LSFU1.values.at(0) = ALU2.values.at(0);
-			LSFU1.valids.at(0) = ALU2.valids.at(0);
-		}
-		if (LSFU1.operands.at(1) == forwardReg){
-			LSFU1.values.at(1) = ALU2.values.at(0);
-			LSFU1.valids.at(1) = ALU2.valids.at(0);
-		}
-	}
-	// --> IQ (ALU2.op[0] == IQ.entry.{srcs})
-	for (auto &entry: myiq.issue_queue){
-		std::string forwardReg = myregisters.translateReg(ALU2.operands.at(0));
-		if (entry.opcode == "ADD" ||
-				entry.opcode == "SUB" ||
-				entry.opcode == "MUL" ||
-				entry.opcode == "AND" ||
-				entry.opcode == "OR" ||
-				entry.opcode == "EX-OR"){
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = ALU2.values.at(0);
-				entry.valids.at(1) = ALU2.valids.at(0);
-			}
-			if (entry.operands.at(2) == forwardReg){
-				entry.values.at(2) = ALU2.values.at(0);
-				entry.valids.at(2) = ALU2.valids.at(0);
-			}
-		}
-		if (entry.opcode == "LOAD"){
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = ALU2.values.at(0);
-				entry.valids.at(1) = ALU2.valids.at(0);
-			}
-		}
-		if (entry.opcode == "STORE"){
-			if (entry.operands.at(0) == forwardReg){
-				entry.values.at(0) = ALU2.values.at(0);
-				entry.valids.at(0) = ALU2.valids.at(0);
-			}
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = ALU2.values.at(0);
-				entry.valids.at(1) = ALU2.valids.at(0);
-			}
-		}
-		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-			if (entry.operands.at(0) == forwardReg){
-				entry.values.at(0) = ALU2.values.at(0);
-				entry.valids.at(0) = ALU2.valids.at(0);
-			}
-		}
-	}
-
-	/****MUL2 --> ****/
-	// --> IQ (MUL2.op[0] == IQ.entry.{srcs})
-	for (auto &entry: myiq.issue_queue){
-		std::string forwardReg = myregisters.translateReg(MUL2.operands.at(0));
-		if (entry.opcode == "ADD" ||
-				entry.opcode == "SUB" ||
-				entry.opcode == "MUL" ||
-				entry.opcode == "AND" ||
-				entry.opcode == "OR" ||
-				entry.opcode == "EX-OR"){
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = MUL2.values.at(0);
-				entry.valids.at(1) = MUL2.valids.at(0);
-			}
-			if (entry.operands.at(2) == forwardReg){
-				entry.values.at(2) = MUL2.values.at(0);
-				entry.valids.at(2) = MUL2.valids.at(0);
-			}
-		}
-		if (entry.opcode == "LOAD"){
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = MUL2.values.at(0);
-				entry.valids.at(1) = MUL2.valids.at(0);
-			}
-		}
-		if (entry.opcode == "STORE"){
-			if (entry.operands.at(0) == forwardReg){
-				entry.values.at(0) = MUL2.values.at(0);
-				entry.valids.at(0) = MUL2.valids.at(0);
-			}
-			if (entry.operands.at(1) == forwardReg){
-				entry.values.at(1) = MUL2.values.at(0);
-				entry.valids.at(1) = MUL2.valids.at(0);
-			}
-		}
-		if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-			if (entry.operands.at(0) == forwardReg){
-				entry.values.at(0) = MUL2.values.at(0);
-				entry.valids.at(0) = MUL2.valids.at(0);
-			}
-		}
-	}
-
-	/****MUL1 (when MUL1.lcounter == 0) --> ****/
-	if (MUL1.lcounter == 0){
-		std::string forwardReg = myregisters.translateReg(MUL1.operands.at(0));
-		// --> ALU1 (MUL1.dst == ALU1.srcs)
-		//MOVC has an empty source set
-		if (ALU1.opcode != "MOVC"){
-			if (ALU1.operands.at(1) == forwardReg){
-				ALU1.values.at(1) = MUL1.values.at(0);
-				ALU1.valids.at(1) = MUL1.valids.at(0);
-			}
-			if (ALU1.operands.at(2) == forwardReg){
-				ALU1.values.at(2) = MUL1.values.at(0);
-				ALU1.valids.at(2) = MUL1.valids.at(0);
-			}
-		}
-		// --> B1 (MUL1.dst = B1.srcs)
-		if (B1.opcode == "BAL" || B1.opcode == "JUMP"){
-			if (B1.operands.at(0) == forwardReg){
-				B1.values.at(0) = MUL1.values.at(0);
-				B1.valids.at(0) = MUL1.valids.at(0);
-			}
-		}
-		// --> LSFU2 (MUL1.dst = LSFU2.srcs)
-		if (LSFU2.opcode == "LOAD"){
-			if (LSFU2.operands.at(1) == forwardReg){
-				LSFU2.values.at(1) = MUL1.values.at(0);
-				LSFU2.valids.at(1) = MUL1.valids.at(0);
-			}
-		}
-		// --> LSFU2 (LSFU2.opcode == {STORE}, MUL1.dst == LSFU2.srcs)
-		if (LSFU2.opcode == "STORE"){
-			if (LSFU2.operands.at(0) == forwardReg){
-				LSFU2.values.at(0) = MUL1.values.at(0);
-				LSFU2.valids.at(0) = MUL1.valids.at(0);
-			}
-			if (LSFU2.operands.at(1) == forwardReg){
-				LSFU2.values.at(1) = MUL1.values.at(0);
-				LSFU2.valids.at(1) = MUL1.valids.at(0);
-			}
-		}
-		// --> LSFU1 (MUL1.dst = LSFU2.srcs)
-		if (LSFU1.opcode == "LOAD"){
-			if (LSFU1.operands.at(1) == forwardReg){
-				LSFU1.values.at(1) = MUL1.values.at(0);
-				LSFU1.valids.at(1) = MUL1.valids.at(0);
-			}
-		}
-		// --> LSFU2 (LSFU2.opcode == {STORE}, MUL1.dst == LSFU2.srcs)
-		if (LSFU1.opcode == "STORE"){
-			if (LSFU1.operands.at(0) == forwardReg){
-				LSFU1.values.at(0) = MUL1.values.at(0);
-				LSFU1.valids.at(0) = MUL1.valids.at(0);
-			}
-			if (LSFU1.operands.at(1) == forwardReg){
-				LSFU1.values.at(1) = MUL1.values.at(0);
-				LSFU1.valids.at(1) = MUL1.valids.at(0);
-			}
-		}
-
-		/****MUL1 --> ****/
-		// --> IQ (MUL1.op[0] == IQ.entry.{srcs})
-		for (auto &entry: myiq.issue_queue){
-			std::string forwardReg = myregisters.translateReg(MUL1.operands.at(0));
-			if (entry.opcode == "ADD" ||
-					entry.opcode == "SUB" ||
-					entry.opcode == "MUL" ||
-					entry.opcode == "AND" ||
-					entry.opcode == "OR" ||
-					entry.opcode == "EX-OR"){
-				if (entry.operands.at(1) == forwardReg){
-					entry.values.at(1) = MUL1.values.at(0);
-					entry.valids.at(1) = MUL1.valids.at(0);
-				}
-				if (entry.operands.at(2) == forwardReg){
-					entry.values.at(2) = MUL1.values.at(0);
-					entry.valids.at(2) = MUL1.valids.at(0);
-				}
-			}
-			if (entry.opcode == "LOAD"){
-				if (entry.operands.at(1) == forwardReg){
-					entry.values.at(1) = MUL1.values.at(0);
-					entry.valids.at(1) = MUL1.valids.at(0);
-				}
-			}
-			if (entry.opcode == "STORE"){
-				if (entry.operands.at(0) == forwardReg){
-					entry.values.at(0) = MUL1.values.at(0);
-					entry.valids.at(0) = MUL1.valids.at(0);
-				}
-				if (entry.operands.at(1) == forwardReg){
-					entry.values.at(1) = MUL1.values.at(0);
-					entry.valids.at(1) = MUL1.valids.at(0);
-				}
-			}
-			if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-				if (entry.operands.at(0) == forwardReg){
-					entry.values.at(0) = MUL1.values.at(0);
-					entry.valids.at(0) = MUL1.valids.at(0);
-				}
-			}
-		}
-	}
-
-	/****LSFU3 --> ****/
-	//Only LOAD instructions in the LSFU have a destination set
-	//That destination set is not computed until LSFU3
-	//(no forwarding from LSFU1, LSFU2)
-	if (LSFU3.opcode == "LOAD"){
-		std::string forwardReg = myregisters.translateReg(LSFU3.operands.at(0));
-		// --> LSFU2 (LSFU2.opcode == STORE, LSFU3.dst = LSFU2.srcs[0])
-		if (LSFU2.opcode == "STORE" &&
-			(LSFU2.operands.at(0) == forwardReg)){
-			LSFU2.values.at(0) = LSFU3.values.at(0);
-			LSFU2.valids.at(0) = LSFU3.valids.at(0);
-		}
-		// --> ALU1 (LSFU3.dst == ALU1.srcs)
-		// MOVC instructions have no source set
-		if (ALU1.opcode != "MOVC"){
-			if (ALU1.operands.at(1) == forwardReg){
-				ALU1.values.at(1) = LSFU3.values.at(0);
-				ALU1.valids.at(1) = LSFU3.valids.at(0);
-			}
-			if (ALU1.operands.at(2) == forwardReg){
-				ALU1.values.at(2) = LSFU3.values.at(0);
-				ALU1.valids.at(2) = LSFU3.valids.at(0);
-			}
-		}
-		// --> MUL1 (LSFU3.dst == MUL1.srcs)
-		if (MUL1.operands.at(1) == forwardReg){
-			MUL1.values.at(1) = LSFU3.values.at(0);
-			MUL1.valids.at(1) = LSFU3.valids.at(0);
-		}
-		if (MUL1.operands.at(2) == forwardReg){
-			MUL1.values.at(2) = LSFU3.values.at(0);
-			MUL1.valids.at(2) = LSFU3.valids.at(0);
-		}
-		// --> LSFU2 (LSFU2.opcode == STORE, LSFU2.src[0] == LSFU3.dst)
-		if (LSFU2.opcode == "LOAD" &&
-			LSFU2.operands.at(0) == forwardReg){
-				LSFU2.values.at(0) = LSFU3.values.at(0);
-				LSFU2.valids.at(0) = LSFU3.valids.at(0);
-		}
-		// --> LSFU1 (LSFU1.opcode == STORE, LSFU1.src[0] == LSFU3.dst  )
-		if (LSFU1.opcode == "LOAD" &&
-			LSFU1.operands.at(0) == forwardReg){
-				LSFU1.values.at(0) = LSFU3.values.at(0);
-				LSFU1.valids.at(0) = LSFU3.valids.at(0);
-		}
-		// --> IQ
-		for (auto &entry: myiq.issue_queue){
-			if (entry.opcode == "ADD" ||
-					entry.opcode == "SUB" ||
-					entry.opcode == "MUL" ||
-					entry.opcode == "AND" ||
-					entry.opcode == "OR" ||
-					entry.opcode == "EX-OR"){
-				if (entry.operands.at(1) == forwardReg){
-					entry.values.at(1) = LSFU3.values.at(0);
-					entry.valids.at(1) = LSFU3.valids.at(0);
-				}
-				if (entry.operands.at(2) == forwardReg){
-					entry.values.at(2) = LSFU3.values.at(0);
-					entry.valids.at(2) = LSFU3.valids.at(0);
-				}
-			}
-			if (entry.opcode == "LOAD"){
-				if (entry.operands.at(1) == forwardReg){
-					entry.values.at(1) = LSFU3.values.at(0);
-					entry.valids.at(1) = LSFU3.valids.at(0);
-				}
-			}
-			if (entry.opcode == "STORE"){
-				if (entry.operands.at(0) == forwardReg){
-					entry.values.at(0) = LSFU3.values.at(0);
-					entry.valids.at(0) = LSFU3.valids.at(0);
-				}
-				if (entry.operands.at(1) == forwardReg){
-					entry.values.at(1) = LSFU3.values.at(0);
-					entry.valids.at(1) = LSFU3.valids.at(0);
-				}
-			}
-			if (entry.opcode == "BAL" || entry.opcode == "JUMP"){
-				if (entry.operands.at(0) == forwardReg){
-					entry.values.at(0) = LSFU3.values.at(0);
-					entry.valids.at(0) = LSFU3.valids.at(0);
-				}
-			}
-		}
-	}
-	#endif
 
 	/*STOPPING PHASE**************************************************************
 	******************************************************************************
