@@ -90,6 +90,7 @@ The \codename entry point file is \texttt{main.cpp}. Besides maintaining simulat
 \codename models each major component of the APEX system as a standalone class. Unless mentioned below, these classes did not change appreciably from release v1.0 and are not discussed further in this report. Please see the release v1.0 documentation for discussion of these unchanged classes.
 
 \subsubsection{Issue Queue}
+\label{sec:iq}
 \codename's issue queue (IQ) uses C++11's Standard Template Library (STL) deque container to model a priority queue. 
 Each entry in the deque is a Stage class instance. 
 This allows inflight instructions to seamlessly dispatch from the DRF2 stage into the IQ, and issue out into one of the function units. 
@@ -98,6 +99,7 @@ Additionally, this mechanism allows us to determine if an later \texttt{LOAD} in
 The use of the deque container was precipitated by the queue container not having a standard iterator.
 
 \subsubsection{Reorder Buffer}
+\label{sec:rob}
 The reorder buffer (ROB) likewise uses a deque container for the same design reasons as the IQ, however it is a strict FIFO queue. 
 This allows instructions which may have been issued out-of-program order to be committed in-program order. 
 Whenever an entry is made in the IQ, a parallel entry is made and queued in the ROB. 
@@ -113,7 +115,7 @@ However, in phase two, we added three components.
 First, a front-end rename table mapping physical register tag to architectural register tag (STL::map).
 Second, a back-end rename table mapping architectural register tag to physical register tag (STL::map).
 Third, a free list (STL::vector), listing free physical registers, sorted by their tag's integral value.
-This assures that the lowest numbered physical register is preferentially allocated.
+This assures that the lowest numbered physical register is preferentially allocated. Section \ref{sec:allocation} discusses this further.
 
 \subsubsection{CPU and Stages}
 The functionality and design of the Stage class is largely unchanged from phase 1. 
@@ -132,16 +134,16 @@ Figure \ref{fig:overview} shows the interactions between these new classes.
 In this section, we will discuss key aspects of our simulator's execution: the stage-wise reverse-ordered execution, register renaming, dispatch, issue, commit, register value forwarding.
 
 \subsection{Reverse-Ordered Execution}
-
-\subsubsection{Committing}
-
-
-\subsubsection{Advancing}
-
-\subsubsection{Working}
+When we say \textit{reverse-ordered execution}, what we mean is that the \texttt{simulate()} function generally proceeds in what appears to be the opposite order of the pipeline flow. 
+That is, later stages in the pipeline perform their tasks in any given phase before earlier stages, and the Branch FU performs its work before the other function units. 
+This scheme prevents runaway by an inflight instruction or crossing up values between stages.
+This function is broken up into four phases, each providing one general task of the overall cycle's worth of simulation. 
 
 \subsubsection{Forwarding}
-Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwarding from later stages to earlier stages in order to reduce bubbles caused by waiting for flow dependencies to resolve. In \codename this is accomplished in \texttt{simulate.cpp} during the forwarding phase (lines \todo{Add forwarding code's line numbers}). The instructions' source sets and destination sets are enumerated in table \ref{tab:instsets}.
+Stages attempt to forward. 
+Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwarding from later stages to earlier stages in order to reduce bubbles caused by waiting for flow dependencies to resolve. 
+In \codename this is accomplished in \texttt{simulate.cpp} during the forwarding phase (lines \todo{Add forwarding code's line numbers}). 
+The instructions' source sets and destination sets are enumerated in table \ref{tab:instsets}.
 
 \begin{table}
   \centering
@@ -197,22 +199,74 @@ Table \ref{tab:fwdscenarios} describes scenarios where \codename performs forwar
   \end{tabular}
 \end{table}
 
+\subsubsection{Committing}
+In this phase, the stages' contents of each of the four WB stages are compared to the ROB's head. If the stage is ready, not empty, and the opcode and timestamp match between stage and ROB head, the instruction is committed.
+Committing allows register values to writeback, allows memory access for the LSFU, deallocates registers back into the free list, pops the ROB head, and empties the WB stage.
+This phase occurs in lines \todo{add committing source code line numbers}, and takes advantage of the ROB class' \texttt{commit()} function to perform each of the tasks listed above.
+
+\subsubsection{Advancing}
+Next, stages other than those which commit are allowed to advance.
+Advancing occurs only if the following conditions are all met:
+\begin{itemize}
+  \item The sending stage is not empty.
+  \item The sending stage is ready (i.e. it has completed its work in a previous cycle's working phase).
+  \item The receiving stage is empty (i.e. it advanced its contents in this cycle or a previous cycle).
+\end{itemize}
+Advancing takes advantage of the Stage class' \texttt{advance()} function to perform this logic and to copy contents.
+This phase occurs in lines \todo{add advancing phase source code lines}.
+
+\subsubsection{Working}
+Then, stages perform their work as one might expect. 
+For example, the ALU performs either arithmetic, logical operations or a constant move into a register.
+Other stages have their own working phase tasks, and they can be seen in lines \todo{add working phase source code lines}.
+
+
 \subsection{Register Renaming and Allocation}
+\label{sec:renamealloc}
+
 \subsubsection{Allocation}
-\todo{Add discussion of allocating in ascending order of tag. See para 5 in spec.}
+\label{sec:allocation}
+%%%% For Brian 
+
 \subsubsection{Renaming}
+\label{sec:renaming}
+%%%% For Brian
 
 \subsection{Dispatch}
-\subsubsection{Stalling for Multiple Control Flow Instructions}
+Instructions are dispatched from the DRF2 stage to the IQ using the IQ class' \texttt{dispatchInst(Stage\&)} function when DRF2 is ready and not empty. 
+At the same time, an identical entry is added to the ROB using the ROB class' \texttt{addStage(Stage\&)} function. 
+There are three exceptions to this flow.
+First, if DRF2 contains a \texttt{HALT} instruction, it is not dispatched because keeping the \texttt{HALT} in DRF2 prevents further instructions from entering the IQ (unless a branch instruction flushes DRF2), and because it is part of the halting detection logic.
+Second, if DRF2 contains a \texttt{NOP} instruction, it is not dispatched because the instruction is idempotent and belongs to no FU.
+Third, if there is already a control flow instruction in the IQ, design limitations given by the specification prevent a second control flow instruction from entering the IQ.
+This is checked using the IQ's \texttt{hasEntryWithOpcode(String opcode)} function with each of the control flow instructions. 
+Once dispatch occurs, or it is determined that no dispatch can occur, the relevant statistics are updated within the CPU simulation function.
 
 \subsection{Issue}
-\todo{Add discussion of issuing LSFU in program order. See para 4 in spec.}
+As noted in section \ref{sec:iq}, the IQ is a priority queue.
+This means that we issue from the IQ to a waiting function unit using the IQ's \texttt{issue(...)} function.
+This function uses the following logic to select the highest priority entry for issue:
+\begin{itemize}
+  \item Only ready entries can be issued. This means all operands needed in the first stage of the applicable FU are ready.
+  \item The ready entry with the lowest time stamp should be issued first. This is accomplished by selecting the entry closest to the IQ head with the assumption that since entries were added in program order, they remain stored within the container in program order no matter how many dispatch and issue actions occur.
+\end{itemize}
+Once it is determined that issue occurs or no issue can occur, the relevant statistics are updated within the CPU simulation function.
 
 \subsection{Commit}
-\todo{Add discussion of how commit logic works.}
+Commits occur when inflight instructions reach one of the four WB stages. 
+Their opcode and timestamp are compared against the ROB's head to determine which (if any) should commit. 
+As noted above, the ROB is a true FIFO queue, even though it is implemented as a dual-ended deque container.
+This decision was made in order to permit the use of an iterator to traverse the ROB for flushing.
+
+\subsection{Flushing}
+Whenever a branch is taken, entries in the IQ, ROB and any stage must be flushed if its timestamp is \textit{later} than the timestamp of the instruction causing the branch to be taken. 
+This is achieved using \texttt{flush()} functions. 
+These functions receive an integral value for the timestamp from the instruction generating the flush, and \-- in the case of the IQ and Stage functions \-- a handle to the registers so that they can cause the allocated registers they hold to be deallocated.
+For the IQ and ROB's version of the \texttt{flush()} function, an iterator across the collection simplifies the process.
 
 \subsection{Statistics}
-\todo{Add discussion of statistics mechanism in apex.cpp, used in simulate.cpp}
+As noted above, statistics counters are updated throughout the execution span of the simulator. They are calculated using the \texttt{stats()} function in \texttt{apex.cpp}. 
+This will also display the stats to the console either when the \texttt{stats()} or \texttt{display()} functions are called. 
 
 
 %-------------------
@@ -224,8 +278,11 @@ Additionally, it contains an in-depth look at our work progress over the course 
 As of writing this report, \todo{Add number of commits} commits were made with a total of \todo{Add number of lines of code} lines of code.
 Naturally, such a volume of code and the required levels of collaboration would have been nearly impossible without the use of some sort of repository.
 We encourage the curious reader to see these statistics in depth using the \textbf{Pulse} and \textbf{Graphs} tabs available on the repository.
+Brian Gracin was the team lead for this release of the project. He is behind the overall design, register renaming and the overwhelming majority of troubleshooting.
+Matthew Cole rebuilt the simulation functions and user interfaces from release version 1.0, and maintained the repository and documentation.
 
-Table \ref{tab:worklog} is a broad, chronological overview of work performed by each member.
+
+Table \ref{tab:worklog} is a broad, chronological overview of work performed by each member. 
 
 \begin{table}
 \centering
