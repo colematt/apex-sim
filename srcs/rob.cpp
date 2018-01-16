@@ -2,108 +2,101 @@
 File:     rob.cpp
 Authors:  Matthew Cole <mcole8@binghamton.edu>
           Brian Gracin <bgracin1@binghamton.edu>
-Description: Contains the ROB class, which simulates the operation of a Reorder Buffer.
+Description: Contains the ROB class, which simulates the operation of a Reorder
+Buffer.
 */
 
-#include <iostream>
+#include "apex.h"
 #include "rob.h"
+#include <iostream>
 
-ROB::ROB(){
-	this->initialize();
+ROB::ROB() { this->initialize(); }
+
+ROB::~ROB() {}
+
+// Display the contents of the ROB
+// Each entry is a Stage, so we delegate the display call
+void ROB::display() {
+  if (VERBOSE >= 1) {
+    std::cout << "Name: Opcode Operands" << std::endl;
+  }
+
+  std::cout << "Head" << std::endl;
+  for (auto e : reorder_buffer) {
+    e.display();
+  }
+  std::cout << "Tail" << std::endl;
 }
 
-ROB::~ROB(){}
+// Initialize the ROB to empty state
+void ROB::initialize() { reorder_buffer.clear(); }
 
-//Display the contents of the ROB
-//Each entry is a Stage, so we delegate the display call
-void ROB::display(){
-	if (VERBOSE >= 1){
-		std::cout << "Name: Opcode Operands" << std::endl;
-	}
-	
-	std::cout << "Head" << std::endl;
-	for (auto e : reorder_buffer){
-		e.display();
-	}
-	std::cout << "Tail" << std::endl;
+bool ROB::isEmpty() { return reorder_buffer.empty(); }
+
+// Remove head from ROB and call registers' commit function,
+// updating backend table and free list
+void ROB::commit(Registers &reg) {
+  std::string curOpcode = this->reorder_buffer.front().opcode;
+  if (curOpcode != "STORE" && curOpcode != "BZ" && curOpcode != "BNZ" &&
+      curOpcode != "BAL" && curOpcode != "JUMP") {
+    std::string pReg;
+    pReg = this->reorder_buffer.front().operands.at(0);
+    reg.commit(pReg);
+  }
+  this->reorder_buffer.pop_front();
 }
 
-//Initialize the ROB to empty state
-void ROB::initialize(){
-	reorder_buffer.clear();
+// Add a Stage instance to ROB
+bool ROB::addStage(Stage &stage) {
+  if (this->reorder_buffer.size() < this->max_size) {
+    this->reorder_buffer.push_back(stage);
+    return true;
+  }
+  return false;
 }
 
-bool ROB::isEmpty(){
-	return reorder_buffer.empty();
-}
+// Given a cycle value gets cycle value of current head
+// and returns if they are equal (==)
+bool ROB::match(Stage &stage) {
+  // If stage is empty, it cannot match the ROB head entry!
+  if (stage.isEmpty())
+    return false;
 
-//Remove head from ROB and call registers' commit function,
-//updating backend table and free list
-void ROB::commit(Registers &reg){
-	std::string curOpcode = this->reorder_buffer.front().opcode;
-	if (curOpcode != "STORE" &&
-		curOpcode != "BZ" &&
-		curOpcode != "BNZ" &&
-		curOpcode != "BAL" &&
-		curOpcode != "JUMP"){
-		std::string pReg;
-		pReg = this->reorder_buffer.front().operands.at(0);
-		reg.commit(pReg);
-	}
-	this->reorder_buffer.pop_front();
-}
+  int size = 0;
+  int passedCycle = 0;
+  int headCycle = 0;
 
-//Add a Stage instance to ROB
-bool ROB::addStage(Stage &stage){
-	if (this->reorder_buffer.size() < this->max_size){
-		this->reorder_buffer.push_back(stage);
-		return true;
-	}
-	return false;
-}
+  size = this->reorder_buffer.size();
+  passedCycle = stage.c;
 
-//Given a cycle value gets cycle value of current head
-//and returns if they are equal (==)
-bool ROB::match(Stage& stage){
-	// If stage is empty, it cannot match the ROB head entry!
-	if (stage.isEmpty())
-		return false;
+  if (size > 0) {
+    headCycle = this->reorder_buffer.front().c;
+  }
 
-	int size = 0;
-	int passedCycle = 0;
-	int headCycle = 0;
+  if (headCycle == passedCycle) {
+    return true;
+  }
 
-	size = this->reorder_buffer.size();
-	passedCycle = stage.c;
-
-	if(size > 0){
-		headCycle = this->reorder_buffer.front().c;
-	}
-
-	if(headCycle == passedCycle){
-		return true;
-	}
-
-	return false;
+  return false;
 }
 
 // Flush all entries in the ROB with whose cycle time stamp
 // is >= specified time stamp (used when branch is taken)
 // ASSUMPTION: the entries in the IQ and ROB are
 // sorted at all times by their timestamp of creation (c)
-void ROB::flush(int cycle){
-		// Point an iterator at the start of the IQ
-		std::deque<Stage>::iterator it = this->reorder_buffer.begin();
+void ROB::flush(int cycle) {
+  // Point an iterator at the start of the IQ
+  std::deque<Stage>::iterator it = this->reorder_buffer.begin();
 
-		// Traverse until encountering an entry
-		// whose cycle timestamp indicates it must be flushed
-		if (it != reorder_buffer.end()){
-			while((it->c <= cycle) && (it != reorder_buffer.end())){
-				++it;
-			}
-		}
+  // Traverse until encountering an entry
+  // whose cycle timestamp indicates it must be flushed
+  if (it != reorder_buffer.end()) {
+    while ((it->c <= cycle) && (it != reorder_buffer.end())) {
+      ++it;
+    }
+  }
 
-		// flush the elements from the current iterator to end:
-		if (it != reorder_buffer.end())
-			this->reorder_buffer.erase(it, reorder_buffer.end());
+  // flush the elements from the current iterator to end:
+  if (it != reorder_buffer.end())
+    this->reorder_buffer.erase(it, reorder_buffer.end());
 }
