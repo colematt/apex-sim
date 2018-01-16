@@ -1,4 +1,6 @@
 # apex-sim
+[![Build Status](https://travis-ci.org/colematt/apex-sim.svg?branch=master)](https://travis-ci.org/colematt/apex-sim)
+
 This is a simulator for the Architecture Pipeline EXample (APEX) Instruction Set Architecture (ISA).
 
 - Release version _1.x_ implemented an in-order execution pipeline with two parallel function units.
