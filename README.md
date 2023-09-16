@@ -1,6 +1,6 @@
 # apex-sim
 
-[![C/C++ CI](https://github.com/colematt/apex-sim/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/colematt/apex-sim/actions/workflows/c-cpp.yml)
+[![Build](https://github.com/colematt/apex-sim/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/colematt/apex-sim/actions/workflows/c-cpp.yml)
 
 This is a simulator for the Architecture Pipeline EXample (APEX) Instruction Set Architecture (ISA).
 
