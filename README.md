@@ -1,5 +1,7 @@
 # apex-sim
 
+[![C/C++ CI](https://github.com/colematt/apex-sim/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/colematt/apex-sim/actions/workflows/c-cpp.yml)
+
 This is a simulator for the Architecture Pipeline EXample (APEX) Instruction Set Architecture (ISA).
 
 - Release version _1.x_ implemented an in-order execution pipeline with two parallel function units.
